@@ -1,0 +1,741 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Weekly Prep</title>
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050d1a;--panel:#0a1628;--panel2:#0d1e35;
+  --border:#111f38;--border2:#1a2f4a;
+  --text:#c8d8f0;--dim:#4a6080;--hdr:#e8f0ff;
+  --teal:#00f5d4;--crimson:#ff4d6d;--gold:#fbbf24;
+  --blue:#60a5fa;--purple:#a78bfa;--wait:#fb923c;
+  --red:#ef4444;--navy:#1e3a8a;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-brand:'Josefin Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;line-height:1.7}
+
+/* ── Nav ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(5,13,26,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-ion{font-family:var(--font-brand);font-weight:300;font-size:21px;letter-spacing:7px;color:#fff;-webkit-text-stroke:.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1}
+.nav-right{display:flex;gap:6px;align-items:center}
+.nav-link{font-size:11px;color:var(--dim);text-decoration:none;padding:4px 10px;border:1px solid transparent;border-radius:4px;transition:all .15s}
+.nav-link:hover{color:var(--blue);border-color:var(--border2)}
+
+/* ── Hero ── */
+.hero{padding:48px 24px 32px;max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.hero-left{}
+.hero-eyebrow{font-family:var(--font-data);font-size:9px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+.hero-title{font-family:var(--font-brand);font-size:clamp(28px,4vw,48px);font-weight:300;color:var(--hdr);line-height:1.2;margin-bottom:8px;letter-spacing:3px}
+.hero-title span{color:var(--gold)}
+.hero-sub{font-size:14px;color:var(--text);max-width:500px;line-height:1.75}
+.hero-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.week-badge{font-family:var(--font-data);font-size:11px;color:var(--dim);background:var(--panel);border:1px solid var(--border2);border-radius:6px;padding:8px 14px}
+.week-badge span{color:var(--gold);font-weight:700}
+.save-btn{font-family:var(--font-data);font-size:11px;font-weight:700;padding:8px 18px;background:var(--gold);color:#050d1a;border:none;border-radius:6px;cursor:pointer;letter-spacing:.08em;transition:background .15s}
+.save-btn:hover{background:#f59e0b}
+.save-btn.saved{background:var(--teal)}
+
+/* ── Progress strip ── */
+.progress-strip{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;gap:6px;max-width:1000px;margin:0 auto;flex-wrap:wrap}
+.prog-pill{font-family:var(--font-data);font-size:9px;letter-spacing:.1em;padding:4px 10px;border-radius:12px;cursor:pointer;transition:all .15s;border:1px solid;text-transform:uppercase}
+.prog-pill.done{background:var(--teal);color:#050d1a;border-color:var(--teal)}
+.prog-pill.active{background:var(--gold);color:#050d1a;border-color:var(--gold)}
+.prog-pill.pending{background:transparent;color:var(--dim);border-color:var(--border2)}
+.prog-pct{font-family:var(--font-data);font-size:11px;color:var(--dim);margin-left:auto;align-self:center}
+
+/* ── Main layout ── */
+.main{max-width:1000px;margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+
+/* ── Section cards ── */
+.prep-section{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ps-header{padding:14px 20px;background:#070f1e;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .12s}
+.ps-header:hover{background:#0a1420}
+.ps-num{font-family:var(--font-data);font-size:10px;color:var(--dim);letter-spacing:.1em;min-width:28px}
+.ps-title{font-family:var(--font-brand);font-size:18px;font-weight:300;color:var(--hdr);letter-spacing:2px;flex:1}
+.ps-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;flex-shrink:0}
+.ps-check.done{background:var(--teal);border-color:var(--teal);color:#050d1a}
+.ps-check.done::after{content:'✓';font-weight:700}
+.ps-body{padding:20px;display:none}
+.ps-body.open{display:block}
+
+/* ── Text areas ── */
+.prep-ta{width:100%;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--font-ui);font-size:13px;padding:10px 14px;outline:none;resize:none;min-height:70px;line-height:1.65;transition:border-color .15s}
+.prep-ta:focus{border-color:var(--gold)}
+.prep-ta::placeholder{color:var(--dim);font-size:12px}
+
+/* ── Field labels ── */
+.field-label{font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+.field-wrap{margin-bottom:14px}
+.field-wrap:last-child{margin-bottom:0}
+
+/* ── Grid layouts ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:600px){.two-col,.three-col{grid-template-columns:1fr}}
+
+/* ── Mini cards ── */
+.mini-card{background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:12px 14px}
+.mc-label{font-family:var(--font-data);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+
+/* ── Sector row ── */
+.sector-row{display:flex;flex-direction:column;gap:6px}
+.sector-item{display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--panel2);border-radius:4px;border:1px solid var(--border)}
+.sector-name{font-family:var(--font-data);font-size:11px;color:var(--hdr);min-width:120px}
+.sector-input{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font-ui);font-size:12px;outline:none}
+.sector-bias{font-family:var(--font-data);font-size:9px;padding:2px 8px;border-radius:3px;cursor:pointer;border:none;font-weight:700;letter-spacing:.05em}
+.bias-bull{background:#00f5d418;color:var(--teal);border:1px solid #00f5d433}
+.bias-bear{background:#ff4d6d18;color:var(--crimson);border:1px solid #ff4d6d33}
+.bias-neut{background:#4a608020;color:var(--dim);border:1px solid #4a608040}
+
+/* ── Position review ── */
+.pos-review-item{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:8px}
+.pri-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pri-ticker{font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--hdr)}
+.pri-contract{font-family:var(--font-data);font-size:11px;color:var(--dim)}
+.pri-status{font-family:var(--font-data);font-size:9px;padding:2px 8px;border-radius:3px;cursor:pointer;border:none;font-weight:700;margin-left:auto}
+.status-manage{background:#ff4d6d18;color:var(--crimson);border:1px solid #ff4d6d33}
+.status-monitor{background:#fb923c18;color:var(--wait);border:1px solid #fb923c33}
+.status-leave{background:#00f5d418;color:var(--teal);border:1px solid #00f5d433}
+.pri-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pri-field{display:flex;flex-direction:column;gap:3px}
+.pf-label{font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.pf-input{background:var(--panel);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--font-data);font-size:11px;padding:4px 8px;outline:none;transition:border-color .15s}
+.pf-input:focus{border-color:var(--gold)}
+
+/* ── Checklist items ── */
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--panel2);border-radius:5px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:border-color .15s}
+.check-item:hover{border-color:var(--border2)}
+.check-item.done{opacity:.6}
+.check-item.done .ci-label{text-decoration:line-through;color:var(--dim)}
+.ci-box{width:18px;height:18px;border-radius:3px;border:1px solid var(--border2);background:var(--panel);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s}
+.check-item.done .ci-box{background:var(--teal);border-color:var(--teal);color:#050d1a}
+.check-item.done .ci-box::after{content:'✓'}
+.ci-label{font-size:13px;color:var(--text);line-height:1.55}
+.ci-label strong{color:var(--hdr);display:block;font-size:13px;margin-bottom:2px}
+
+/* ── Operator state ── */
+.operator-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.op-item{background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:12px 14px}
+.op-q{font-size:12px;color:var(--text);margin-bottom:8px;line-height:1.5}
+.op-btns{display:flex;gap:6px;flex-wrap:wrap}
+.op-btn{font-family:var(--font-data);font-size:9px;padding:3px 10px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--dim);transition:all .15s;letter-spacing:.05em}
+.op-btn:hover{border-color:var(--border2);color:var(--text)}
+.op-btn.selected-green{background:#00f5d418;color:var(--teal);border-color:#00f5d433}
+.op-btn.selected-red{background:#ff4d6d18;color:var(--crimson);border-color:#ff4d6d33}
+.op-btn.selected-yellow{background:#fbbf2418;color:var(--gold);border-color:#fbbf2433}
+
+/* ── Commitment block ── */
+.commitment{background:linear-gradient(135deg,#fbbf2410,#060e1e);border:1px solid #fbbf2430;border-radius:8px;padding:20px 24px;margin-top:14px;text-align:center}
+.commit-text{font-family:var(--font-brand);font-style:italic;font-size:16px;color:var(--hdr);line-height:1.65;margin-bottom:12px;font-weight:300;letter-spacing:1px}
+.commit-sign{display:flex;align-items:center;gap:10px;justify-content:center}
+.commit-input{font-family:var(--font-brand);font-weight:300;font-size:14px;letter-spacing:3px;background:transparent;border:none;border-bottom:1px solid var(--gold);color:var(--gold);outline:none;padding:4px 8px;text-align:center;width:220px}
+.commit-input::placeholder{color:var(--dim);font-size:12px}
+.commit-date{font-family:var(--font-data);font-size:10px;color:var(--dim)}
+
+/* ── Past weeks ── */
+.past-week{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.past-week:hover{border-color:var(--border2)}
+.pw-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.pw-date{font-family:var(--font-data);font-size:11px;color:var(--gold)}
+.pw-score{font-family:var(--font-data);font-size:10px;padding:2px 8px;border-radius:3px}
+.pw-preview{font-size:12px;color:var(--dim);line-height:1.5}
+
+/* ── Not trade box ── */
+.not-trade-box{background:#ff4d6d0a;border:1px solid #ff4d6d30;border-radius:6px;padding:14px;margin-bottom:14px}
+.ntb-label{font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--crimson);text-transform:uppercase;margin-bottom:8px}
+.ntb-input{width:100%;background:transparent;border:none;border-bottom:1px solid #ff4d6d30;color:var(--text);font-family:var(--font-ui);font-size:13px;padding:6px 0;outline:none;transition:border-color .15s}
+.ntb-input:focus{border-bottom-color:var(--crimson)}
+.ntb-input::placeholder{color:var(--dim);font-size:12px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav class="nav">
+  <a class="nav-logo" href="ZION_Academy.html">
+    <svg width="34" height="34" viewBox="0 0 34 34" style="display:block;flex-shrink:0">
+      <circle cx="17" cy="17" r="15" fill="#050d1a" stroke="#ef4444" stroke-width="2.2"/>
+      <circle cx="17" cy="17" r="11" fill="none" stroke="#1e3a8a" stroke-width=".7" opacity=".4"/>
+      <circle cx="17" cy="17" r="7.5" fill="none" stroke="#1e3a8a" stroke-width=".5" stroke-dasharray="2,3" opacity=".3"/>
+      <polygon points="17,1 18.8,6.8 17,9 15.2,6.8" fill="#ef4444"/>
+      <polygon points="17,33 18.5,27.5 17,25 15.5,27.5" fill="none" stroke="#ef4444" stroke-width="1.2"/>
+      <polygon points="33,17 27.5,18.5 25,17 27.5,15.5" fill="none" stroke="#ef4444" stroke-width="1.2"/>
+      <polygon points="1,17 6.5,18.5 9,17 6.5,15.5" fill="none" stroke="#ef4444" stroke-width="1.2"/>
+      <text x="17" y="3.2" font-family="Josefin Sans,sans-serif" font-size="3.2" font-weight="600" text-anchor="middle" fill="#ef4444">N</text>
+      <circle cx="17" cy="17" r="2" fill="#ef4444"/>
+      <circle cx="17" cy="17" r=".8" fill="#050d1a"/>
+      <text x="17" y="22.5" font-family="Josefin Sans,sans-serif" font-size="17.5" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text>
+    </svg>
+    <span class="nav-ion">ION</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="ZION_Command.html">Command</a>
+    <a class="nav-link" href="ZION_Dashboard.html">Dashboard</a>
+    <a class="nav-link" href="ZION_Trades.html">Trades</a>
+    <a class="nav-link" href="ZION_Pretrade.html">Pre-Trade</a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">ZION · Sunday Evening Ritual</div>
+    <h1 class="hero-title">Weekly <span>Prep</span></h1>
+    <p class="hero-sub">The week is built on Sunday. Not Monday morning. Not during Amateur Hour. Right now — before the market opens, before the noise starts, while your mind is clear. This is how operators prepare.</p>
+  </div>
+  <div class="hero-right">
+    <div class="week-badge">Week of <span id="weekOf">—</span></div>
+    <button class="save-btn" id="saveBtn" onclick="savePrep()">◆ Save This Week</button>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);margin-top:4px" id="lastSaved"></div>
+  </div>
+</div>
+
+<!-- ── Progress strip ── -->
+<div class="progress-strip" id="progressStrip">
+  <span class="prog-pill active" onclick="scrollTo('s1')">01 Market Context</span>
+  <span class="prog-pill pending" onclick="scrollTo('s2')">02 Position Review</span>
+  <span class="prog-pill pending" onclick="scrollTo('s3')">03 Watchlist</span>
+  <span class="prog-pill pending" onclick="scrollTo('s4')">04 Game Plan</span>
+  <span class="prog-pill pending" onclick="scrollTo('s5')">05 Operator State</span>
+  <span class="prog-pill pending" onclick="scrollTo('s6')">06 Commit</span>
+  <span class="prog-pct" id="progPct">0% complete</span>
+</div>
+
+<div class="main">
+
+<!-- ══ SECTION 1 — MARKET CONTEXT ══ -->
+<div class="prep-section" id="s1">
+  <div class="ps-header" onclick="toggleSection('s1')">
+    <span class="ps-num">01</span>
+    <span class="ps-title">Market Context</span>
+    <div class="ps-check" id="check-s1"></div>
+  </div>
+  <div class="ps-body open" id="body-s1">
+
+    <div class="two-col" style="margin-bottom:16px">
+      <div class="mini-card">
+        <div class="mc-label">Last Week — Breadth Regime</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="regimeBtns">
+          <button class="op-btn" onclick="selectRegime(this,'TREND')">TREND</button>
+          <button class="op-btn" onclick="selectRegime(this,'ROTATION')">ROTATION</button>
+          <button class="op-btn" onclick="selectRegime(this,'FRAGILE')">FRAGILE RALLY</button>
+          <button class="op-btn" onclick="selectRegime(this,'LIQUIDATION')">LIQUIDATION</button>
+          <button class="op-btn" onclick="selectRegime(this,'DE-RISKING')">DE-RISKING</button>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mc-label">VIX Posture</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <button class="op-btn" id="vix-calm" onclick="selectVIX('calm')">Calm (&lt;15)</button>
+          <button class="op-btn" id="vix-elev" onclick="selectVIX('elev')">Elevated (15-25)</button>
+          <button class="op-btn" id="vix-fear" onclick="selectVIX('fear')">Fear (&gt;25)</button>
+          <button class="op-btn" id="vix-spike" onclick="selectVIX('spike')">Spike (&gt;35)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-label">What happened last week — key moves, sector leaders, themes</div>
+      <textarea class="prep-ta" id="lastWeek" rows="3" placeholder="e.g. Tech led all week on AI catalyst. Financials rotated in Thursday. Small caps weak. SPY held VWAP into the close Friday..."></textarea>
+    </div>
+
+    <div class="field-label" style="margin-bottom:10px">Sector Bias This Week</div>
+    <div class="sector-row">
+      <div class="sector-item"><span class="sector-name">XLK — Technology</span><input class="sector-input" id="sec-xlk" placeholder="Key level / thesis..."><button class="sector-bias bias-neut" id="bias-xlk" onclick="cycleBias('xlk')">NEUTRAL</button></div>
+      <div class="sector-item"><span class="sector-name">XLF — Financials</span><input class="sector-input" id="sec-xlf" placeholder="Key level / thesis..."><button class="sector-bias bias-neut" id="bias-xlf" onclick="cycleBias('xlf')">NEUTRAL</button></div>
+      <div class="sector-item"><span class="sector-name">XLE — Energy</span><input class="sector-input" id="sec-xle" placeholder="Key level / thesis..."><button class="sector-bias bias-neut" id="bias-xle" onclick="cycleBias('xle')">NEUTRAL</button></div>
+      <div class="sector-item"><span class="sector-name">XLV — Healthcare</span><input class="sector-input" id="sec-xlv" placeholder="Key level / thesis..."><button class="sector-bias bias-neut" id="bias-xlv" onclick="cycleBias('xlv')">NEUTRAL</button></div>
+      <div class="sector-item"><span class="sector-name">XLI — Industrials</span><input class="sector-input" id="sec-xli" placeholder="Key level / thesis..."><button class="sector-bias bias-neut" id="bias-xli" onclick="cycleBias('xli')">NEUTRAL</button></div>
+      <div class="sector-item"><span class="sector-name">XLC — Comm Svcs</span><input class="sector-input" id="sec-xlc" placeholder="Key level / thesis..."><button class="sector-bias bias-neut" id="bias-xlc" onclick="cycleBias('xlc')">NEUTRAL</button></div>
+    </div>
+
+    <div class="field-wrap" style="margin-top:14px">
+      <div class="field-label">Key Economic Events This Week</div>
+      <textarea class="prep-ta" id="econEvents" rows="2" placeholder="e.g. Monday: ISM Manufacturing. Wednesday: FOMC Minutes. Thursday: CPI. Friday: Jobs Report. Earnings: NVDA Wed after close, AAPL Thu..."></textarea>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+      <button class="save-btn" style="font-size:10px;padding:6px 14px" onclick="markDone('s1')">Mark Complete ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2 — POSITION REVIEW ══ -->
+<div class="prep-section" id="s2">
+  <div class="ps-header" onclick="toggleSection('s2')">
+    <span class="ps-num">02</span>
+    <span class="ps-title">Position Review</span>
+    <div class="ps-check" id="check-s2"></div>
+  </div>
+  <div class="ps-body" id="body-s2">
+
+    <div style="font-size:13px;color:var(--text);line-height:1.75;margin-bottom:16px">
+      Go through each open position. Is the thesis still valid? Is the Kijun intact? How much DTE is left? Set your management status for the week. Be honest — not emotional.
+    </div>
+
+    <div id="positionReviewList">
+      <!-- Loaded from localStorage trades -->
+    </div>
+
+    <div class="field-wrap" style="margin-top:4px">
+      <div class="field-label">Position Review Notes — overall portfolio assessment</div>
+      <textarea class="prep-ta" id="posNotes" rows="3" placeholder="e.g. Overall portfolio is healthy. URA thesis intact — Kijun holding. ORCL needs watching — DTE getting thin. BULL still coiling, no action needed..."></textarea>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+      <button class="save-btn" style="font-size:10px;padding:6px 14px" onclick="markDone('s2')">Mark Complete ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 3 — WATCHLIST BUILD ══ -->
+<div class="prep-section" id="s3">
+  <div class="ps-header" onclick="toggleSection('s3')">
+    <span class="ps-num">03</span>
+    <span class="ps-title">Watchlist Build</span>
+    <div class="ps-check" id="check-s3"></div>
+  </div>
+  <div class="ps-body" id="body-s3">
+
+    <div class="two-col" style="margin-bottom:16px">
+      <div class="field-wrap" style="margin-bottom:0">
+        <div class="field-label">Developing Structure — Tickers to Watch</div>
+        <textarea class="prep-ta" id="watchDev" rows="4" placeholder="NVDA — daily TK bullish, above cloud, waiting for 65m PRIME&#10;PLTR — coiling at Kijun, BB squeeze building&#10;ORCL — retested cloud top, holding..."></textarea>
+      </div>
+      <div class="field-wrap" style="margin-bottom:0">
+        <div class="field-label">UOA from Friday — Unusual Flow Worth Watching</div>
+        <textarea class="prep-ta" id="watchUOA" rows="4" placeholder="SMCI — large call sweep, bullish structure aligns&#10;ETN — unusual put buying, watch for breakdown&#10;RKLB — multiple blocks at $30 calls..."></textarea>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-label">Sector Rotation Play — Best Setup for the Week</div>
+      <textarea class="prep-ta" id="watchRotation" rows="2" placeholder="e.g. Tech rotation into Energy if VIX stays calm. Watching XLE names — CVX and XOM both above cloud with TK bullish on daily..."></textarea>
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-label">Tickers to AVOID This Week</div>
+      <div class="not-trade-box">
+        <div class="ntb-label">🚫 Will Not Trade</div>
+        <input class="ntb-input" id="watchAvoid" placeholder="e.g. No 0DTE. No TSLA earnings plays. Nothing in the cloud on the daily. No names under $10...">
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:4px">
+      <button class="save-btn" style="font-size:10px;padding:6px 14px" onclick="markDone('s3')">Mark Complete ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 4 — GAME PLAN ══ -->
+<div class="prep-section" id="s4">
+  <div class="ps-header" onclick="toggleSection('s4')">
+    <span class="ps-num">04</span>
+    <span class="ps-title">The Week's Game Plan</span>
+    <div class="ps-check" id="check-s4"></div>
+  </div>
+  <div class="ps-body" id="body-s4">
+
+    <div class="three-col" style="margin-bottom:16px">
+      <div class="mini-card">
+        <div class="mc-label">Monday Expectation</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <button class="op-btn" onclick="selectDay('mon','trade')">Trading Day</button>
+          <button class="op-btn" onclick="selectDay('mon','watch')">Watching Day</button>
+          <button class="op-btn" onclick="selectDay('mon','both')">Depends on Open</button>
+        </div>
+        <div id="mon-sel" style="font-family:var(--font-data);font-size:9px;color:var(--dim);margin-top:6px"></div>
+      </div>
+      <div class="mini-card">
+        <div class="mc-label">Mid-Week Expectation</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <button class="op-btn" onclick="selectDay('mid','trade')">Trading Day</button>
+          <button class="op-btn" onclick="selectDay('mid','watch')">Watching Day</button>
+          <button class="op-btn" onclick="selectDay('mid','both')">Depends on Open</button>
+        </div>
+        <div id="mid-sel" style="font-family:var(--font-data);font-size:9px;color:var(--dim);margin-top:6px"></div>
+      </div>
+      <div class="mini-card">
+        <div class="mc-label">Friday Expectation</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <button class="op-btn" onclick="selectDay('fri','trade')">Trading Day</button>
+          <button class="op-btn" onclick="selectDay('fri','watch')">Watching Day</button>
+          <button class="op-btn" onclick="selectDay('fri','both')">Light — EOW</button>
+        </div>
+        <div id="fri-sel" style="font-family:var(--font-data);font-size:9px;color:var(--dim);margin-top:6px"></div>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-label">Top 3 Setups — Levels, Triggers, Targets</div>
+      <textarea class="prep-ta" id="topSetups" rows="5" placeholder="1. NVDA — Entry on reclaim above $920 with PRIME ▲. Stop: Kijun $895. Target: $960 (cloud resistance). Size: 2 contracts.&#10;&#10;2. PLTR — Watch for BB squeeze release above $85. Stop: $82. Target: $92.&#10;&#10;3. ETN — Bull continuation above $320. Kijun at $308. Target: $340."></textarea>
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-label">Key Levels to Watch Across the Market</div>
+      <textarea class="prep-ta" id="keyLevels" rows="3" placeholder="SPY: $540 is the level. Hold = bullish. Lose = watch out.&#10;QQQ: $460 cloud top. Break above = tech green light.&#10;VIX: If spikes above 20, go to watching day regardless of setups..."></textarea>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+      <button class="save-btn" style="font-size:10px;padding:6px 14px" onclick="markDone('s4')">Mark Complete ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 5 — OPERATOR STATE ══ -->
+<div class="prep-section" id="s5">
+  <div class="ps-header" onclick="toggleSection('s5')">
+    <span class="ps-num">05</span>
+    <span class="ps-title">Operator State Check</span>
+    <div class="ps-check" id="check-s5"></div>
+  </div>
+  <div class="ps-body" id="body-s5">
+
+    <div style="font-size:13px;color:var(--text);line-height:1.75;margin-bottom:16px">
+      The chart is only as good as the mind reading it. Check your state before the week begins — not during it when feelings are loudest.
+    </div>
+
+    <div class="operator-grid">
+      <div class="op-item">
+        <div class="op-q">Mental clarity going into this week?</div>
+        <div class="op-btns">
+          <button class="op-btn" onclick="selectOp(this,'clarity','sharp','green')">Sharp</button>
+          <button class="op-btn" onclick="selectOp(this,'clarity','ok','yellow')">Okay</button>
+          <button class="op-btn" onclick="selectOp(this,'clarity','foggy','red')">Foggy</button>
+        </div>
+      </div>
+      <div class="op-item">
+        <div class="op-q">Emotional residue from last week?</div>
+        <div class="op-btns">
+          <button class="op-btn" onclick="selectOp(this,'emotion','none','green')">Clean</button>
+          <button class="op-btn" onclick="selectOp(this,'emotion','some','yellow')">Some</button>
+          <button class="op-btn" onclick="selectOp(this,'emotion','heavy','red')">Heavy</button>
+        </div>
+      </div>
+      <div class="op-item">
+        <div class="op-q">Any life events this week affecting focus?</div>
+        <div class="op-btns">
+          <button class="op-btn" onclick="selectOp(this,'life','none','green')">Clear week</button>
+          <button class="op-btn" onclick="selectOp(this,'life','minor','yellow')">Minor stuff</button>
+          <button class="op-btn" onclick="selectOp(this,'life','major','red')">Major events</button>
+        </div>
+      </div>
+      <div class="op-item">
+        <div class="op-q">Trading to recover a loss this week?</div>
+        <div class="op-btns">
+          <button class="op-btn" onclick="selectOp(this,'motive','no','green')">No</button>
+          <button class="op-btn" onclick="selectOp(this,'motive','tempted','yellow')">Tempted</button>
+          <button class="op-btn" onclick="selectOp(this,'motive','yes','red')">Yes ⚠</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-label">Operator Notes — anything that needs to be on record</div>
+      <textarea class="prep-ta" id="opNotes" rows="3" placeholder="e.g. Feeling sharp this week. Last week's URA stop-out stings a little but I followed the system. The thesis was right, the timing was wrong. Moving on clean..."></textarea>
+    </div>
+
+    <!-- Weekly checklist items -->
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin:16px 0 10px">Pre-Week Operator Checklist</div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="ci-box"></div><div class="ci-label"><strong>Journal reviewed</strong>Reviewed last week's trades — wins and losses both examined honestly</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="ci-box"></div><div class="ci-label"><strong>Position sizing pre-calculated</strong>Know the max risk per trade before the week starts</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="ci-box"></div><div class="ci-label"><strong>Not trading for revenge</strong>Last week's losses don't vote on this week's decisions</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="ci-box"></div><div class="ci-label"><strong>Economic calendar checked</strong>Know the landmines before Monday morning</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="ci-box"></div><div class="ci-label"><strong>Sleep and body in order</strong>Not trading on fumes — physical state is part of operator state</div></div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+      <button class="save-btn" style="font-size:10px;padding:6px 14px" onclick="markDone('s5')">Mark Complete ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 6 — THE COMMITMENT ══ -->
+<div class="prep-section" id="s6">
+  <div class="ps-header" onclick="toggleSection('s6')">
+    <span class="ps-num">06</span>
+    <span class="ps-title">The Weekly Commitment</span>
+    <div class="ps-check" id="check-s6"></div>
+  </div>
+  <div class="ps-body" id="body-s6">
+
+    <div style="font-size:13px;color:var(--text);line-height:1.75;margin-bottom:20px">
+      One paragraph. Your plan for the week in your own words. Write it like you're briefing yourself — because you are. Then sign it.
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-label">This Week's Plan — in your own words</div>
+      <textarea class="prep-ta" id="weekPlan" rows="5" placeholder="This week I will focus on [sector] with [setups] showing structure. My primary candidates are [tickers]. I will not trade during Midday Chop, will not chase breakouts, and will exit any position that closes below the 65m Kijun. My operator state is [state] and I am going into this week [feeling]. The chart is the gatekeeper. Not the P/L. Not my feelings. The chart."></textarea>
+    </div>
+
+    <div class="commitment">
+      <div class="commit-text">Trade the structure. Ignore the noise. Honor the process.</div>
+      <div class="commit-sign">
+        <input class="commit-input" id="commitSign" placeholder="Sign your name here">
+        <span class="commit-date" id="commitDate"></span>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;margin-top:20px">
+      <button class="save-btn" style="font-size:12px;padding:10px 28px" onclick="saveAndComplete()">◆ Lock In This Week</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAST WEEKS ══ -->
+<div class="prep-section">
+  <div class="ps-header" onclick="toggleSection('past')">
+    <span class="ps-num">◷</span>
+    <span class="ps-title">Past Weekly Preps</span>
+    <div class="ps-check" id="check-past"></div>
+  </div>
+  <div class="ps-body" id="body-past">
+    <div id="pastWeeksList">
+      <div style="color:var(--dim);font-size:13px;padding:8px">No past preps saved yet. Complete your first weekly prep above.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── Week label ─────────────────────────────────────
+const getWeekOf = () => {
+  const now = new Date();
+  const day = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - day + (day===0 ? -6 : 1));
+  return monday.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+};
+const weekKey = () => 'zion-weekly-' + getWeekOf().replace(/[, ]/g,'-');
+document.getElementById('weekOf').textContent = getWeekOf();
+document.getElementById('commitDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+// ── Section toggle ─────────────────────────────────
+const toggleSection = id => {
+  const body = document.getElementById(`body-${id}`);
+  if(body) body.classList.toggle('open');
+};
+
+const scrollTo = id => {
+  const el = document.getElementById(id);
+  if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); }
+  const body = document.getElementById(`body-${id}`);
+  if(body && !body.classList.contains('open')) body.classList.add('open');
+};
+
+// ── Section complete ───────────────────────────────
+const SECTIONS = ['s1','s2','s3','s4','s5','s6'];
+let completed = JSON.parse(localStorage.getItem('zion-weekly-done-'+weekKey())||'{}');
+
+const markDone = id => {
+  completed[id] = true;
+  localStorage.setItem('zion-weekly-done-'+weekKey(), JSON.stringify(completed));
+  updateProgress();
+  // Open next section
+  const idx = SECTIONS.indexOf(id);
+  if(idx < SECTIONS.length-1) {
+    const next = SECTIONS[idx+1];
+    const nextBody = document.getElementById('body-'+next);
+    if(nextBody && !nextBody.classList.contains('open')) nextBody.classList.add('open');
+    document.getElementById(next)?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+};
+
+const updateProgress = () => {
+  const done = Object.keys(completed).length;
+  const pct  = Math.round((done/SECTIONS.length)*100);
+  document.getElementById('progPct').textContent = `${pct}% complete`;
+  // Update pills
+  const pills = document.querySelectorAll('.prog-pill');
+  SECTIONS.forEach((id,i) => {
+    if(pills[i]) {
+      pills[i].className = 'prog-pill ' + (completed[id] ? 'done' : 'pending');
+    }
+  });
+  // Update check circles
+  SECTIONS.forEach(id => {
+    const el = document.getElementById('check-'+id);
+    if(el) el.className = 'ps-check' + (completed[id] ? ' done' : '');
+  });
+};
+updateProgress();
+
+// ── Sector bias ────────────────────────────────────
+const biasStates = {};
+const cycleBias = sector => {
+  const states = ['NEUTRAL','BULLISH','BEARISH'];
+  const classes = ['bias-neut','bias-bull','bias-bear'];
+  biasStates[sector] = ((biasStates[sector]||0)+1)%3;
+  const s = biasStates[sector];
+  const btn = document.getElementById(`bias-${sector}`);
+  if(btn){ btn.textContent=states[s]; btn.className=`sector-bias ${classes[s]}`; }
+};
+
+// ── Regime / VIX selectors ─────────────────────────
+const selectRegime = (el, val) => {
+  document.querySelectorAll('#regimeBtns .op-btn').forEach(b=>b.className='op-btn');
+  el.className='op-btn selected-green';
+};
+const selectVIX = val => {
+  ['calm','elev','fear','spike'].forEach(v=>{
+    const b=document.getElementById(`vix-${v}`);
+    if(b) b.className='op-btn'+(v===val?' selected-'+(val==='calm'?'green':val==='elev'?'yellow':'red'):'');
+  });
+};
+
+// ── Day selectors ──────────────────────────────────
+const selectDay = (day, val) => {
+  const el = document.getElementById(`${day}-sel`);
+  if(el) el.textContent = val==='trade'?'✅ Trading Day':val==='watch'?'👁 Watching Day':'⚡ TBD at Open';
+};
+
+// ── Operator selectors ─────────────────────────────
+const selectOp = (el, group, val, color) => {
+  el.closest('.op-btns').querySelectorAll('.op-btn').forEach(b=>b.className='op-btn');
+  el.className=`op-btn selected-${color}`;
+};
+
+// ── Checklist ──────────────────────────────────────
+const toggleCheck = item => item.classList.toggle('done');
+
+// ── Save ───────────────────────────────────────────
+const collectData = () => ({
+  weekOf: getWeekOf(),
+  savedAt: new Date().toISOString(),
+  lastWeek: document.getElementById('lastWeek').value,
+  econEvents: document.getElementById('econEvents').value,
+  posNotes: document.getElementById('posNotes').value,
+  watchDev: document.getElementById('watchDev').value,
+  watchUOA: document.getElementById('watchUOA').value,
+  watchRotation: document.getElementById('watchRotation').value,
+  watchAvoid: document.getElementById('watchAvoid').value,
+  topSetups: document.getElementById('topSetups').value,
+  keyLevels: document.getElementById('keyLevels').value,
+  opNotes: document.getElementById('opNotes').value,
+  weekPlan: document.getElementById('weekPlan').value,
+  commitSign: document.getElementById('commitSign').value,
+  biasStates: {...biasStates},
+  completed: {...completed},
+});
+
+const savePrep = () => {
+  const data = collectData();
+  localStorage.setItem(weekKey(), JSON.stringify(data));
+  // Add to history
+  const history = JSON.parse(localStorage.getItem('zion-weekly-history')||'[]');
+  const existing = history.findIndex(w=>w.weekOf===data.weekOf);
+  if(existing>=0) history[existing]=data; else history.unshift(data);
+  localStorage.setItem('zion-weekly-history', JSON.stringify(history.slice(0,12)));
+  const btn = document.getElementById('saveBtn');
+  btn.textContent='✓ Saved!'; btn.className='save-btn saved';
+  document.getElementById('lastSaved').textContent=`Last saved: ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+  setTimeout(()=>{ btn.textContent='◆ Save This Week'; btn.className='save-btn'; },2500);
+  loadPastWeeks();
+};
+
+const saveAndComplete = () => {
+  markDone('s6');
+  savePrep();
+};
+
+// ── Load open positions from Trade Tracker ─────────
+const loadPositions = () => {
+  const list = document.getElementById('positionReviewList');
+  const trades = JSON.parse(localStorage.getItem('zion-trades')||'[]').filter(t=>t.status==='open');
+  if(!trades.length){
+    list.innerHTML='<div style="color:var(--dim);font-size:13px;padding:8px">No open positions found in Trade Tracker.</div>';
+    return;
+  }
+  list.innerHTML = trades.map(t=>{
+    const dte = Math.ceil((new Date(t.expDate)-new Date())/86400000);
+    const dteCls = dte<=7?'color:var(--crimson)':dte<=21?'color:var(--wait)':'color:var(--teal)';
+    const status = t.mgmtStatus||'leave';
+    const sCls = status==='manage'?'status-manage':status==='monitor'?'status-monitor':'status-leave';
+    const sLabel = status==='manage'?'⚡ MANAGE':status==='monitor'?'👁 MONITOR':'✓ LEAVE';
+    return `<div class="pos-review-item">
+      <div class="pri-top">
+        <span class="pri-ticker">${t.ticker}</span>
+        <span class="pri-contract">$${t.strike}${t.type==='CALL'?'C':'P'} ${t.expDate}</span>
+        <span style="font-family:var(--font-data);font-size:10px;${dteCls}">${dte}d DTE</span>
+        <button class="pri-status ${sCls}" onclick="this.dataset.s=(this.dataset.s==='manage'?'monitor':this.dataset.s==='monitor'?'leave':'manage');this.className='pri-status status-'+this.dataset.s;this.textContent=this.dataset.s==='manage'?'⚡ MANAGE':this.dataset.s==='monitor'?'👁 MONITOR':'✓ LEAVE'" data-s="${status}">${sLabel}</button>
+      </div>
+      <div class="pri-fields">
+        <div class="pri-field"><span class="pf-label">Kijun Intact?</span><select class="pf-input" style="cursor:pointer"><option value="">—</option><option>Yes — holding</option><option>Watch — close</option><option>No — broken</option></select></div>
+        <div class="pri-field"><span class="pf-label">Thesis Valid?</span><select class="pf-input" style="cursor:pointer"><option value="">—</option><option>Yes — unchanged</option><option>Weakening</option><option>Broken</option></select></div>
+        <div class="pri-field"><span class="pf-label">Action This Week</span><select class="pf-input" style="cursor:pointer"><option value="">—</option><option>Hold — no change</option><option>Set alert at Kijun</option><option>Take partial profit</option><option>Exit if breaks</option><option>Add on strength</option></select></div>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+// ── Load past weeks ────────────────────────────────
+const loadPastWeeks = () => {
+  const history = JSON.parse(localStorage.getItem('zion-weekly-history')||'[]');
+  const list = document.getElementById('pastWeeksList');
+  if(!history.length){
+    list.innerHTML='<div style="color:var(--dim);font-size:13px;padding:8px">No past preps yet.</div>';
+    return;
+  }
+  list.innerHTML = history.map(w=>`
+    <div class="past-week" onclick="loadWeek('${w.weekOf}')">
+      <div class="pw-top">
+        <span class="pw-date">Week of ${w.weekOf}</span>
+        <span class="pw-score" style="background:var(--panel2);border:1px solid var(--border2);color:var(--dim)">
+          ${Object.keys(w.completed||{}).length}/6 sections
+        </span>
+        <span style="font-family:var(--font-data);font-size:9px;color:var(--dim);margin-left:auto">
+          ${w.commitSign||'—'}
+        </span>
+      </div>
+      <div class="pw-preview">${(w.weekPlan||'No plan written').substring(0,120)}${(w.weekPlan||'').length>120?'…':''}</div>
+    </div>`).join('');
+};
+
+const loadWeek = weekOf => {
+  const history = JSON.parse(localStorage.getItem('zion-weekly-history')||'[]');
+  const w = history.find(h=>h.weekOf===weekOf);
+  if(!w) return;
+  if(document.getElementById('lastWeek')) document.getElementById('lastWeek').value=w.lastWeek||'';
+  if(document.getElementById('weekPlan')) document.getElementById('weekPlan').value=w.weekPlan||'';
+  alert(`Loaded: Week of ${weekOf}`);
+};
+
+// ── Auto-save every 60s ────────────────────────────
+setInterval(savePrep, 60000);
+
+// ── Init ───────────────────────────────────────────
+loadPositions();
+loadPastWeeks();
+
+// Load saved data for this week if exists
+const savedData = JSON.parse(localStorage.getItem(weekKey())||'null');
+if(savedData){
+  ['lastWeek','econEvents','posNotes','watchDev','watchUOA','watchRotation',
+   'watchAvoid','topSetups','keyLevels','opNotes','weekPlan','commitSign'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&savedData[id]) el.value=savedData[id];
+  });
+  if(savedData.completed){ Object.assign(completed,savedData.completed); updateProgress(); }
+  if(savedData.savedAt){
+    document.getElementById('lastSaved').textContent=
+      `Last saved: ${new Date(savedData.savedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}`;
+  }
+}
+</script>
+</body>
+</html>

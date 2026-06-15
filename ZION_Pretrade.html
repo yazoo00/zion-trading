@@ -1,0 +1,719 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ZION Config — API key and settings live in ZION_Config.js -->
+<script src="ZION_Config.js"></script>
+<title>ZION Pre-Trade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #050d1a;
+    --panel:   #0a1628;
+    --panel2:  #0d1e35;
+    --border:  #111f38;
+    --border2: #1a2f4a;
+    --text:    #c8d8f0;
+    --dim:     #4a6080;
+    --hdr:     #e8f0ff;
+    --bull:    #4ade80;
+    --teal:    #00f5d4;
+    --bear:    #f87171;
+    --crimson: #ff4d6d;
+    --wait:    #fb923c;
+    --blue:    #60a5fa;
+    --font-data: 'JetBrains Mono', monospace;
+    --font-ui:   'Inter', sans-serif;
+  }
+
+  html, body { min-height:100vh; background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:13px; line-height:1.5; }
+
+  /* ── Top bar ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:44px; background:var(--panel); border-bottom:1px solid var(--border); }
+  .logo { font-family:var(--font-data); font-weight:700; font-size:13px; letter-spacing:.2em; color:var(--hdr); }
+  .logo span { color:var(--blue); }
+  .nav-link { font-family:var(--font-data); font-size:11px; color:var(--dim); text-decoration:none; padding:4px 10px; border:1px solid var(--border2); border-radius:4px; transition:color .15s,border-color .15s; }
+  .nav-link:hover { color:var(--blue); border-color:var(--blue); }
+  .session-label { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+
+  /* ══ SIGNATURE ELEMENT — GO/NO-GO STATUS BAR ══ */
+  .verdict-bar {
+    position: relative;
+    padding: 20px 24px;
+    border-bottom: 2px solid var(--border);
+    transition: background .6s ease, border-color .6s ease;
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .verdict-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity .6s ease;
+  }
+  .verdict-bar.go   { border-bottom-color: var(--teal); }
+  .verdict-bar.go::before   { background: radial-gradient(ellipse at 50% 0%, #00f5d415 0%, transparent 70%); opacity:1; }
+  .verdict-bar.nogo { border-bottom-color: var(--crimson); }
+  .verdict-bar.nogo::before { background: radial-gradient(ellipse at 50% 0%, #ff4d6d18 0%, transparent 70%); opacity:1; }
+  .verdict-bar.warn { border-bottom-color: var(--wait); }
+  .verdict-bar.warn::before { background: radial-gradient(ellipse at 50% 0%, #fb923c12 0%, transparent 70%); opacity:1; }
+
+  .verdict-inner { display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+  .verdict-left { display:flex; align-items:center; gap:16px; }
+
+  .verdict-status {
+    font-family: var(--font-data);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--dim);
+    transition: color .4s;
+  }
+  .verdict-bar.go   .verdict-status { color: var(--teal); }
+  .verdict-bar.nogo .verdict-status { color: var(--crimson); }
+  .verdict-bar.warn .verdict-status { color: var(--wait); }
+
+  .verdict-sub { font-size:11px; color:var(--dim); font-family:var(--font-data); margin-top:3px; }
+
+  .verdict-scores { display:flex; gap:20px; }
+  .score-chip { text-align:center; }
+  .score-chip .num { font-family:var(--font-data); font-size:18px; font-weight:700; color:var(--dim); transition:color .3s; }
+  .score-chip .lbl { font-size:9px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; }
+  .score-chip.red .num { color:var(--crimson); }
+  .score-chip.amber .num { color:var(--wait); }
+  .score-chip.green .num { color:var(--teal); }
+
+  .verdict-actions { display:flex; gap:8px; align-items:center; }
+  .btn { font-family:var(--font-ui); font-size:11px; font-weight:500; padding:6px 14px; border-radius:4px; border:1px solid var(--border2); background:transparent; color:var(--dim); cursor:pointer; transition:all .15s; }
+  .btn:hover { color:var(--text); border-color:var(--blue); }
+  .btn.primary { border-color:var(--blue); background:#0f2545; color:var(--blue); }
+  .btn.primary:hover { background:#163560; }
+  .btn.danger { border-color:var(--border2); color:var(--dim); }
+
+  /* ── DO NOT CLICK easter egg ── */
+  .dnc-wrap { position:relative; }
+  .btn.dnc { border-color:#1a1a2e; color:#1a1a2e; font-size:9px; letter-spacing:.05em; transition:all .3s; }
+  .btn.dnc:hover { border-color:#2a1a3e; color:#3a1a4e; }
+  .easter-egg { position:absolute; bottom:calc(100% + 8px); right:0; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; padding:10px 14px; font-size:11px; color:var(--text); white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .3s; font-family:var(--font-data); min-width:240px; text-align:center; z-index:100; }
+  .easter-egg.show { opacity:1; }
+  .easter-egg::after { content:''; position:absolute; top:100%; right:20px; border:5px solid transparent; border-top-color:var(--border2); }
+
+  /* ── Main layout ── */
+  .main { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; padding:0; }
+
+  /* ── Sections ── */
+  .section { border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .section:nth-child(3n) { border-right:none; }
+  .section.full-width { grid-column:1/-1; border-right:none; }
+
+  .sec-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 8px; border-bottom:1px solid var(--border); background:#070f1e; }
+  .sec-title { font-size:9px; letter-spacing:.14em; color:var(--dim); text-transform:uppercase; }
+  .sec-score { font-family:var(--font-data); font-size:11px; font-weight:700; }
+  .sec-score.red    { color:var(--crimson); }
+  .sec-score.amber  { color:var(--wait); }
+  .sec-score.green  { color:var(--teal); }
+  .sec-score.neutral{ color:var(--dim); }
+
+  .sec-body { padding:10px 14px 14px; }
+
+  /* ── Check items ── */
+  .check-item { display:flex; align-items:flex-start; gap:10px; padding:6px 0; border-bottom:1px solid var(--border); cursor:pointer; transition:background .1s; border-radius:3px; }
+  .check-item:last-child { border-bottom:none; }
+  .check-item:hover { background:var(--panel2); padding-left:4px; }
+
+  .check-item input[type=checkbox] { display:none; }
+
+  .check-box {
+    width: 16px; height: 16px; flex-shrink:0; margin-top:1px;
+    border: 1px solid var(--border2); border-radius: 3px;
+    background: var(--panel2);
+    display: flex; align-items:center; justify-content:center;
+    transition: background .15s, border-color .15s;
+    font-size: 10px;
+  }
+  .check-item.checked .check-box { background:#00f5d422; border-color:var(--teal); color:var(--teal); }
+  .check-item.checked .check-box::after { content:'✓'; }
+  .check-item.flagged .check-box { background:#ff4d6d22; border-color:var(--crimson); color:var(--crimson); }
+  .check-item.flagged .check-box::after { content:'✗'; }
+
+  .check-text { font-size:12px; color:var(--text); line-height:1.5; flex:1; }
+  .check-item.checked .check-text { color:var(--dim); }
+
+  .check-tag { font-size:9px; font-family:var(--font-data); padding:1px 5px; border-radius:3px; margin-top:2px; display:inline-block; }
+  .tag-warn  { background:#fb923c18; color:var(--wait);    border:1px solid #fb923c33; }
+  .tag-flag  { background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; }
+  .tag-auto  { background:#60a5fa18; color:var(--blue);    border:1px solid #60a5fa33; }
+
+  /* ── Notes ── */
+  .notes-ta { width:100%; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; color:var(--text); font-family:var(--font-ui); font-size:12px; line-height:1.6; padding:10px 12px; resize:vertical; outline:none; min-height:80px; transition:border-color .15s; }
+  .notes-ta:focus { border-color:var(--blue); }
+  .notes-ta::placeholder { color:var(--dim); }
+
+  /* ── Session log ── */
+  .log-entry { padding:8px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:10px; }
+  .log-entry:last-child { border-bottom:none; }
+  .log-time { font-family:var(--font-data); font-size:10px; color:var(--dim); white-space:nowrap; margin-top:1px; }
+  .log-verdict { font-family:var(--font-data); font-size:10px; font-weight:700; }
+  .log-verdict.go   { color:var(--teal); }
+  .log-verdict.nogo { color:var(--crimson); }
+  .log-verdict.warn { color:var(--wait); }
+  .log-note { font-size:11px; color:var(--text); flex:1; }
+  .log-empty { font-size:11px; color:var(--dim); text-align:center; padding:16px 0; font-family:var(--font-data); }
+
+  /* ── Flag counter badge ── */
+  .flag-badge { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; font-family:var(--font-data); font-size:10px; font-weight:700; background:#ff4d6d22; color:var(--crimson); border:1px solid #ff4d6d44; }
+
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+  @media (max-width: 900px) {
+    .main { grid-template-columns:1fr; }
+    .section { border-right:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="logo"><svg width="34" height="34" viewBox="0 0 34 34" style="display:block;flex-shrink:0"><circle cx="17.0" cy="17.0" r="15.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="17.0" cy="17.0" r="12.24" fill="none" stroke="#1e3a8a" stroke-width="0.272" opacity="0.4"/><circle cx="17.0" cy="17.0" r="8.5" fill="none" stroke="#1e3a8a" stroke-width="0.20400000000000001" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="17.0,0.68 18.53,6.800000000000001 17.0,8.84 15.47,6.800000000000001" fill="#ef4444"/><polygon points="17.0,33.32 18.19,27.200000000000003 17.0,25.16 15.81,27.200000000000003" fill="none" stroke="#ef4444" stroke-width="0.47600000000000003"/><polygon points="33.32,17.0 27.200000000000003,18.19 25.16,17.0 27.200000000000003,15.81" fill="none" stroke="#ef4444" stroke-width="0.47600000000000003"/><polygon points="0.68,17.0 6.800000000000001,18.19 8.84,17.0 6.800000000000001,15.81" fill="none" stroke="#ef4444" stroke-width="0.47600000000000003"/><text x="17.0" y="3.4000000000000004" font-family="'Josefin Sans',sans-serif" font-size="3.23" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="17.0" cy="17.0" r="1.87" fill="#ef4444"/><circle cx="17.0" cy="17.0" r="0.782" fill="#050d1a"/><text x="17.0" y="23.3648" font-family="'Josefin Sans',sans-serif" font-size="17.68" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:18px;letter-spacing:6px;color:#ffffff;-webkit-text-stroke:0.7px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></span> PRE-TRADE</div>
+    <span class="session-label" id="clockEl">—</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a class="nav-link" href="ZION_Dashboard.html">← Dashboard</a>
+  </div>
+</header>
+
+<!-- ══ SIGNATURE: VERDICT BAR ══ -->
+<div class="verdict-bar" id="verdictBar">
+  <div class="verdict-inner">
+    <div class="verdict-left">
+      <div>
+        <div class="verdict-status" id="verdictStatus">AWAITING CHECK</div>
+        <div class="verdict-sub" id="verdictSub">Complete the checklist and hit Evaluate</div>
+      </div>
+      <div class="verdict-scores">
+        <div class="score-chip" id="chip-red">
+          <div class="num" id="flagCount">—</div>
+          <div class="lbl">Red Flags</div>
+        </div>
+        <div class="score-chip" id="chip-warn">
+          <div class="num" id="warnCount">—</div>
+          <div class="lbl">Warnings</div>
+        </div>
+        <div class="score-chip" id="chip-clear">
+          <div class="num" id="clearCount">—</div>
+          <div class="lbl">Clear</div>
+        </div>
+      </div>
+    </div>
+    <div class="verdict-actions">
+      <button class="btn primary" onclick="evaluate()">Evaluate Trade</button>
+      <button class="btn" onclick="resetForm()">Reset</button>
+      <div class="dnc-wrap">
+        <button class="btn dnc" id="dncBtn" onclick="showEasterEgg()">DO NOT CLICK</button>
+        <div class="easter-egg" id="easterEgg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHECKLIST GRID ══ -->
+<div class="main">
+
+  <!-- 1. CATALYST SCAN -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">① Catalyst Scan</span>
+      <span class="sec-score neutral" id="score-catalyst">—</span>
+    </div>
+    <div class="sec-body">
+      <div class="check-item" data-section="catalyst" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Event window exists — earnings, CPI, FOMC, product launch</div></div>
+      </div>
+      <div class="check-item" data-section="catalyst" data-type="positive" data-requires="catalyst-0" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">I know historical behavior of this catalyst</div><span class="check-tag tag-warn">Required if catalyst present</span></div>
+      </div>
+      <div class="check-item" data-section="catalyst" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Structure strong — above Kijun, slope positive, RSI healthy</div></div>
+      </div>
+      <div class="check-item" data-section="catalyst" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Sector aligned with direction of trade</div></div>
+      </div>
+      <div class="check-item" data-section="catalyst" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Macro supportive — no conflicting Fed, bond, or USD signal</div></div>
+      </div>
+      <div class="check-item" data-section="catalyst" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Expiration allows time for repair if wrong</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ROTATION SCAN -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">② Rotation Scan</span>
+      <span class="sec-score neutral" id="score-rotation">—</span>
+    </div>
+    <div class="sec-body">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:8px;font-family:var(--font-data)">Flag items that are TRUE right now. 3+ = red flag.</div>
+      <div class="check-item" data-section="rotation" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">VIX rising while NQ is green</div><span class="check-tag tag-flag">Rotation signal</span></div>
+      </div>
+      <div class="check-item" data-section="rotation" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">XLK lagging QQQ on the session</div></div>
+      </div>
+      <div class="check-item" data-section="rotation" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Breadth improving while megacaps bleed</div></div>
+      </div>
+      <div class="check-item" data-section="rotation" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Defensives green while tech red</div></div>
+      </div>
+      <div class="check-item" data-section="rotation" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">NQ rejected at daily Tenkan</div></div>
+      </div>
+      <div class="check-item" data-section="rotation" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Megacap lagging its own sector ETF</div></div>
+      </div>
+      <div class="check-item" data-section="rotation" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Energy + tech both red simultaneously</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. LIQUIDITY SCAN -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">③ Liquidity Scan</span>
+      <span class="sec-score neutral" id="score-liquidity">—</span>
+    </div>
+    <div class="sec-body">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:8px;font-family:var(--font-data)">Flag items that are TRUE. 2+ = red flag.</div>
+      <div class="check-item" data-section="liquidity" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Low-volume lift — price up, volume thin</div><span class="check-tag tag-flag">Trap warning</span></div>
+      </div>
+      <div class="check-item" data-section="liquidity" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">No follow-through after strong open</div></div>
+      </div>
+      <div class="check-item" data-section="liquidity" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">RSI divergence on 65m — price making highs, RSI not</div></div>
+      </div>
+      <div class="check-item" data-section="liquidity" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Sector lagging its own ETF</div></div>
+      </div>
+      <div class="check-item" data-section="liquidity" data-type="flag" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">VIX rising during green candles</div><span class="check-tag tag-flag">Smart money hedging</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. STRUCTURE CHECK -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">④ ZION Structure</span>
+      <span class="sec-score neutral" id="score-structure">—</span>
+    </div>
+    <div class="sec-body">
+      <div class="check-item" data-section="structure" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Price above Kijun on 65m</div></div>
+      </div>
+      <div class="check-item" data-section="structure" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">TK bullish on 65m — Tenkan above Kijun</div></div>
+      </div>
+      <div class="check-item" data-section="structure" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Price above cloud on 65m</div></div>
+      </div>
+      <div class="check-item" data-section="structure" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Chikou above candles on 65m</div></div>
+      </div>
+      <div class="check-item" data-section="structure" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">VWAP slope positive on 65m</div></div>
+      </div>
+      <div class="check-item" data-section="structure" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Daily TK aligned — Daily Tenkan above Kijun</div></div>
+      </div>
+      <div class="check-item" data-section="structure" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Price above cloud on Daily</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. EXPIRATION & SIZING -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">⑤ Expiration &amp; Sizing</span>
+      <span class="sec-score neutral" id="score-expiration">—</span>
+    </div>
+    <div class="sec-body">
+      <div class="check-item" data-section="expiration" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Enough time for repair — not expiring this week</div></div>
+      </div>
+      <div class="check-item" data-section="expiration" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Not already in a deep repair cycle on this ticker</div></div>
+      </div>
+      <div class="check-item" data-section="expiration" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Position size is appropriate to account size</div></div>
+      </div>
+      <div class="check-item" data-section="expiration" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Not over-concentrated in one megacap</div></div>
+      </div>
+      <div class="check-item" data-section="expiration" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">Risk/reward is at least 2:1</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. EMOTIONAL STATE -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">⑥ Operator State</span>
+      <span class="sec-score neutral" id="score-operator">—</span>
+    </div>
+    <div class="sec-body">
+      <div class="check-item" data-section="operator" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">I am not trading to recover a loss</div><span class="check-tag tag-flag">Revenge trade check</span></div>
+      </div>
+      <div class="check-item" data-section="operator" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">I have slept and eaten — not trading on fumes</div></div>
+      </div>
+      <div class="check-item" data-section="operator" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">I can articulate WHY this trade makes sense right now</div></div>
+      </div>
+      <div class="check-item" data-section="operator" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">I have a defined exit — both profit target and stop</div></div>
+      </div>
+      <div class="check-item" data-section="operator" data-type="positive" onclick="toggle(this)">
+        <div class="check-box"></div>
+        <div><div class="check-text">I am OK if this trade loses — it is sized for that reality</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WILL NOT TRADE — full width -->
+  <div class="section full-width" style="border-left:3px solid var(--crimson)">
+    <div class="sec-header">
+      <span class="sec-title" style="color:var(--crimson)">🚫 What I Will NOT Trade Today</span>
+      <span style="font-size:10px;color:var(--dim);font-family:var(--font-data)">Name it. Stick to it.</span>
+    </div>
+    <div class="sec-body">
+      <textarea class="notes-ta" id="willNotTradeEl" placeholder="e.g. No 0DTE. No chasing gaps. No trading during Midday Chop (11:30-1:30pm). No revenge trades after a stop-out. No adding to a losing position…" style="border-color:#ff4d6d33;min-height:60px" onfocus="this.style.borderColor='var(--crimson)'" onblur="this.style.borderColor='#ff4d6d33'"></textarea>
+      <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);margin-top:6px;letter-spacing:.08em">◆ ZION: The best operators plan what to AVOID as much as what to pursue. Define your traps before the session starts.</div>
+    </div>
+  </div>
+
+  <!-- NOTES — full width -->
+  <div class="section full-width">
+    <div class="sec-header">
+      <span class="sec-title">Observations &amp; Notes</span>
+      <span style="font-size:10px;color:var(--dim);font-family:var(--font-data)">Auto-saved</span>
+    </div>
+    <div class="sec-body">
+      <textarea class="notes-ta" id="notesEl" placeholder="Write your thesis, warnings, emotional state, or anything that needs to be on record before you pull the trigger…"></textarea>
+    </div>
+  </div>
+
+  <!-- SESSION LOG — full width -->
+  <div class="section full-width">
+    <div class="sec-header">
+      <span class="sec-title">Session Log</span>
+      <button class="btn danger" onclick="clearLog()" style="font-size:10px;padding:2px 8px">Clear</button>
+    </div>
+    <div class="sec-body" id="sessionLog">
+      <div class="log-empty">No evaluations this session.</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ── Easter eggs ───────────────────────────────────
+const EASTER_EGGS = [
+  "Bold move. The market respects that energy. 📈",
+  "Curiosity didn't kill the cat. It made her rich. 😏",
+  "You were warned. Now you owe me a winning trade.",
+  "That's not a button. That's a vibe check. You passed. ✨",
+  "The best traders know which rules to break. Carefully.",
+  "I respect the audacity. Now go read the structure.",
+  "Oh you clicked it. You're definitely a structure trader.",
+  "Red means stop. Green means go. This means… chaos. 💚",
+  "If you had this much courage on every trade, you'd be retired.",
+  "The market doesn't care you clicked this. But I noticed. 😊",
+];
+let eggIdx = 0;
+const showEasterEgg = () => {
+  const egg = document.getElementById('easterEgg');
+  egg.textContent = EASTER_EGGS[eggIdx % EASTER_EGGS.length];
+  eggIdx++;
+  egg.classList.add('show');
+  setTimeout(() => egg.classList.remove('show'), 3500);
+};
+
+// ── Clock ─────────────────────────────────────────
+const NYSE_HOLIDAYS_2025_2027 = [
+  '2025-01-01','2025-01-20','2025-02-17','2025-04-18','2025-05-26',
+  '2025-06-19','2025-07-04','2025-09-01','2025-11-27','2025-12-25',
+  '2026-01-01','2026-01-19','2026-02-16','2026-04-03','2026-05-25',
+  '2026-06-19','2026-07-03','2026-09-07','2026-11-26','2026-12-25',
+  '2027-01-01','2027-01-18','2027-02-15','2027-03-26','2027-05-31',
+  '2027-06-18','2027-07-05','2027-09-06','2027-11-25','2027-12-24',
+];
+const updateClock = () => {
+  const ny = new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const hh=ny.getHours(), mm=ny.getMinutes(), day=ny.getDay();
+  const dateStr = ny.toISOString().slice(0,10);
+  const t=`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')} ET`;
+  const isWeekend = day===0||day===6;
+  const isHoliday = NYSE_HOLIDAYS_2025_2027.includes(dateStr);
+  let session;
+  if(isWeekend) session = day===0?'⏸ Sunday — Market Closed':'⏸ Saturday — Market Closed';
+  else if(isHoliday) session = '⏸ NYSE Holiday — Market Closed';
+  else if(hh<4) session = '○ Overnight';
+  else if(hh<9||(hh===9&&mm<30)) session = '◐ Pre-Market';
+  else if(hh===9&&mm>=30||hh>=10&&hh<16) {
+    const mins=hh*60+mm;
+    if(mins>=570&&mins<600) session='🚫 Amateur Hour';
+    else if(mins>=600&&mins<690) session='✅ Pro Setup Window';
+    else if(mins>=690&&mins<810) session='🚫 Midday Chop';
+    else if(mins>=810&&mins<900) session='⚡ Smart Money Return';
+    else session='⚡ Power Hour';
+  }
+  else session='○ After-Hours';
+  document.getElementById('clockEl').textContent=`${t} · ${session}`;
+};
+updateClock(); setInterval(updateClock,30000);
+
+// ── State ─────────────────────────────────────────
+const $ = id => document.getElementById(id);
+let sessionLog = [];
+
+// ── Toggle checkboxes ─────────────────────────────
+const toggle = (item) => {
+  item.classList.toggle('checked');
+  autoSave();
+  liveScore();
+};
+
+// ── Section scoring ───────────────────────────────
+const sectionFlags = {
+  catalyst:  { type:'positive', redAt:0  },
+  rotation:  { type:'flag',     redAt:3  },
+  liquidity: { type:'flag',     redAt:2  },
+  structure: { type:'positive', redAt:0  },
+  expiration:{ type:'positive', redAt:0  },
+  operator:  { type:'positive', redAt:0  },
+};
+
+const scoreSection = (sectionId) => {
+  const items   = document.querySelectorAll(`[data-section="${sectionId}"]`);
+  const cfg     = sectionFlags[sectionId];
+  const checked = [...items].filter(i=>i.classList.contains('checked')).length;
+  const total   = items.length;
+  const el      = $(`score-${sectionId}`);
+
+  if(cfg.type === 'positive'){
+    const pct = total>0 ? checked/total : 0;
+    if(pct===1)       { el.textContent='✓ Clear';    el.className='sec-score green'; }
+    else if(pct>=0.5) { el.textContent=`${checked}/${total}`; el.className='sec-score amber'; }
+    else              { el.textContent=`${checked}/${total}`; el.className='sec-score neutral'; }
+  } else {
+    // flag type — more = worse
+    if(checked>=cfg.redAt) { el.textContent=`${checked} flagged`; el.className='sec-score red'; }
+    else if(checked>0)     { el.textContent=`${checked} flagged`; el.className='sec-score amber'; }
+    else                   { el.textContent='Clear';              el.className='sec-score green'; }
+  }
+  return { checked, total, type:cfg.type, redAt:cfg.redAt };
+};
+
+const liveScore = () => {
+  Object.keys(sectionFlags).forEach(scoreSection);
+};
+
+// ── Full evaluation ───────────────────────────────
+const evaluate = () => {
+  let redFlags=0, warnings=0, clear=0;
+  const results = {};
+
+  // Catalyst
+  const cat = document.querySelectorAll('[data-section="catalyst"]');
+  const catChecked = [...cat].filter(i=>i.classList.contains('checked')).length;
+  const hasCatalyst = cat[0].classList.contains('checked');
+  if(hasCatalyst && !cat[1].classList.contains('checked')) redFlags++;   // catalyst without history
+  if(hasCatalyst && !cat[5].classList.contains('checked')) redFlags++;   // no expiration buffer
+  if(catChecked >= 4) clear++; else if(catChecked >= 2) warnings++;
+
+  // Rotation
+  const rotItems = document.querySelectorAll('[data-section="rotation"]');
+  const rotCount = [...rotItems].filter(i=>i.classList.contains('checked')).length;
+  if(rotCount>=3) redFlags++; else if(rotCount>=1) warnings++; else clear++;
+
+  // Liquidity
+  const liqItems = document.querySelectorAll('[data-section="liquidity"]');
+  const liqCount = [...liqItems].filter(i=>i.classList.contains('checked')).length;
+  if(liqCount>=2) redFlags++; else if(liqCount>=1) warnings++; else clear++;
+
+  // Structure
+  const strItems = document.querySelectorAll('[data-section="structure"]');
+  const strCount = [...strItems].filter(i=>i.classList.contains('checked')).length;
+  if(strCount<=2) redFlags++; else if(strCount<=4) warnings++; else clear++;
+
+  // Expiration
+  const expItems = document.querySelectorAll('[data-section="expiration"]');
+  const expCount = [...expItems].filter(i=>i.classList.contains('checked')).length;
+  if(!expItems[0].classList.contains('checked')) redFlags++;  // no repair time
+  if(!expItems[2].classList.contains('checked')) redFlags++;  // sizing
+  if(expCount>=4) clear++; else if(expCount>=2) warnings++;
+
+  // Operator
+  const opItems = document.querySelectorAll('[data-section="operator"]');
+  const opCount = [...opItems].filter(i=>i.classList.contains('checked')).length;
+  if(!opItems[0].classList.contains('checked')) redFlags++;   // revenge trade
+  if(!opItems[2].classList.contains('checked')) warnings++;   // can't articulate thesis
+  if(opCount>=4) clear++; else if(opCount>=2) warnings++;
+
+  // Update counts
+  $('flagCount').textContent  = redFlags;
+  $('warnCount').textContent  = warnings;
+  $('clearCount').textContent = clear;
+
+  $('chip-red').className   = `score-chip ${redFlags>0?'red':'green'}`;
+  $('chip-warn').className  = `score-chip ${warnings>0?'amber':'green'}`;
+  $('chip-clear').className = `score-chip ${clear>0?'green':'neutral'}`;
+
+  // Verdict
+  const bar = $('verdictBar');
+  const status = $('verdictStatus');
+  const sub    = $('verdictSub');
+
+  bar.className = 'verdict-bar';
+  if(redFlags > 0){
+    bar.classList.add('nogo');
+    status.textContent = '🚫  NO-GO';
+    sub.textContent    = `${redFlags} red flag${redFlags>1?'s':''} detected — review flagged sections before entry`;
+  } else if(warnings > 0){
+    bar.classList.add('warn');
+    status.textContent = '⚠  CAUTION';
+    sub.textContent    = `${warnings} warning${warnings>1?'s':''} — proceed with reduced size and tighter stop`;
+  } else {
+    bar.classList.add('go');
+    status.textContent = '◆  GO';
+    sub.textContent    = 'All systems clear — structure supports the trade';
+  }
+
+  // Log entry
+  const now  = new Date();
+  const time = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const note = $('notesEl').value.trim().slice(0,120) || '(no notes)';
+  const verdict = redFlags>0?'nogo':warnings>0?'warn':'go';
+  const label   = redFlags>0?'NO-GO':warnings>0?'CAUTION':'GO';
+  sessionLog.unshift({ time, label, verdict, note, flags:redFlags, warns:warnings });
+  renderLog();
+  autoSave();
+};
+
+// ── Session log ───────────────────────────────────
+const renderLog = () => {
+  const el = $('sessionLog');
+  if(!sessionLog.length){ el.innerHTML='<div class="log-empty">No evaluations this session.</div>'; return; }
+  el.innerHTML='';
+  sessionLog.forEach(entry => {
+    const row = document.createElement('div');
+    row.className='log-entry';
+    row.innerHTML=`
+      <span class="log-time">${entry.time}</span>
+      <span class="log-verdict ${entry.verdict}">${entry.label}</span>
+      <span class="log-note">${entry.note}</span>`;
+    el.appendChild(row);
+  });
+};
+
+const clearLog = () => { sessionLog=[]; renderLog(); };
+
+// ── Persist state ─────────────────────────────────
+const autoSave = () => {
+  const checks = {};
+  document.querySelectorAll('.check-item').forEach((item,i)=>{
+    checks[i] = item.classList.contains('checked');
+  });
+  localStorage.setItem('zion-pretrade', JSON.stringify({
+    checks,
+    notes: $('notesEl').value,
+  }));
+};
+
+const loadSaved = () => {
+  const saved = JSON.parse(localStorage.getItem('zion-pretrade')||'{}');
+  if(saved.checks){
+    document.querySelectorAll('.check-item').forEach((item,i)=>{
+      if(saved.checks[i]) item.classList.add('checked');
+    });
+  }
+  if(saved.notes) $('notesEl').value = saved.notes;
+  liveScore();
+};
+
+// ── Reset ─────────────────────────────────────────
+const resetForm = () => {
+  document.querySelectorAll('.check-item').forEach(i=>i.classList.remove('checked','flagged'));
+  $('notesEl').value='';
+  $('verdictBar').className='verdict-bar';
+  $('verdictStatus').textContent='AWAITING CHECK';
+  $('verdictSub').textContent='Complete the checklist and hit Evaluate';
+  $('flagCount').textContent=$('warnCount').textContent=$('clearCount').textContent='—';
+  $('chip-red').className=$('chip-warn').className=$('chip-clear').className='score-chip';
+  Object.keys(sectionFlags).forEach(s=>{
+    const el=$(`score-${s}`);
+    if(el){ el.textContent='—'; el.className='sec-score neutral'; }
+  });
+  localStorage.removeItem('zion-pretrade');
+};
+
+// ── Notes auto-save on type ───────────────────────
+$('notesEl').addEventListener('input', autoSave);
+
+// ── Boot ──────────────────────────────────────────
+loadSaved();
+</script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Setup — Configure Your System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050d1a;--panel:#0a1628;--panel2:#0d1e35;
+  --border:#111f38;--border2:#1a2f4a;
+  --text:#c8d8f0;--dim:#4a6080;--hdr:#e8f0ff;
+  --teal:#00f5d4;--crimson:#ff4d6d;--gold:#fbbf24;
+  --blue:#60a5fa;--red:#ef4444;--navy:#1e3a8a;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-brand:'Josefin Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;line-height:1.7;padding:40px 24px;max-width:740px;margin:0 auto}
+.nav{display:flex;align-items:center;gap:12px;margin-bottom:48px}
+.nav-ion{font-family:var(--font-brand);font-weight:300;font-size:18px;letter-spacing:6px;color:#fff;-webkit-text-stroke:.7px #ef4444;paint-order:stroke fill;text-transform:uppercase}
+h1{font-family:var(--font-brand);font-weight:300;font-size:36px;letter-spacing:3px;color:var(--hdr);margin-bottom:8px}
+h1 span{color:var(--gold)}
+.eyebrow{font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:12px}
+.intro{font-size:15px;color:var(--text);line-height:1.8;margin-bottom:48px;max-width:620px}
+
+.setup-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.sc-header{padding:14px 20px;background:#070f1e;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sc-num{font-family:var(--font-data);font-size:10px;color:var(--dim);letter-spacing:.1em}
+.sc-title{font-family:var(--font-brand);font-size:17px;font-weight:300;color:var(--hdr);letter-spacing:2px}
+.sc-status{margin-left:auto;font-family:var(--font-data);font-size:9px;padding:3px 10px;border-radius:3px}
+.status-done{background:#00f5d418;color:var(--teal);border:1px solid #00f5d433}
+.status-req{background:#fbbf2418;color:var(--gold);border:1px solid #fbbf2433}
+.status-opt{background:#4a608020;color:var(--dim);border:1px solid #4a608040}
+.sc-body{padding:20px}
+
+.field-label{font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+.api-input{width:100%;font-family:var(--font-data);font-size:13px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;color:var(--hdr);padding:10px 14px;outline:none;transition:border-color .15s;margin-bottom:8px}
+.api-input:focus{border-color:var(--gold)}
+.api-input::placeholder{color:var(--dim);font-size:11px}
+
+.save-btn{font-family:var(--font-data);font-size:11px;font-weight:700;padding:8px 20px;background:var(--gold);color:#050d1a;border:none;border-radius:6px;cursor:pointer;letter-spacing:.08em;transition:background .15s}
+.save-btn:hover{background:#f59e0b}
+.save-btn.saved{background:var(--teal)}
+
+.step-list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.step{display:flex;gap:10px;font-size:13px;color:var(--text);line-height:1.6}
+.step-num{font-family:var(--font-data);font-size:10px;color:var(--gold);flex-shrink:0;margin-top:2px;min-width:20px}
+.step a{color:var(--blue);text-decoration:none}
+.step a:hover{text-decoration:underline}
+
+.note{background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:12px 14px;font-size:12px;color:var(--dim);line-height:1.7;margin-top:12px}
+.note strong{color:var(--text)}
+
+.verified-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-data);font-size:10px;padding:4px 12px;border-radius:4px;margin-top:8px}
+.vb-ok{background:#00f5d418;color:var(--teal);border:1px solid #00f5d433}
+.vb-fail{background:#ff4d6d18;color:var(--crimson);border:1px solid #ff4d6d33}
+.vb-idle{background:#4a608020;color:var(--dim);border:1px solid #4a608040}
+
+.test-btn{font-family:var(--font-data);font-size:10px;padding:6px 14px;background:transparent;border:1px solid var(--border2);color:var(--dim);border-radius:4px;cursor:pointer;transition:all .15s;margin-left:8px}
+.test-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+.divider{border:none;border-top:1px solid var(--border);margin:32px 0}
+
+.launch-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}
+.launch-btn{font-family:var(--font-brand);font-weight:300;font-size:14px;letter-spacing:3px;padding:12px 24px;border-radius:6px;text-decoration:none;text-align:center;transition:all .2s}
+.lb-primary{background:var(--gold);color:#050d1a}
+.lb-primary:hover{background:#f59e0b}
+.lb-secondary{border:1px solid var(--border2);color:var(--dim)}
+.lb-secondary:hover{border-color:var(--blue);color:var(--blue)}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <svg width="32" height="32" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="14" fill="#050d1a" stroke="#ef4444" stroke-width="2"/>
+    <circle cx="16" cy="16" r="10" fill="none" stroke="#1e3a8a" stroke-width=".7" opacity=".4"/>
+    <polygon points="16,1 17.8,6.2 16,8.5 14.2,6.2" fill="#ef4444"/>
+    <circle cx="16" cy="16" r="1.8" fill="#ef4444"/>
+    <text x="16" y="21" font-family="Josefin Sans,sans-serif" font-size="16" font-weight="300" text-anchor="middle" fill="#fff">Z</text>
+  </svg>
+  <span class="nav-ion">ION</span>
+</div>
+
+<div class="eyebrow">ZION Trading System</div>
+<h1>System <span>Setup</span></h1>
+<p class="intro">Welcome to ZION. Before you can use the live dashboard, Trend-Lock, and market data tools, you need to connect your data source. This takes about five minutes. The education modules (Academy, Primer, all Modules) work immediately with no setup required.</p>
+
+<!-- ── STEP 1: API KEY ── -->
+<div class="setup-card">
+  <div class="sc-header">
+    <span class="sc-num">01</span>
+    <span class="sc-title">Market Data API Key</span>
+    <span class="sc-status status-req">Required for live tools</span>
+  </div>
+  <div class="sc-body">
+    <p style="font-size:13px;color:var(--text);line-height:1.75;margin-bottom:16px">
+      The ZION Dashboard, Trend-Lock, and live screeners pull real market data from <strong style="color:var(--hdr)">Polygon.io</strong> (also called Massive). You need a Polygon.io account and API key to use these tools. The education modules work without it.
+    </p>
+
+    <div class="step-list">
+      <div class="step"><span class="step-num">1.</span><span>Go to <a href="https://polygon.io/dashboard/signup" target="_blank">polygon.io/dashboard/signup</a> and create a free account</span></div>
+      <div class="step"><span class="step-num">2.</span><span>Choose the <strong style="color:var(--gold)">Starter plan (~$29/month)</strong> — this gives you the data ZION needs</span></div>
+      <div class="step"><span class="step-num">3.</span><span>In your Polygon dashboard, go to <strong style="color:var(--hdr)">Keys</strong> and copy your API key</span></div>
+      <div class="step"><span class="step-num">4.</span><span>Paste it below and click Save — ZION stores it locally in your browser, never on a server</span></div>
+    </div>
+
+    <div style="margin-top:16px">
+      <div class="field-label">Your Polygon.io API Key</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="api-input" id="apiKeyInput" type="password" placeholder="Paste your API key here..." style="margin-bottom:0;flex:1">
+        <button class="test-btn" onclick="testKey()">Test Key</button>
+      </div>
+      <div id="keyStatus" class="verified-badge vb-idle" style="margin-top:8px">○ Not tested yet</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px;align-items:center">
+      <button class="save-btn" id="saveKeyBtn" onclick="saveKey()">◆ Save API Key</button>
+      <button class="test-btn" onclick="toggleKeyVisibility()">Show/Hide</button>
+      <span style="font-family:var(--font-data);font-size:9px;color:var(--dim)">Stored locally in your browser. Never transmitted.</span>
+    </div>
+
+    <div class="note">
+      <strong>Free tier limitation:</strong> Polygon.io's free tier has delayed data (15 minutes). The Starter plan gives you real-time data. ZION's tools are designed for the Starter plan. If you want to evaluate ZION's education first, start with the free modules and upgrade when you're ready.
+    </div>
+  </div>
+</div>
+
+<!-- ── STEP 2: YOUR WATCHLIST ── -->
+<div class="setup-card">
+  <div class="sc-header">
+    <span class="sc-num">02</span>
+    <span class="sc-title">Your Watchlist</span>
+    <span class="sc-status status-opt">Customize</span>
+  </div>
+  <div class="sc-body">
+    <p style="font-size:13px;color:var(--text);line-height:1.75;margin-bottom:16px">
+      The Dashboard loads a default watchlist of tickers. Replace them with the names you actually trade. One ticker per line.
+    </p>
+    <div class="field-label">Your Watchlist (one ticker per line)</div>
+    <textarea class="api-input" id="watchlistInput" rows="8" style="font-size:12px;line-height:1.8" placeholder="NVDA&#10;AAPL&#10;PLTR&#10;ORCL&#10;SPY&#10;QQQ&#10;MSFT&#10;AMZN"></textarea>
+    <button class="save-btn" id="saveWatchBtn" onclick="saveWatchlist()" style="margin-top:10px">◆ Save Watchlist</button>
+    <div class="note">These tickers will load automatically in the Dashboard. You can also add/remove them directly in the Dashboard at any time.</div>
+  </div>
+</div>
+
+<!-- ── STEP 3: TRADE TRACKER ── -->
+<div class="setup-card">
+  <div class="sc-header">
+    <span class="sc-num">03</span>
+    <span class="sc-title">Trade Tracker</span>
+    <span class="sc-status status-opt">Optional — starts empty</span>
+  </div>
+  <div class="sc-body">
+    <p style="font-size:13px;color:var(--text);line-height:1.75;margin-bottom:16px">
+      The Trade Tracker starts completely empty — ready for your first entry. Use natural language to add positions: <span style="font-family:var(--font-data);font-size:12px;color:var(--teal)">"Bought 2 NVDA $900 calls exp Jan 17 at $12.50"</span>
+    </p>
+    <p style="font-size:13px;color:var(--text);line-height:1.75">
+      All trade data is stored in your browser's local storage — it never leaves your device. If you clear your browser data, your trades will be cleared too. Export your trades regularly using the Export button in the Trade Tracker.
+    </p>
+    <div class="note"><strong>Privacy note:</strong> ZION stores zero user data on any server. Your API key, watchlist, trades, and journal entries all live in your browser. No accounts, no cloud sync, no data collection.</div>
+  </div>
+</div>
+
+<!-- ── STEP 4: COMMAND CENTER ── -->
+<div class="setup-card">
+  <div class="sc-header">
+    <span class="sc-num">04</span>
+    <span class="sc-title">Command Center</span>
+    <span class="sc-status status-opt">Ready to use</span>
+  </div>
+  <div class="sc-body">
+    <p style="font-size:13px;color:var(--text);line-height:1.75;margin-bottom:12px">
+      The Command Center is your morning launch page. Open this first every trading day. It shows:
+    </p>
+    <div class="step-list">
+      <div class="step"><span class="step-num">◆</span><span>Live ET clock with current trading session window (Pro Setup, Midday Chop, Smart Money Return, etc.)</span></div>
+      <div class="step"><span class="step-num">◆</span><span>Macro futures strip — NQ, ES, YM, RTY, VX, DX — click any tile for live Yahoo Finance data</span></div>
+      <div class="step"><span class="step-num">◆</span><span>Quick links to every ZION tool, external platform, and reference</span></div>
+      <div class="step"><span class="step-num">◆</span><span>Open positions count and cost basis (pulled from Trade Tracker)</span></div>
+    </div>
+    <div class="note">Bookmark <strong style="color:var(--hdr)">ZION_Command.html</strong> as your browser homepage or new tab page. Open it every morning before you open anything else.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div style="text-align:center;margin-bottom:24px">
+  <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-bottom:8px">Setup complete — you're ready</div>
+  <div id="setupStatus" style="font-family:var(--font-data);font-size:11px;color:var(--dim)">Save your API key above to unlock live data tools</div>
+</div>
+
+<div class="launch-row" style="justify-content:center">
+  <a class="launch-btn lb-primary" href="ZION_Command.html">→ Open Command Center</a>
+  <a class="launch-btn lb-secondary" href="ZION_Academy.html">Start Learning</a>
+  <a class="launch-btn lb-secondary" href="ZION_Dashboard.html">Open Dashboard</a>
+</div>
+
+<script>
+// ── Load saved values ────────────────────────────
+const savedKey = localStorage.getItem('zion-api-key') || 
+  (typeof ZION_CONFIG !== 'undefined' ? ZION_CONFIG.apiKey : '');
+if(savedKey) {
+  document.getElementById('apiKeyInput').value = savedKey;
+  document.getElementById('keyStatus').textContent = '✓ API key loaded from storage';
+  document.getElementById('keyStatus').className = 'verified-badge vb-ok';
+}
+
+const savedWatchlist = localStorage.getItem('zion-user-watchlist');
+if(savedWatchlist) {
+  document.getElementById('watchlistInput').value = savedWatchlist;
+}
+
+// ── Save API key ─────────────────────────────────
+const saveKey = () => {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if(!key) { alert('Please enter your API key first'); return; }
+  localStorage.setItem('zion-api-key', key);
+  const btn = document.getElementById('saveKeyBtn');
+  btn.textContent = '✓ Saved!'; btn.className = 'save-btn saved';
+  document.getElementById('setupStatus').textContent = 'API key saved — live data tools are ready';
+  document.getElementById('setupStatus').style.color = 'var(--teal)';
+  setTimeout(() => { btn.textContent = '◆ Save API Key'; btn.className = 'save-btn'; }, 2000);
+};
+
+// ── Test API key ─────────────────────────────────
+const testKey = async () => {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if(!key) { alert('Enter a key first'); return; }
+  const badge = document.getElementById('keyStatus');
+  badge.textContent = '⟳ Testing…'; badge.className = 'verified-badge vb-idle';
+  try {
+    const r = await fetch(`https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2024-01-01/2024-01-05?apiKey=${key}`);
+    const d = await r.json();
+    if(d.resultsCount > 0 || d.results?.length > 0) {
+      badge.textContent = '✓ API key valid — live data confirmed';
+      badge.className = 'verified-badge vb-ok';
+      localStorage.setItem('zion-api-key', key);
+    } else if(d.status === 'ERROR') {
+      badge.textContent = '✗ Invalid key — check and try again';
+      badge.className = 'verified-badge vb-fail';
+    } else {
+      badge.textContent = '⚠ Key tested — check Polygon dashboard for plan details';
+      badge.className = 'verified-badge vb-idle';
+    }
+  } catch(e) {
+    badge.textContent = '✗ Connection error — check your internet connection';
+    badge.className = 'verified-badge vb-fail';
+  }
+};
+
+// ── Toggle key visibility ────────────────────────
+const toggleKeyVisibility = () => {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+};
+
+// ── Save watchlist ───────────────────────────────
+const saveWatchlist = () => {
+  const list = document.getElementById('watchlistInput').value.trim();
+  localStorage.setItem('zion-user-watchlist', list);
+  const btn = document.getElementById('saveWatchBtn');
+  btn.textContent = '✓ Saved!'; btn.className = 'save-btn saved';
+  setTimeout(() => { btn.textContent = '◆ Save Watchlist'; btn.className = 'save-btn'; }, 2000);
+};
+</script>
+</body>
+</html>

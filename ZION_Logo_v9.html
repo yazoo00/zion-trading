@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#111; padding:48px; font-family:'Josefin Sans',sans-serif; }
+
+.version-label {
+  font-family:'Courier New',monospace;
+  font-size:9px; letter-spacing:3px; color:#334155;
+  text-transform:uppercase; margin:40px 0 14px;
+}
+
+.logo-card {
+  display:inline-flex;
+  align-items:center;
+  gap:20px;
+  padding:32px 40px;
+  border-radius:10px;
+  margin-bottom:8px;
+}
+.logo-card.dark  { background:#050d1a; border:1px solid #0f1f3a; }
+.logo-card.light { background:#ffffff; border:1px solid #e2e8f0; }
+.logo-card.navy  { background:#1e3a8a; border:1px solid #1e40af; }
+
+/* ── THE MARK — compass wrapping the Z ── */
+.mark-wrap { position:relative; flex-shrink:0; }
+
+/* ── ION — small caps, follows the mark ── */
+.ion-block {
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding-bottom:8px;
+}
+
+.ion-word {
+  font-family:'Josefin Sans',sans-serif;
+  font-weight:300;
+  font-size:42px;
+  letter-spacing:10px;
+  text-transform:uppercase;
+  line-height:1;
+}
+.ion-dark  { color:#ffffff; -webkit-text-stroke:1.2px #dc2626; paint-order:stroke fill; }
+.ion-light { color:#1e3a8a; -webkit-text-stroke:1.2px #dc2626; paint-order:stroke fill; }
+.ion-navy  { color:#ffffff; -webkit-text-stroke:1.2px #ef4444; paint-order:stroke fill; }
+
+/* Tagline block under ION */
+.tag-block { margin-top:8px; }
+.rule { display:flex; height:2px; margin-bottom:8px; }
+.rule-red  { width:80px; background:#dc2626; border-radius:1px; }
+.rule-blue { flex:1; background:#1e40af; opacity:0.35; border-radius:1px; }
+.rule-white { flex:1; background:#ffffff; opacity:0.2; border-radius:1px; }
+
+.tag1 {
+  font-family:'Josefin Sans',sans-serif;
+  font-weight:600; font-size:11px;
+  letter-spacing:4.5px; text-transform:uppercase;
+}
+.tag1.dark  { color:#ffffff; }
+.tag1.light { color:#1e3a8a; }
+.tag1.navy  { color:#ffffff; }
+
+.tag2 {
+  font-family:'Josefin Sans',sans-serif;
+  font-weight:600; font-size:11px;
+  letter-spacing:4.5px; text-transform:uppercase;
+  margin-top:3px;
+}
+.tag2.dark  { color:#3b82f6; }
+.tag2.light { color:#dc2626; }
+.tag2.navy  { color:#93c5fd; }
+
+.tagdesc {
+  font-family:'Courier New',monospace;
+  font-size:7px; letter-spacing:1.8px;
+  text-transform:uppercase; margin-top:7px;
+}
+.tagdesc.dark  { color:#1e3a8a; }
+.tagdesc.light { color:#94a3b8; }
+.tagdesc.navy  { color:#3b82f6; opacity:0.6; }
+
+/* ── SIZE ROW ── */
+.size-row { display:flex; gap:24px; align-items:flex-end; flex-wrap:wrap; }
+.size-item { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.size-item span {
+  font-family:'Courier New',monospace;
+  font-size:8px; letter-spacing:1px; color:#334155;
+}
+</style>
+</head>
+<body>
+
+<script>
+// ── Compass + Z mark ─────────────────────────────────────
+function compassZ(size, red, navy, bg, zColor, fontLoaded) {
+  const r = size/2;
+  const c = r;
+  const ringW = Math.max(2.5, size * 0.03);
+  const zSize = size * 0.52;
+
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+
+    <!-- Outer compass ring — RED, the star -->
+    <circle cx="${c}" cy="${c}" r="${r-2}" fill="${bg}"
+      stroke="${red}" stroke-width="${ringW}"/>
+
+    <!-- Secondary ring — navy, subtle structure -->
+    <circle cx="${c}" cy="${c}" r="${r*0.72}" fill="none"
+      stroke="${navy}" stroke-width="${size*0.008}" opacity="0.4"/>
+
+    <!-- Inner dashed ring — Ichimoku cloud nod -->
+    <circle cx="${c}" cy="${c}" r="${r*0.5}" fill="none"
+      stroke="${navy}" stroke-width="${size*0.006}"
+      stroke-dasharray="2.5,4" opacity="0.3"/>
+
+    <!-- NORTH needle — solid filled diamond, the hero -->
+    <polygon points="
+      ${c},${size*0.02}
+      ${c + size*0.045},${r*0.4}
+      ${c},${r*0.52}
+      ${c - size*0.045},${r*0.4}"
+      fill="${red}"/>
+
+    <!-- SOUTH needle — hollow outline -->
+    <polygon points="
+      ${c},${size*0.98}
+      ${c + size*0.035},${r*1.6}
+      ${c},${r*1.48}
+      ${c - size*0.035},${r*1.6}"
+      fill="none" stroke="${red}" stroke-width="${size*0.014}"/>
+
+    <!-- EAST needle — hollow outline -->
+    <polygon points="
+      ${size*0.98},${c}
+      ${r*1.6},${c + size*0.035}
+      ${r*1.48},${c}
+      ${r*1.6},${c - size*0.035}"
+      fill="none" stroke="${red}" stroke-width="${size*0.014}"/>
+
+    <!-- WEST needle — hollow outline -->
+    <polygon points="
+      ${size*0.02},${c}
+      ${r*0.4},${c + size*0.035}
+      ${r*0.52},${c}
+      ${r*0.4},${c - size*0.035}"
+      fill="none" stroke="${red}" stroke-width="${size*0.014}"/>
+
+    <!-- Intercardinal ticks — very subtle -->
+    <line x1="${c + r*0.56}" y1="${c - r*0.56}"
+          x2="${c + r*0.68}" y2="${c - r*0.68}"
+      stroke="${red}" stroke-width="${size*0.008}" opacity="0.25"/>
+    <line x1="${c + r*0.56}" y1="${c + r*0.56}"
+          x2="${c + r*0.68}" y2="${c + r*0.68}"
+      stroke="${red}" stroke-width="${size*0.008}" opacity="0.25"/>
+    <line x1="${c - r*0.56}" y1="${c + r*0.56}"
+          x2="${c - r*0.68}" y2="${c + r*0.68}"
+      stroke="${red}" stroke-width="${size*0.008}" opacity="0.25"/>
+    <line x1="${c - r*0.56}" y1="${c - r*0.56}"
+          x2="${c - r*0.68}" y2="${c - r*0.68}"
+      stroke="${red}" stroke-width="${size*0.008}" opacity="0.25"/>
+
+    <!-- N label -->
+    <text x="${c}" y="${size*0.1}"
+      font-family="'Josefin Sans',sans-serif"
+      font-size="${size*0.095}" font-weight="600"
+      letter-spacing="1" text-anchor="middle"
+      fill="${red}">N</text>
+
+    <!-- Center bullseye -->
+    <circle cx="${c}" cy="${c}" r="${size*0.055}" fill="${red}"/>
+    <circle cx="${c}" cy="${c}" r="${size*0.023}" fill="${bg}"/>
+
+    <!-- Z — centered in compass, the co-star -->
+    <text x="${c}" y="${c + zSize*0.36}"
+      font-family="'Josefin Sans',sans-serif"
+      font-size="${zSize}" font-weight="300"
+      text-anchor="middle"
+      fill="${zColor}"
+      letter-spacing="0">Z</text>
+
+  </svg>`;
+}
+
+const body = document.body;
+
+// Helper to build a full logo card
+function buildCard(mode, markSize, showTag) {
+  const isDark  = mode === 'dark';
+  const isNavy  = mode === 'navy';
+  const isLight = mode === 'light';
+
+  const red    = isDark || isNavy ? '#ef4444' : '#dc2626';
+  const navy   = '#1e3a8a';
+  const bg     = isDark ? '#050d1a' : isNavy ? '#1e3a8a' : '#ffffff';
+  const zColor = isLight ? '#1e3a8a' : '#ffffff';
+  const ionCls = `ion-word ion-${mode}`;
+  const t1Cls  = `tag1 ${mode}`;
+  const t2Cls  = `tag2 ${mode}`;
+  const tdCls  = `tagdesc ${mode}`;
+  const rBlue  = isLight ? 'rule-blue' : 'rule-white';
+
+  const card = document.createElement('div');
+  card.className = `logo-card ${mode}`;
+
+  card.innerHTML = `
+    <div class="mark-wrap">
+      ${compassZ(markSize, red, navy, bg, zColor)}
+    </div>
+    <div class="ion-block">
+      <span class="${ionCls}">ION</span>
+      ${showTag ? `
+      <div class="tag-block">
+        <div class="rule">
+          <div class="rule-red"></div>
+          <div class="${rBlue}"></div>
+        </div>
+        <div class="${t1Cls}">TRADE THE STRUCTURE.</div>
+        <div class="${t2Cls}">NAVIGATE. DON'T PREDICT.</div>
+        <div class="${tdCls}">ZEN · ICHIMOKU · OPTIONS · NAVIGATION · ZionTrading.io</div>
+      </div>` : ''}
+    </div>`;
+
+  return card;
+}
+
+// ── PRIMARY DARK ──
+const dl = document.createElement('div');
+dl.className='version-label';
+dl.textContent='PRIMARY — Dark Background (Web / Screen / Dashboard)';
+body.appendChild(dl);
+body.appendChild(buildCard('dark', 140, true));
+
+// ── PRIMARY LIGHT ──
+const ll = document.createElement('div');
+ll.className='version-label';
+ll.textContent='LIGHT BACKGROUND — Print / PDF / White Mode';
+body.appendChild(ll);
+body.appendChild(buildCard('light', 140, true));
+
+// ── NAVY BACKGROUND ──
+const nl = document.createElement('div');
+nl.className='version-label';
+nl.textContent='NAVY BACKGROUND — Merch / Polo / Hat / Premium Feel';
+body.appendChild(nl);
+body.appendChild(buildCard('navy', 140, true));
+
+// ── SIZE TEST ──
+const sl = document.createElement('div');
+sl.className='version-label';
+sl.textContent='SCALE TEST — The mark must hold at every size';
+body.appendChild(sl);
+
+const srow = document.createElement('div');
+srow.className='size-row';
+
+[280, 200, 140, 100, 72, 48, 32].forEach(sz => {
+  const item = document.createElement('div');
+  item.className='size-item';
+  item.innerHTML=`
+    <div style="background:#050d1a;padding:${Math.max(6,sz*0.08)}px;border-radius:6px">
+      ${compassZ(sz,'#ef4444','#1e3a8a','#050d1a','#ffffff')}
+    </div>
+    <span>${sz}px</span>`;
+  srow.appendChild(item);
+});
+body.appendChild(srow);
+
+// ── COMPACT HORIZONTAL — no tagline, just mark + ION ──
+const cl = document.createElement('div');
+cl.className='version-label';
+cl.textContent='COMPACT — Social avatar · Email signature · Small use';
+body.appendChild(cl);
+
+const crow = document.createElement('div');
+crow.style.display='flex';
+crow.style.gap='16px';
+crow.style.flexWrap='wrap';
+
+['dark','light','navy'].forEach(mode => {
+  crow.appendChild(buildCard(mode, 72, false));
+});
+body.appendChild(crow);
+
+// ── STANDALONE MARK ONLY ──
+const mkl = document.createElement('div');
+mkl.className='version-label';
+mkl.textContent='STANDALONE MARK — Hat · Discord · Favicon · Future merch';
+body.appendChild(mkl);
+
+const mkrow = document.createElement('div');
+mkrow.style.display='flex';
+mkrow.style.gap='20px';
+mkrow.style.flexWrap='wrap';
+mkrow.style.alignItems='flex-end';
+
+[
+  {mode:'dark',  bg:'#050d1a', border:'#0f1f3a'},
+  {mode:'light', bg:'#ffffff', border:'#e2e8f0'},
+  {mode:'navy',  bg:'#1e3a8a', border:'#1e40af'},
+].forEach(({mode, bg, border}) => {
+  const red    = mode==='light' ? '#dc2626' : '#ef4444';
+  const zColor = mode==='light' ? '#1e3a8a' : '#ffffff';
+  const lblClr = mode==='light' ? '#94a3b8'  : mode==='navy' ? '#93c5fd' : '#1e3a8a';
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText=`background:${bg};border:1px solid ${border};border-radius:10px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;`;
+  wrap.innerHTML=`
+    ${compassZ(180,'${red}','#1e3a8a','${bg}','${zColor}')}
+    <div style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:12px;letter-spacing:8px;color:${lblClr};text-transform:uppercase;">ZionTrading.io</div>`;
+
+  // Fix template literal issue
+  wrap.innerHTML = wrap.innerHTML
+    .replace('${red}', red)
+    .replace('${bg}', bg)
+    .replace('${zColor}', zColor);
+  wrap.querySelector('svg') || wrap.insertAdjacentHTML('afterbegin', compassZ(180, red, '#1e3a8a', bg, zColor));
+
+  mkrow.appendChild(wrap);
+});
+body.appendChild(mkrow);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,724 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ZION Config — API key and settings live in ZION_Config.js -->
+<script src="ZION_Config.js"></script>
+<title>ZION Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --teal:#00f5d4; --blue:#60a5fa; --gold:#fbbf24;
+  --crimson:#ff4d6d; --wait:#fb923c; --bull:#4ade80;
+  --purple:#a78bfa;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+}
+html,body { min-height:100vh; background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:13px; }
+
+/* ── Nav ── */
+.nav { display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:48px; background:var(--panel); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); }
+.nav-logo span { color:var(--teal); }
+.nav-right { display:flex; gap:8px; align-items:center; }
+.nav-link { font-size:11px; color:var(--dim); text-decoration:none; padding:4px 10px; border:1px solid transparent; border-radius:4px; transition:all .15s; }
+.nav-link:hover { color:var(--blue); border-color:var(--border2); }
+
+/* ── Header ── */
+.page-header { padding:40px 32px 20px; max-width:1200px; margin:0 auto; }
+.page-title { font-family:var(--font-data); font-size:11px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-bottom:8px; }
+.page-sub { font-size:22px; font-weight:700; color:var(--hdr); }
+
+/* ── Clock strip ── */
+.clock-strip { display:flex; align-items:center; gap:24px; padding:12px 32px; max-width:1200px; margin:0 auto 8px; }
+.clock-main { font-family:var(--font-data); font-size:24px; font-weight:700; color:var(--hdr); letter-spacing:.05em; }
+.clock-et { font-family:var(--font-data); font-size:11px; color:var(--dim); }
+.session-pill { font-family:var(--font-data); font-size:10px; font-weight:700; padding:4px 12px; border-radius:20px; letter-spacing:.08em; }
+.session-open   { background:#00f5d420; color:var(--teal); border:1px solid #00f5d440; }
+.session-pre    { background:#fbbf2420; color:var(--gold); border:1px solid #fbbf2440; }
+.session-after  { background:#60a5fa20; color:var(--blue); border:1px solid #60a5fa40; }
+.session-closed { background:#4a608030; color:var(--dim); border:1px solid #4a608050; }
+.clock-divider  { width:1px; height:24px; background:var(--border2); }
+.econ-label { font-size:10px; color:var(--dim); }
+.econ-val   { font-family:var(--font-data); font-size:11px; color:var(--text); }
+
+/* ── Grid ── */
+.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:0 32px 32px; max-width:1200px; margin:0 auto; }
+@media(max-width:900px){ .grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:560px){ .grid { grid-template-columns:1fr; } }
+.grid-full { grid-column:1/-1; }
+
+/* ── Group card ── */
+.group { background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.group-header { padding:10px 16px; background:#070f1e; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.group-icon { font-size:16px; }
+.group-title { font-family:var(--font-data); font-size:9px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; }
+.group-body { padding:10px; display:flex; flex-direction:column; gap:6px; }
+
+/* ── Link tiles ── */
+.link-tile { display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--panel2); border:1px solid var(--border); border-radius:6px; text-decoration:none; transition:all .2s; cursor:pointer; position:relative; overflow:hidden; }
+.link-tile::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; transition:background .2s; }
+.link-tile:hover { border-color:var(--border2); background:#0f1f38; transform:translateX(2px); }
+.lt-icon { font-size:18px; flex-shrink:0; width:32px; text-align:center; }
+.lt-text { flex:1; min-width:0; }
+.lt-name { font-size:12px; font-weight:600; color:var(--hdr); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lt-desc { font-size:10px; color:var(--dim); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lt-arrow { font-family:var(--font-data); font-size:12px; color:var(--dim); flex-shrink:0; transition:color .2s,transform .2s; }
+.link-tile:hover .lt-arrow { transform:translateX(3px); }
+
+/* Color themes per group */
+.theme-zion   .link-tile::before { background:var(--teal); }
+.theme-zion   .link-tile:hover .lt-arrow { color:var(--teal); }
+.theme-bc     .link-tile::before { background:var(--gold); }
+.theme-bc     .link-tile:hover .lt-arrow { color:var(--gold); }
+.theme-rh     .link-tile::before { background:var(--bull); }
+.theme-rh     .link-tile:hover .lt-arrow { color:var(--bull); }
+.theme-fid    .link-tile::before { background:var(--green,#22c55e); }
+.theme-fid    .link-tile:hover .lt-arrow { color:#22c55e; }
+.theme-tv     .link-tile::before { background:var(--blue); }
+.theme-tv     .link-tile:hover .lt-arrow { color:var(--blue); }
+.theme-disc   .link-tile::before { background:var(--purple); }
+.theme-disc   .link-tile:hover .lt-arrow { color:var(--purple); }
+.theme-ref    .link-tile::before { background:var(--wait); }
+.theme-ref    .link-tile:hover .lt-arrow { color:var(--wait); }
+
+/* ── Open positions mini panel ── */
+.mini-positions { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:10px; }
+.mini-pos { background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; cursor:pointer; transition:border-color .15s; }
+.mini-pos:hover { border-color:var(--teal); }
+.mp-sym { font-family:var(--font-data); font-size:11px; font-weight:700; color:var(--blue); }
+.mp-contract { font-family:var(--font-data); font-size:9px; color:var(--dim); margin-top:2px; }
+.mp-dte { font-family:var(--font-data); font-size:9px; margin-top:4px; }
+.mp-dte.ok   { color:var(--teal); }
+.mp-dte.warn { color:var(--wait); }
+.mp-dte.hot  { color:var(--crimson); }
+.mp-cost { font-family:var(--font-data); font-size:10px; color:var(--text); margin-top:2px; }
+
+/* ── Quick notes ── */
+.quick-note { width:100%; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; color:var(--text); font-family:var(--font-ui); font-size:12px; padding:10px 12px; resize:none; outline:none; transition:border-color .15s; min-height:70px; }
+.quick-note:focus { border-color:var(--blue); }
+.quick-note::placeholder { color:var(--dim); }
+.quick-note-actions { display:flex; justify-content:space-between; align-items:center; margin-top:6px; padding:0 2px; }
+.qn-hint { font-size:10px; color:var(--dim); }
+.qn-btn { font-size:11px; padding:4px 12px; border-radius:4px; border:1px solid var(--blue); background:#0f2545; color:var(--blue); cursor:pointer; font-family:var(--font-ui); font-weight:600; }
+.qn-btn:hover { background:#163560; }
+
+/* ── Recent journal ── */
+.recent-entry { padding:10px 14px; border-bottom:1px solid var(--border); }
+.recent-entry:last-child { border-bottom:none; }
+.re-meta { font-family:var(--font-data); font-size:9px; color:var(--dim); margin-bottom:4px; }
+.re-text { font-size:11px; color:var(--text); line-height:1.55; white-space:pre-wrap; }
+.re-stamp { color:var(--teal); font-size:10px; }
+.empty-recent { padding:16px; text-align:center; font-size:11px; color:var(--dim); font-family:var(--font-data); }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div class="nav-right">
+    <a class="nav-link" href="ZION_Dashboard.html">Dashboard</a>
+    <a class="nav-link" href="ZION_Trades.html">Trades</a>
+    <a class="nav-link" href="ZION_Pretrade.html">Pre-Trade</a>
+    <a class="nav-link" href="ZION_Academy.html">Academy</a>
+    <a class="nav-link" href="ZION_Setup.html">⚙ Setup</a>
+    <a class="nav-link" href="ZION_WeeklyPrep.html">Weekly Prep</a>
+    <a class="nav-link" href="ZION_Module1_Foundation.html">M1</a>
+    <a class="nav-link" href="ZION_Module2_Ichimoku.html">M2</a>
+    <a class="nav-link" href="ZION_Module3_Operator.html">M3</a>
+    <a class="nav-link" href="ZION_Module3_5_Operator_Advanced.html">M3.5</a>
+    <a class="nav-link" href="ZION_Module3_6_Mindset.html">M3.6</a>
+  </div>
+</nav>
+
+<!-- Header -->
+<div class="page-header">
+  <div class="page-title">Zen Ichimoku Options Navigation</div>
+  <div class="page-sub">Command Center</div>
+</div>
+
+<!-- Clock strip -->
+<div class="clock-strip">
+  <div>
+    <div class="clock-main" id="clockMain">--:--:--</div>
+    <div class="clock-et" id="clockET">Eastern Time</div>
+  </div>
+  <div class="clock-divider"></div>
+  <div class="session-pill" id="sessionPill">Loading…</div>
+  <div class="clock-divider"></div>
+  <div>
+    <div class="econ-label">Next Close</div>
+    <div class="econ-val" id="nextClose">—</div>
+  </div>
+  <div class="clock-divider"></div>
+  <div>
+    <div class="econ-label">Open Positions</div>
+    <div class="econ-val" id="openPosCount" style="color:var(--teal)">—</div>
+  </div>
+  <div class="clock-divider"></div>
+  <div>
+    <div class="econ-label">Total Cost Basis</div>
+    <div class="econ-val" id="totalBasis">—</div>
+  </div>
+</div>
+
+<!-- ══ MACRO MORNING STRIP ══ -->
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--border)">
+  <a href="https://finance.yahoo.com/quote/NQ=F" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;gap:2px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)'">
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">NQ · Nasdaq Futures</div>
+    <div style="font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--hdr)">↗ Click for Live</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim)">Yahoo Finance</div>
+  </a>
+  <a href="https://finance.yahoo.com/quote/ES=F" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;gap:2px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border2)'">
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">ES · S&P Futures</div>
+    <div style="font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--hdr)">↗ Click for Live</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim)">Yahoo Finance</div>
+  </a>
+  <a href="https://finance.yahoo.com/quote/YM=F" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;gap:2px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">YM · Dow Futures</div>
+    <div style="font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--hdr)">↗ Click for Live</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim)">Yahoo Finance</div>
+  </a>
+  <a href="https://finance.yahoo.com/quote/RTY=F" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;gap:2px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border2)'">
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">RTY · Russell Futures</div>
+    <div style="font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--hdr)">↗ Click for Live</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim)">Yahoo Finance</div>
+  </a>
+  <a href="https://finance.yahoo.com/quote/%5EVIX" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;gap:2px;background:var(--panel2);border:1px solid #ff4d6d44;border-radius:6px;padding:8px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--crimson)'" onmouseout="this.style.borderColor='#ff4d6d44'">
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">VX · VIX Fear Index</div>
+    <div style="font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--hdr)">↗ Click for Live</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim)">CBOE Volatility</div>
+  </a>
+  <a href="https://finance.yahoo.com/quote/DX-Y.NYB" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;gap:2px;background:var(--panel2);border:1px solid #fbbf2444;border-radius:6px;padding:8px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='#fbbf2444'">
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">DX · Dollar Index</div>
+    <div style="font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--hdr)">↗ Click for Live</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim)">DXY · Macro context</div>
+  </a>
+</div>
+
+<div class="grid">
+
+  <!-- ══ ZION TOOLS ══ -->
+  <div class="group theme-zion">
+    <div class="group-header">
+      <span class="group-icon">◆</span>
+      <span class="group-title">ZION Tools</span>
+    </div>
+    <div class="group-body">
+      <a class="link-tile" href="ZION_Dashboard.html">
+        <span class="lt-icon">📊</span>
+        <div class="lt-text"><div class="lt-name">Live Dashboard</div><div class="lt-desc">HUD · Sectors · Watchlist · Screener</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_Trades.html">
+        <span class="lt-icon">📋</span>
+        <div class="lt-text"><div class="lt-name">Trade Tracker</div><div class="lt-desc">Open positions · History · Journal · P&L</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_Module4_Catalyst.html">
+        <span class="lt-icon">📊</span>
+        <div class="lt-text"><div class="lt-name">Module 4 — The Catalyst</div><div class="lt-desc">FA meets structure · Revenue · Margins · FCF · Catalyst Score</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_WeeklyPrep.html">
+        <span class="lt-icon">📅</span>
+        <div class="lt-text"><div class="lt-name">Weekly Prep</div><div class="lt-desc">Sunday ritual · Market context · Position review · Game plan</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_Pretrade.html">
+        <span class="lt-icon">✅</span>
+        <div class="lt-text"><div class="lt-name">Pre-Trade Checklist</div><div class="lt-desc">GO / NO-GO · Rotation · Structure · Operator</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_TrendLock.html">
+        <span class="lt-icon">🔒</span>
+        <div class="lt-text"><div class="lt-name">Trend-Lock Diagram</div><div class="lt-desc">5m · 65m · Daily alignment · Lock status · Key levels</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="https://finance.yahoo.com/markets/options/most-active/" target="_blank">
+        <span class="lt-icon">🌍</span>
+        <div class="lt-text"><div class="lt-name">Macro Morning Check</div><div class="lt-desc">NQ · ES · YM · RTY · VIX · DXY · Yields</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://finviz.com/map.ashx?t=sec" target="_blank">
+        <span class="lt-icon">🗺</span>
+        <div class="lt-text"><div class="lt-name">Sector Heatmap</div><div class="lt-desc">Finviz sector map · Risk-on vs risk-off · Rotation</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="ZION_Academy.html">
+        <span class="lt-icon">🎓</span>
+        <div class="lt-text"><div class="lt-name">Academy Hub</div><div class="lt-desc">Course home · Full curriculum · Progress tracking</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_Primer.html">
+        <span class="lt-icon">📚</span>
+        <div class="lt-text"><div class="lt-name">Primer — Trading Foundations</div><div class="lt-desc">Glossary · Candlesticks · Chart Basics · Ichimoku Intro</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_Module1_Foundation.html">
+        <span class="lt-icon">📖</span>
+        <div class="lt-text"><div class="lt-name">Module 1 — Foundation</div><div class="lt-desc">VWAP · Bollinger · RSI · FVGs</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_Module2_Ichimoku.html">
+        <span class="lt-icon">☁️</span>
+        <div class="lt-text"><div class="lt-name">Module 2 — Ichimoku</div><div class="lt-desc">TK · Cloud · Chikou · ZION Signal</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+      <a class="link-tile" href="ZION_Module3_Operator.html">
+        <span class="lt-icon">🧠</span>
+        <div class="lt-text"><div class="lt-name">Module 3 — The Operator</div><div class="lt-desc">Discipline · Revenge Trade · Sizing · Ritual</div></div>
+        <span class="lt-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ BARCHART ══ -->
+  <div class="group theme-bc">
+    <div class="group-header">
+      <span class="group-icon">📈</span>
+      <span class="group-title">Barchart</span>
+    </div>
+    <div class="group-body">
+      <a class="link-tile" href="https://www.barchart.com/my/watchlist?viewName=main&orderBy=percentChange&orderDir=desc" target="_blank">
+        <span class="lt-icon">👁</span>
+        <div class="lt-text"><div class="lt-name">Options Watchlist</div><div class="lt-desc">Sorted by % change · Your primary scan list</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://www.barchart.com/my/watchlist?watchlist=1699315&viewName=main&orderBy=percentChange&orderDir=desc" target="_blank">
+        <span class="lt-icon">🔄</span>
+        <div class="lt-text"><div class="lt-name">Rotation Tracking</div><div class="lt-desc">Sector rotation watchlist · % change sorted</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://www.barchart.com/stocks/sectors" target="_blank">
+        <span class="lt-icon">🗂</span>
+        <div class="lt-text"><div class="lt-name">Sector Overview</div><div class="lt-desc">Sector performance snapshot</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://www.barchart.com/options/unusual-activity/stocks" target="_blank">
+        <span class="lt-icon">🔥</span>
+        <div class="lt-text"><div class="lt-name">Unusual Options Activity</div><div class="lt-desc">Smart money flow · Unusual volume</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ TRADINGVIEW ══ -->
+  <div class="group theme-tv">
+    <div class="group-header">
+      <span class="group-icon">📉</span>
+      <span class="group-title">TradingView</span>
+    </div>
+    <div class="group-body">
+      <a class="link-tile" href="https://tradingview.com/chart" target="_blank">
+        <span class="lt-icon">🕯</span>
+        <div class="lt-text"><div class="lt-name">Chart</div><div class="lt-desc">ZION Cockpit + HUD — your primary chart</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://tradingview.com/screener" target="_blank">
+        <span class="lt-icon">🔍</span>
+        <div class="lt-text"><div class="lt-name">Stock Screener</div><div class="lt-desc">Filter by technical criteria</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://tradingview.com/markets/stocks-usa/sectorandindustry-sector" target="_blank">
+        <span class="lt-icon">🗺</span>
+        <div class="lt-text"><div class="lt-name">Sector Heatmap</div><div class="lt-desc">Visual sector rotation overview</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://tradingview.com/markets/indices" target="_blank">
+        <span class="lt-icon">📊</span>
+        <div class="lt-text"><div class="lt-name">Market Overview</div><div class="lt-desc">Indices · Futures · Breadth</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ ROBINHOOD ══ -->
+  <div class="group theme-rh">
+    <div class="group-header">
+      <span class="group-icon">🪶</span>
+      <span class="group-title">Robinhood</span>
+    </div>
+    <div class="group-body">
+      <a class="link-tile" href="https://robinhood.com/legend/layout/388f21f4-20f1-4bac-a191-69994047890d?source=web_button_after_1st_visit" target="_blank">
+        <span class="lt-icon">⚡</span>
+        <div class="lt-text"><div class="lt-name">Legend</div><div class="lt-desc">Your primary trading layout</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://robinhood.com/retirement" target="_blank">
+        <span class="lt-icon">🏦</span>
+        <div class="lt-text"><div class="lt-name">Retirement</div><div class="lt-desc">IRA · Retirement account overview</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://robinhood.com/options/positions" target="_blank">
+        <span class="lt-icon">📋</span>
+        <div class="lt-text"><div class="lt-name">Options Positions</div><div class="lt-desc">Open contracts · P&L</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ FIDELITY ══ -->
+  <div class="group theme-fid">
+    <div class="group-header">
+      <span class="group-icon">🏛</span>
+      <span class="group-title">Fidelity</span>
+    </div>
+    <div class="group-body">
+      <a class="link-tile" href="https://digital.fidelity.com/ftgw/digital/portfolio/positions" target="_blank">
+        <span class="lt-icon">💼</span>
+        <div class="lt-text"><div class="lt-name">Portfolio Positions</div><div class="lt-desc">Investment holdings · Long-term</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://digital.fidelity.com/ftgw/digital/portfolio/summary" target="_blank">
+        <span class="lt-icon">📊</span>
+        <div class="lt-text"><div class="lt-name">Portfolio Summary</div><div class="lt-desc">Account overview · Performance</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://digital.fidelity.com/ftgw/digital/research/research" target="_blank">
+        <span class="lt-icon">🔬</span>
+        <div class="lt-text"><div class="lt-name">Research</div><div class="lt-desc">Analyst ratings · Fundamentals</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ DISCORD ══ -->
+  <div class="group theme-disc">
+    <div class="group-header">
+      <span class="group-icon">💬</span>
+      <span class="group-title">Discord</span>
+    </div>
+    <div class="group-body">
+      <a class="link-tile" href="https://discord.com/channels/1287556749272027299" target="_blank">
+        <span class="lt-icon">📡</span>
+        <div class="lt-text"><div class="lt-name">Trading Group</div><div class="lt-desc">Your trading community · Call out trades here</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://discord.com/channels/1373446656829292574" target="_blank">
+        <span class="lt-icon">🏠</span>
+        <div class="lt-text"><div class="lt-name">Personal Server</div><div class="lt-desc">Your personal Discord</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://discord.com/channels/@me" target="_blank">
+        <span class="lt-icon">✉️</span>
+        <div class="lt-text"><div class="lt-name">Direct Messages</div><div class="lt-desc">DMs · Notifications</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ REFERENCE ══ -->
+  <div class="group theme-ref">
+    <div class="group-header">
+      <span class="group-icon">📚</span>
+      <span class="group-title">Reference</span>
+    </div>
+    <div class="group-body">
+      <a class="link-tile" href="https://www.cmegroup.com/trading/equity-index/us-index/e-mini-sandp500.html" target="_blank">
+        <span class="lt-icon">🔢</span>
+        <div class="lt-text"><div class="lt-name">CME — ES Futures</div><div class="lt-desc">S&P 500 futures specs · Settlement</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://www.cboe.com/tradable_products/vix" target="_blank">
+        <span class="lt-icon">😱</span>
+        <div class="lt-text"><div class="lt-name">CBOE — VIX</div><div class="lt-desc">Volatility index · Fear gauge</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://www.federalreserve.gov/releases/h15" target="_blank">
+        <span class="lt-icon">🏦</span>
+        <div class="lt-text"><div class="lt-name">Fed — Interest Rates</div><div class="lt-desc">Current rate environment</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://finance.yahoo.com/calendar/earnings" target="_blank">
+        <span class="lt-icon">📅</span>
+        <div class="lt-text"><div class="lt-name">Earnings Calendar</div><div class="lt-desc">Upcoming earnings · Catalyst scan</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://www.investing.com/economic-calendar" target="_blank">
+        <span class="lt-icon">🗓</span>
+        <div class="lt-text"><div class="lt-name">Economic Calendar</div><div class="lt-desc">CPI · FOMC · Jobs · Macro events</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://x.com/search?q=%24SPY+OR+%24QQQ+OR+%24NQ+OR+market&src=typed_query&f=live" target="_blank">
+        <span class="lt-icon">𝕏</span>
+        <div class="lt-text"><div class="lt-name">X — Market Flow</div><div class="lt-desc">Live market chatter · News · Sentiment</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+      <a class="link-tile" href="https://x.com/home" target="_blank">
+        <span class="lt-icon">🐦</span>
+        <div class="lt-text"><div class="lt-name">X — Your Feed</div><div class="lt-desc">Your timeline · Who you follow</div></div>
+        <span class="lt-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ OPEN POSITIONS MINI ══ -->
+  <div class="group grid-full" style="grid-column:span 2">
+    <div class="group-header">
+      <span class="group-icon">📋</span>
+      <span class="group-title">Open Positions — Quick View</span>
+      <a href="ZION_Trades.html" style="margin-left:auto;font-size:10px;color:var(--teal);text-decoration:none;font-family:var(--font-data)">Full tracker →</a>
+    </div>
+    <div class="mini-positions" id="miniPositions">
+      <div style="grid-column:1/-1;padding:12px;text-align:center;font-size:11px;color:var(--dim);font-family:var(--font-data)">Loading positions…</div>
+    </div>
+  </div>
+
+  <!-- ══ QUICK JOURNAL ══ -->
+  <div class="group">
+    <div class="group-header">
+      <span class="group-icon">✏️</span>
+      <span class="group-title">Quick Journal Entry</span>
+      <a href="ZION_Trades.html" style="margin-left:auto;font-size:10px;color:var(--blue);text-decoration:none;font-family:var(--font-data)">Full journal →</a>
+    </div>
+    <div class="group-body" style="gap:0">
+      <textarea class="quick-note" id="quickNote" placeholder="Session notes, observations, what the structure was saying…"></textarea>
+      <div class="quick-note-actions">
+        <span class="qn-hint">Saved to journal in Trades</span>
+        <button class="qn-btn" onclick="saveQuickNote()">Add to Journal</button>
+      </div>
+      <!-- Recent entries preview -->
+      <div id="recentJournal" style="margin-top:10px;border-top:1px solid var(--border);max-height:180px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Clock ──────────────────────────────────────────
+// ── NYSE Market Holiday Calendar ──────────────────────
+// Covers 2025-2027. Update annually.
+const MARKET_HOLIDAYS = new Set([
+  // 2025
+  '2025-01-01', // New Year's Day
+  '2025-01-20', // MLK Day
+  '2025-02-17', // Presidents Day
+  '2025-04-18', // Good Friday
+  '2025-05-26', // Memorial Day
+  '2025-06-19', // Juneteenth
+  '2025-07-04', // Independence Day
+  '2025-09-01', // Labor Day
+  '2025-11-27', // Thanksgiving
+  '2025-12-25', // Christmas
+  // 2026
+  '2026-01-01', // New Year's Day
+  '2026-01-19', // MLK Day
+  '2026-02-16', // Presidents Day
+  '2026-04-03', // Good Friday
+  '2026-05-25', // Memorial Day
+  '2026-06-19', // Juneteenth
+  '2026-07-03', // Independence Day (observed)
+  '2026-09-07', // Labor Day
+  '2026-11-26', // Thanksgiving
+  '2026-12-25', // Christmas
+  // 2027
+  '2027-01-01', // New Year's Day
+  '2027-01-18', // MLK Day
+  '2027-02-15', // Presidents Day
+  '2027-03-26', // Good Friday
+  '2027-05-31', // Memorial Day
+  '2027-06-18', // Juneteenth (observed)
+  '2027-07-05', // Independence Day (observed)
+  '2027-09-06', // Labor Day
+  '2027-11-25', // Thanksgiving
+  '2027-12-24', // Christmas (observed)
+]);
+
+// Early close days (1pm ET = 780 mins) 
+const EARLY_CLOSE = new Set([
+  '2025-07-03', // Day before July 4
+  '2025-11-28', // Day after Thanksgiving
+  '2025-12-24', // Christmas Eve
+  '2026-11-27', // Day after Thanksgiving
+  '2026-12-24', // Christmas Eve
+  '2027-11-26', // Day after Thanksgiving
+]);
+
+const toDateStr = d => d.toLocaleDateString('en-CA', {timeZone:'America/New_York'}); // YYYY-MM-DD
+
+const isMarketHoliday = et => MARKET_HOLIDAYS.has(toDateStr(et));
+const isWeekend       = et => { const d = et.getDay(); return d===0||d===6; };
+const isEarlyClose    = et => EARLY_CLOSE.has(toDateStr(et));
+
+// Find next trading day
+const nextTradingDay = (et) => {
+  const d = new Date(et);
+  d.setDate(d.getDate()+1);
+  while(isWeekend(d)||isMarketHoliday(d)) d.setDate(d.getDate()+1);
+  return d;
+};
+
+// ── Clock ──────────────────────────────────────────
+const updateClock = () => {
+  const now  = new Date();
+  const et   = new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const hh   = et.getHours(), mm = et.getMinutes(), ss = et.getSeconds();
+  const pad  = n => String(n).padStart(2,'0');
+
+  document.getElementById('clockMain').textContent = `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
+  document.getElementById('clockET').textContent   = 'Eastern Time · ' + now.toLocaleDateString('en-US',{timeZone:'America/New_York',weekday:'long',month:'long',day:'numeric'});
+
+  const pill    = document.getElementById('sessionPill');
+  const nc      = document.getElementById('nextClose');
+  const ncLabel = document.getElementById('nextClose').previousElementSibling;
+  const mins    = hh*60+mm;
+  const closeAt = isEarlyClose(et) ? 780 : 960; // 1pm or 4pm
+
+  const isHolidayToday = isMarketHoliday(et);
+  const isWeekendToday = isWeekend(et);
+  const marketClosed   = isHolidayToday || isWeekendToday;
+
+  if(marketClosed) {
+    // Weekend or holiday
+    const reason = isHolidayToday ? '○ Market Holiday' : et.getDay()===6 ? '○ Saturday — Closed' : '○ Sunday — Closed';
+    pill.textContent = reason;
+    pill.className   = 'session-pill session-closed';
+    const next = nextTradingDay(et);
+    ncLabel.textContent = 'Next Open';
+    nc.textContent = next.toLocaleDateString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric'}) + ' 9:30 AM';
+
+  } else if(mins >= 570 && mins < closeAt) {
+    // Regular session — with window labels
+    const closeMin = closeAt - mins;
+    ncLabel.textContent = isEarlyClose(et) ? 'Early Close In' : 'Closes In';
+    nc.textContent = `${Math.floor(closeMin/60)}h ${closeMin%60}m`;
+    // Session windows
+    if(mins >= 570 && mins < 600) {
+      pill.textContent = '🚫 Amateur Hour (9:30–10am)';
+      pill.className   = 'session-pill session-pre';
+    } else if(mins >= 600 && mins < 690) {
+      pill.textContent = '✅ Pro Setup Window (10–11:30am)';
+      pill.className   = 'session-pill session-open';
+    } else if(mins >= 690 && mins < 810) {
+      pill.textContent = '🚫 Midday Chop (11:30am–1:30pm)';
+      pill.className   = 'session-pill session-pre';
+    } else if(mins >= 810 && mins < 900) {
+      pill.textContent = '⚡ Smart Money Return (1:30–3pm)';
+      pill.className   = 'session-pill session-open';
+    } else if(mins >= 900 && mins < closeAt) {
+      pill.textContent = '⚡ Power Hour (3–4pm)';
+      pill.className   = 'session-pill session-open';
+    } else {
+      pill.textContent = isEarlyClose(et) ? '● Early Close Day' : '● Market Open';
+      pill.className   = 'session-pill session-open';
+    }
+
+  } else if(mins >= 240 && mins < 570) {
+    // Pre-market
+    pill.textContent = '◐ Pre-Market';
+    pill.className   = 'session-pill session-pre';
+    const openMin    = 570 - mins;
+    ncLabel.textContent = 'Opens In';
+    nc.textContent   = `${Math.floor(openMin/60)}h ${openMin%60}m`;
+
+  } else if(mins >= closeAt && mins < 1200) {
+    // After hours
+    pill.textContent = '◑ After Hours';
+    pill.className   = 'session-pill session-after';
+    const next       = nextTradingDay(et);
+    ncLabel.textContent = 'Next Open';
+    nc.textContent   = next.toLocaleDateString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric'}) + ' 9:30 AM';
+
+  } else {
+    // Overnight
+    pill.textContent = '○ Overnight';
+    pill.className   = 'session-pill session-closed';
+    ncLabel.textContent = 'Pre-Market';
+    nc.textContent   = '4:00 AM ET';
+  }
+};
+updateClock(); setInterval(updateClock,1000);
+
+// ── Load positions from trades localStorage ────────
+const loadPositions = () => {
+  const trades = JSON.parse(localStorage.getItem('zion-trades')||'[]');
+  const open   = trades.filter(t=>t.status==='open');
+  const basis  = open.reduce((s,t)=>s+t.totalCost,0);
+
+  document.getElementById('openPosCount').textContent = `${open.length} open`;
+  document.getElementById('totalBasis').textContent   = '$'+basis.toLocaleString('en-US',{minimumFractionDigits:2});
+
+  const container = document.getElementById('miniPositions');
+  if(!open.length){
+    container.innerHTML='<div style="grid-column:1/-1;padding:12px;text-align:center;font-size:11px;color:var(--dim);font-family:var(--font-data)">No open positions · Enter trades in the tracker</div>';
+    return;
+  }
+
+  container.innerHTML = open.map(t => {
+    const dte     = Math.ceil((new Date(t.expDate)-new Date())/86400000);
+    const dteCls  = dte<=5?'hot':dte<=14?'warn':'ok';
+    const dteIcon = dte<=5?'⚠':'';
+    return `<div class="mini-pos" onclick="window.location='ZION_Trades.html'">
+      <div class="mp-sym">${t.ticker}</div>
+      <div class="mp-contract">$${t.strike}${t.type==='CALL'?'C':'P'} ${t.expDate}</div>
+      <div class="mp-dte ${dteCls}">${dteIcon} ${dte}d · ${t.contracts} con</div>
+      <div class="mp-cost">@ $${t.premium.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+};
+loadPositions();
+
+// ── Quick journal ──────────────────────────────────
+const loadRecentJournal = () => {
+  const journal = JSON.parse(localStorage.getItem('zion-journal')||'[]');
+  const recent  = [...journal].reverse().slice(0,3);
+  const el      = document.getElementById('recentJournal');
+
+  if(!recent.length){
+    el.innerHTML='<div class="empty-recent">No journal entries yet</div>';
+    return;
+  }
+
+  el.innerHTML = recent.map(e => `
+    <div class="recent-entry">
+      <div class="re-meta">${e.date} · ${e.time}</div>
+      <div class="re-text ${e.isStamp?'re-stamp':''}">${e.text.slice(0,120)}${e.text.length>120?'…':''}</div>
+    </div>`).join('');
+};
+loadRecentJournal();
+
+const saveQuickNote = () => {
+  const ta   = document.getElementById('quickNote');
+  const text = ta.value.trim();
+  if(!text) return;
+
+  const journal = JSON.parse(localStorage.getItem('zion-journal')||'[]');
+  const trades  = JSON.parse(localStorage.getItem('zion-trades')||'[]');
+  const open    = trades.filter(t=>t.status==='open').map(t=>`${t.ticker} $${t.strike}${t.type==='CALL'?'C':'P'}`);
+  const now     = new Date();
+
+  journal.push({
+    text, trades:open, isStamp:false, id:Date.now(),
+    date: now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}),
+  });
+
+  localStorage.setItem('zion-journal', JSON.stringify(journal));
+  ta.value='';
+  loadRecentJournal();
+
+  // Flash confirmation
+  const btn = document.querySelector('.qn-btn');
+  btn.textContent='Added ✓'; btn.style.borderColor='var(--teal)'; btn.style.color='var(--teal)';
+  setTimeout(()=>{ btn.textContent='Add to Journal'; btn.style.borderColor=''; btn.style.color=''; },2000);
+};
+
+document.getElementById('quickNote').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); saveQuickNote(); }
+});
+</script>
+</body>
+</html>

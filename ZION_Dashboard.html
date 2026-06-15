@@ -1,0 +1,1683 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ZION Config — API key and settings live in ZION_Config.js -->
+<script src="ZION_Config.js"></script>
+<title>ZION Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+    --border:#111f38; --border2:#1a2f4a;
+    --text:#c8d8f0; --text-dim:#4a6080; --text-hdr:#e8f0ff;
+    --bull:#4ade80; --bear:#f87171; --wait:#fb923c; --blue:#60a5fa;
+    --teal:#00f5d4; --crimson:#ff4d6d;
+    --font-data:'JetBrains Mono',monospace; --font-ui:'Inter',sans-serif;
+  }
+  html, body { height:100%; background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:13px; line-height:1.5; overflow:hidden; }
+  .shell { display:grid; grid-template-rows:44px 1fr; height:100vh; }
+
+  /* ── Top bar ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:0 18px; background:var(--panel); border-bottom:1px solid var(--border); gap:12px; flex-shrink:0; }
+  .topbar-left,.topbar-right { display:flex; align-items:center; gap:12px; }
+  .logo { font-family:var(--font-data); font-weight:700; font-size:13px; letter-spacing:.2em; color:var(--text-hdr); }
+  .logo span { color:var(--blue); }
+  .ticker-input { font-family:var(--font-data); font-size:13px; font-weight:700; background:var(--panel2); border:1px solid var(--border2); border-radius:4px; color:var(--text-hdr); padding:3px 10px; width:88px; text-align:center; outline:none; transition:border-color .15s; }
+  .ticker-input:focus { border-color:var(--blue); }
+  .live-dot { width:7px; height:7px; border-radius:50%; background:var(--bull); animation:pulse-dot 2s infinite; flex-shrink:0; }
+  .live-dot.loading { background:var(--wait); animation:pulse-dot .6s infinite; }
+  .live-dot.error   { background:var(--bear); animation:none; box-shadow:none; }
+  .live-dot.paused  { background:var(--text-dim); animation:none; box-shadow:none; }
+  @keyframes pulse-dot { 0%{box-shadow:0 0 0 0 #4ade8044}70%{box-shadow:0 0 0 6px #4ade8000}100%{box-shadow:0 0 0 0 #4ade8000} }
+  .btn { font-family:var(--font-ui); font-size:11px; font-weight:500; padding:4px 11px; border-radius:4px; border:1px solid var(--border2); background:transparent; color:var(--text-dim); cursor:pointer; transition:color .15s,border-color .15s,background .15s; white-space:nowrap; }
+  .btn:hover { color:var(--text); border-color:var(--blue); }
+  .btn.active { background:#0f2545; color:var(--blue); border-color:var(--blue); }
+  .session-label { font-family:var(--font-data); font-size:10px; color:var(--text-dim); letter-spacing:.05em; white-space:nowrap; }
+  .status-txt { font-family:var(--font-data); font-size:10px; color:var(--text-dim); white-space:nowrap; max-width:280px; overflow:hidden; text-overflow:ellipsis; }
+  .status-txt.err { color:var(--bear); }
+
+  /* ── Layout ── */
+  .body { display:grid; grid-template-columns:1fr 290px; overflow:hidden; height:100%; }
+  .left-col { display:flex; flex-direction:column; overflow-y:auto; padding:14px; gap:12px; }
+  .left-col::-webkit-scrollbar { width:4px; }
+  .left-col::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+  /* ── Module label ── */
+  .module-label { font-size:9px; letter-spacing:.14em; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; }
+
+  /* ── Cards ── */
+  .signal-row { display:grid; grid-template-columns:3fr 1fr 1fr; gap:10px; }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px; position:relative; overflow:hidden; }
+  .card-label { font-size:9px; letter-spacing:.12em; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px; }
+  .signal-main { border-left:3px solid var(--wait); transition:border-color .4s; }
+  .signal-main.bull { border-left-color:var(--teal); }
+  .signal-main.bear { border-left-color:var(--crimson); }
+  @keyframes stripe-pulse { 0%,100%{opacity:1}50%{opacity:.35} }
+  .signal-main.firing { animation:stripe-pulse .5s ease 3; }
+  .signal-value { font-family:var(--font-data); font-size:21px; font-weight:700; letter-spacing:.04em; color:var(--wait); transition:color .3s; }
+  .signal-value.bull { color:var(--teal); }
+  .signal-value.bear { color:var(--crimson); }
+  .price-value { font-family:var(--font-data); font-size:19px; font-weight:700; color:var(--text-hdr); }
+  .price-change { font-family:var(--font-data); font-size:11px; margin-top:3px; }
+  .strength-number { font-family:var(--font-data); font-size:24px; font-weight:700; text-align:center; margin-top:2px; }
+  .str-bar-wrap { margin-top:8px; position:relative; height:5px; background:var(--border2); border-radius:3px; }
+  .str-bar-fill { position:absolute; top:0; height:100%; border-radius:3px; transition:all .4s ease; }
+  .str-bar-mid { position:absolute; left:50%; top:-3px; width:1px; height:11px; background:var(--border2); }
+
+  /* ── HUD grid ── */
+  .hud-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .hud-grid  { display:grid; grid-template-columns:repeat(5,1fr); }
+  .hud-grid4 { display:grid; grid-template-columns:repeat(4,1fr); }
+  .hud-hdr  { font-family:var(--font-ui); font-size:9px; letter-spacing:.08em; color:#5577aa; text-transform:uppercase; padding:5px 8px; background:#070f1e; border-bottom:1px solid var(--border); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hud-cell { font-family:var(--font-data); font-size:11px; padding:5px 8px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-right:1px solid var(--border); transition:color .3s; }
+  .hud-cell:last-child { border-right:none; }
+
+  /* ── Sectors ── */
+  .sectors-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .breadth-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-bottom:1px solid var(--border); background:#070f1e; }
+  .breadth-label { font-size:9px; letter-spacing:.1em; color:var(--text-dim); text-transform:uppercase; white-space:nowrap; }
+  .breadth-bar { flex:1; height:5px; border-radius:3px; overflow:hidden; display:flex; }
+  .b-bull{background:var(--bull);transition:width .5s;} .b-flat{background:var(--text-dim);transition:width .5s;} .b-bear{background:var(--bear);transition:width .5s;}
+  .breadth-counts { font-family:var(--font-data); font-size:10px; white-space:nowrap; display:flex; gap:8px; }
+  .sec-head { display:grid; grid-template-columns:52px 1fr 80px 68px 88px; background:#070f1e; border-bottom:1px solid var(--border); }
+  .sec-head div { font-size:9px; letter-spacing:.08em; color:#5577aa; text-transform:uppercase; padding:5px 8px; }
+  .sec-head div:nth-child(n+3) { text-align:right; }
+  .sec-row { display:grid; grid-template-columns:52px 1fr 80px 68px 88px; border-bottom:1px solid var(--border); align-items:center; position:relative; transition:background .12s; cursor:default; }
+  .sec-row:last-child { border-bottom:none; }
+  .sec-row:hover { background:var(--panel2); }
+  .heat-stripe { position:absolute; left:0; top:0; bottom:0; width:3px; transition:background .4s; }
+  .sc { font-family:var(--font-data); font-size:11px; padding:5px 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sc-sym { font-weight:700; color:var(--blue); padding-left:12px; }
+  .sc-name { font-family:var(--font-ui); font-size:11px; color:var(--text); padding:5px 8px; }
+  .sc-num { text-align:right; }
+  .sc-latest { font-weight:500; color:var(--text-hdr); }
+  .pct-wrap { display:flex; align-items:center; justify-content:flex-end; gap:5px; }
+  .mini-bar { width:24px; height:3px; background:var(--border2); border-radius:2px; overflow:hidden; flex-shrink:0; }
+  .mini-fill { height:100%; border-radius:2px; transition:width .4s; }
+
+  /* ── Watchlist ── */
+  .watchlist-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .wl-controls { display:flex; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid var(--border); background:#070f1e; }
+  .wl-input { flex:1; font-family:var(--font-data); font-size:11px; background:var(--panel2); border:1px solid var(--border2); border-radius:4px; color:var(--text-hdr); padding:3px 8px; outline:none; text-transform:uppercase; }
+  .wl-input:focus { border-color:var(--blue); }
+  .wl-add { font-size:11px; padding:3px 10px; border-radius:4px; border:1px solid var(--blue); background:#0f2545; color:var(--blue); cursor:pointer; font-family:var(--font-ui); white-space:nowrap; }
+  .wl-add:hover { background:#163560; }
+  .wl-head { display:grid; grid-template-columns:60px 70px 1fr 56px 56px 56px 80px; background:#070f1e; border-bottom:1px solid var(--border); }
+  .wl-head div { font-size:9px; letter-spacing:.08em; color:#5577aa; text-transform:uppercase; padding:5px 8px; }
+  .wl-row { display:grid; grid-template-columns:60px 70px 1fr 56px 56px 56px 80px; border-bottom:1px solid var(--border); align-items:center; position:relative; transition:background .12s; cursor:pointer; }
+  .wl-row:last-child { border-bottom:none; }
+  .wl-row:hover { background:var(--panel2); }
+  .wl-row.loading-row { opacity:.5; }
+  .wl-cell { font-family:var(--font-data); font-size:11px; padding:5px 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wl-sym { font-weight:700; color:var(--blue); padding-left:12px; }
+  .wl-price { font-weight:500; color:var(--text-hdr); }
+  .wl-signal { font-weight:700; font-size:10px; text-align:center; }
+  .wl-del { position:absolute; right:4px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:14px; opacity:0; transition:opacity .15s,color .15s; padding:0 4px; line-height:1; }
+  .wl-row:hover .wl-del { opacity:1; }
+  .wl-del:hover { color:var(--bear); }
+  .wl-empty { padding:16px; font-size:11px; color:var(--text-dim); text-align:center; line-height:1.8; font-family:var(--font-data); }
+
+  /* Signal badge colors */
+  .sig-prime { color:#00f5d4; }
+  .sig-watch { color:#fb923c; }
+  .sig-wait  { color:#4a6080; }
+  .sig-bear  { color:#ff4d6d; }
+
+  /* ── Color utilities ── */
+  .bull-c { color:var(--bull)!important; }
+  .bear-c { color:var(--bear)!important; }
+  .wait-c { color:var(--wait)!important; }
+  .dim-c  { color:var(--text-dim)!important; }
+  .teal-c { color:var(--teal)!important; }
+  .crimson-c { color:var(--crimson)!important; }
+
+  /* ── Notes ── */
+  .notes-panel { background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+  .notes-top { padding:10px 14px 8px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .notes-title { font-size:9px; letter-spacing:.12em; color:var(--text-dim); text-transform:uppercase; }
+  .notes-saved { font-size:9px; color:var(--text-dim); opacity:0; transition:opacity .3s; font-family:var(--font-data); }
+  .notes-saved.show { opacity:1; }
+  .notes-list { flex:1; overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:6px; }
+  .notes-list::-webkit-scrollbar { width:4px; }
+  .notes-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+  .note-item { background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; position:relative; }
+  .note-meta { font-size:9px; color:var(--text-dim); font-family:var(--font-data); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; gap:4px; }
+  .note-badges { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .badge-ticker { font-size:9px; font-family:var(--font-data); font-weight:700; padding:1px 5px; border-radius:3px; background:#0f2545; color:var(--blue); border:1px solid #1a3a6a; }
+  .badge-signal { font-size:8px; font-family:var(--font-data); font-weight:700; padding:1px 5px; border-radius:3px; }
+  .note-text { font-size:11px; color:var(--text); line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+  .note-del { position:absolute; top:5px; right:6px; background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:13px; padding:0 2px; line-height:1; opacity:0; transition:opacity .15s,color .15s; }
+  .note-item:hover .note-del { opacity:1; }
+  .note-del:hover { color:var(--bear); }
+  .notes-input-wrap { padding:10px; border-top:1px solid var(--border); flex-shrink:0; }
+  .notes-ta { width:100%; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; color:var(--text); font-family:var(--font-ui); font-size:12px; line-height:1.5; padding:7px 10px; resize:none; outline:none; transition:border-color .15s; min-height:60px; }
+  .notes-ta:focus { border-color:var(--blue); }
+  .notes-ta::placeholder { color:var(--text-dim); }
+  .notes-actions { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+  .notes-hint { font-size:10px; color:var(--text-dim); }
+  .btn-add { font-family:var(--font-ui); font-size:11px; font-weight:600; padding:4px 12px; border-radius:4px; border:1px solid var(--blue); background:#0f2545; color:var(--blue); cursor:pointer; }
+  .btn-add:hover { background:#163560; }
+  .empty-notes { flex:1; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--text-dim); text-align:center; padding:20px; line-height:1.8; }
+
+  /* ── Settings drawer ── */
+  .drawer { position:fixed; top:44px; right:0; width:300px; height:calc(100vh - 44px); background:var(--panel); border-left:1px solid var(--border2); padding:18px; transform:translateX(100%); transition:transform .25s ease; z-index:200; overflow-y:auto; display:flex; flex-direction:column; gap:18px; }
+  .drawer.open { transform:translateX(0); }
+  .dr-group-label { font-size:9px; letter-spacing:.12em; color:var(--text-dim); text-transform:uppercase; margin-bottom:10px; }
+  .dr-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .dr-row label { font-size:12px; color:var(--text); }
+  .toggle { position:relative; width:30px; height:17px; flex-shrink:0; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .toggle-track { position:absolute; inset:0; background:var(--border2); border-radius:9px; cursor:pointer; transition:background .2s; }
+  .toggle input:checked + .toggle-track { background:var(--blue); }
+  .toggle-track::after { content:''; position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%; background:#fff; transition:transform .2s; }
+  .toggle input:checked + .toggle-track::after { transform:translateX(13px); }
+  .dr-slider { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+  .dr-slider label { font-size:12px; color:var(--text); display:flex; justify-content:space-between; }
+  .dr-slider label span { color:var(--blue); font-family:var(--font-data); }
+  .dr-slider input[type=range] { width:100%; accent-color:var(--blue); }
+  .api-input { width:100%; font-family:var(--font-data); font-size:11px; background:var(--panel2); border:1px solid var(--border2); border-radius:4px; color:var(--text); padding:6px 10px; outline:none; transition:border-color .15s; margin-bottom:6px; }
+  .api-input:focus { border-color:var(--blue); }
+  .dr-note { font-size:10px; color:var(--text-dim); line-height:1.65; }
+
+  /* ── Screener ── */
+  .screener-panel { background:var(--panel2); border-top:1px solid var(--border); overflow:hidden; transition:max-height .3s ease; max-height:0; }
+  .screener-panel.open { max-height:400px; }
+  .scr-head { display:grid; grid-template-columns:64px 70px 1fr 56px 56px 56px 80px; background:#050d1a; border-bottom:1px solid var(--border); }
+  .scr-head div { font-size:9px; letter-spacing:.08em; color:#5577aa; text-transform:uppercase; padding:5px 8px; }
+  .scr-row { display:grid; grid-template-columns:64px 70px 1fr 56px 56px 56px 80px; border-bottom:1px solid var(--border); align-items:center; transition:background .12s; cursor:pointer; }
+  .scr-row:last-child { border-bottom:none; }
+  .scr-row:hover { background:var(--panel); }
+  .scr-cell { font-family:var(--font-data); font-size:11px; padding:5px 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .scr-sym { font-weight:700; color:var(--blue); padding-left:10px; }
+  .scr-loading { padding:12px; font-size:11px; color:var(--text-dim); text-align:center; font-family:var(--font-data); }
+  .sec-row.active { background:var(--panel2); }
+  .sec-row.active .sc-sym { color:var(--teal); }
+
+  /* ── Themed Universe Screener ── */
+  .theme-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .theme-controls { display:flex; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid var(--border); background:#070f1e; flex-wrap:wrap; }
+  .theme-filter-label { font-size:9px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; white-space:nowrap; }
+  .theme-btn { font-family:var(--font-data); font-size:10px; padding:2px 8px; border-radius:3px; border:1px solid var(--border2); background:transparent; color:var(--dim); cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .theme-btn:hover { color:var(--text); border-color:var(--blue); }
+  .theme-btn.active { background:#0f2545; color:var(--teal); border-color:var(--teal); }
+  .theme-head { display:grid; grid-template-columns:64px 52px 70px 1fr 56px 56px 56px 80px; background:#070f1e; border-bottom:1px solid var(--border); }
+  .theme-head div { font-size:9px; letter-spacing:.08em; color:#5577aa; text-transform:uppercase; padding:5px 8px; }
+  .theme-body { max-height:320px; overflow-y:auto; }
+  .theme-row { display:grid; grid-template-columns:64px 52px 70px 1fr 56px 56px 56px 80px; border-bottom:1px solid var(--border); align-items:center; transition:background .12s; cursor:pointer; }
+  .theme-row:last-child { border-bottom:none; }
+  .theme-row:hover { background:var(--panel2); }
+  .theme-row.loading-row { opacity:.5; }
+  .theme-cell { font-family:var(--font-data); font-size:11px; padding:5px 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .theme-sym { font-weight:700; color:var(--blue); padding-left:10px; }
+  .theme-tag { font-family:var(--font-ui); font-size:9px; color:var(--dim); padding:5px 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .theme-empty { padding:16px; font-size:11px; color:var(--dim); text-align:center; font-family:var(--font-data); line-height:1.8; }
+  .theme-status { font-size:9px; color:var(--dim); font-family:var(--font-data); margin-left:auto; white-space:nowrap; }
+
+  /* ── Flow Scanner ── */
+  .flow-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .flow-input-row { display:flex; gap:8px; padding:10px; border-bottom:1px solid var(--border); background:#070f1e; }
+  .flow-input { flex:1; font-family:var(--font-data); font-size:11px; background:var(--panel2); border:1px solid var(--border2); border-radius:4px; color:var(--hdr); padding:6px 10px; outline:none; transition:border-color .15s; text-transform:uppercase; }
+  .flow-input:focus { border-color:var(--teal); }
+  .flow-input::placeholder { color:var(--dim); font-size:10px; text-transform:none; }
+  .flow-run { font-family:var(--font-data); font-size:11px; font-weight:700; padding:6px 14px; background:var(--teal); color:#050d1a; border:none; border-radius:4px; cursor:pointer; white-space:nowrap; transition:background .15s; letter-spacing:.05em; }
+  .flow-run:hover { background:#00e0c0; }
+  .flow-run:disabled { background:var(--border2); color:var(--dim); cursor:default; }
+  .flow-head { display:grid; grid-template-columns:60px 70px 1fr 56px 56px 56px 56px 90px; background:#070f1e; border-bottom:1px solid var(--border); }
+  .flow-head div { font-size:9px; letter-spacing:.08em; color:#5577aa; text-transform:uppercase; padding:5px 8px; }
+  .flow-row { display:grid; grid-template-columns:60px 70px 1fr 56px 56px 56px 56px 90px; border-bottom:1px solid var(--border); align-items:center; transition:background .12s; cursor:pointer; position:relative; }
+  .flow-row:last-child { border-bottom:none; }
+  .flow-row:hover { background:var(--panel2); }
+  .flow-cell { font-family:var(--font-data); font-size:11px; padding:5px 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .flow-sym { font-weight:700; color:var(--blue); padding-left:12px; }
+  .flow-empty { padding:14px; font-size:11px; color:var(--dim); text-align:center; font-family:var(--font-data); line-height:1.8; }
+  .flow-status { font-size:10px; color:var(--dim); font-family:var(--font-data); padding:0 10px; white-space:nowrap; }
+  .flow-confluence { font-family:var(--font-data); font-size:10px; font-weight:700; padding:2px 7px; border-radius:3px; text-align:center; }
+  .conf-prime { background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; }
+  .conf-watch { background:#fb923c18; color:var(--wait); border:1px solid #fb923c33; }
+  .conf-wait  { background:#4a608030; color:var(--dim);  border:1px solid #4a608050; }
+  .conf-bear  { background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; }
+  .conf-conflict { background:#a78bfa18; color:var(--purple); border:1px solid #a78bfa33; }
+
+  ::-webkit-scrollbar { width:4px; height:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="ZION_Command.html" style="text-decoration:none"><div class="logo" title="Zen Ichimoku Options Navigation — Command Center"><svg width="34" height="34" viewBox="0 0 34 34" style="display:block;flex-shrink:0"><circle cx="17.0" cy="17.0" r="15.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="17.0" cy="17.0" r="12.24" fill="none" stroke="#1e3a8a" stroke-width="0.272" opacity="0.4"/><circle cx="17.0" cy="17.0" r="8.5" fill="none" stroke="#1e3a8a" stroke-width="0.20400000000000001" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="17.0,0.68 18.53,6.800000000000001 17.0,8.84 15.47,6.800000000000001" fill="#ef4444"/><polygon points="17.0,33.32 18.19,27.200000000000003 17.0,25.16 15.81,27.200000000000003" fill="none" stroke="#ef4444" stroke-width="0.47600000000000003"/><polygon points="33.32,17.0 27.200000000000003,18.19 25.16,17.0 27.200000000000003,15.81" fill="none" stroke="#ef4444" stroke-width="0.47600000000000003"/><polygon points="0.68,17.0 6.800000000000001,18.19 8.84,17.0 6.800000000000001,15.81" fill="none" stroke="#ef4444" stroke-width="0.47600000000000003"/><text x="17.0" y="3.4000000000000004" font-family="'Josefin Sans',sans-serif" font-size="3.23" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="17.0" cy="17.0" r="1.87" fill="#ef4444"/><circle cx="17.0" cy="17.0" r="0.782" fill="#050d1a"/><text x="17.0" y="23.3648" font-family="'Josefin Sans',sans-serif" font-size="17.68" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:18px;letter-spacing:6px;color:#ffffff;-webkit-text-stroke:0.7px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></span> DASHBOARD</div></a>
+      <div class="live-dot" id="liveDot"></div>
+      <input class="ticker-input" id="tickerInput" value="AAPL" maxlength=10 spellcheck="false" autocomplete="off" title="Enter ticker, press Enter">
+      <span class="session-label" id="sessionLabel">—</span>
+    </div>
+    <div class="topbar-right">
+      <span class="status-txt" id="statusTxt">—</span>
+      <button class="btn" id="pauseBtn">Pause</button>
+      <a class="btn" href="ZION_Pretrade.html" style="text-decoration:none">Pre-Trade ✓</a>
+      <a class="btn" href="ZION_Trades.html" style="text-decoration:none">Trades 📋</a>
+      <a class="btn" href="ZION_TrendLock.html" style="text-decoration:none">Trend-Lock 🔒</a>
+      <button class="btn" id="settingsBtn">⚙ Settings</button>
+    </div>
+  </header>
+
+  <div class="body">
+    <div class="left-col">
+
+      <!-- ══ HUD MODULE ══ -->
+      <div>
+        <div class="module-label"><span>HUD · <span id="hudTicker">—</span></span></div>
+        <div class="signal-row" style="margin-bottom:10px">
+          <div class="card signal-main" id="signalCard">
+            <div class="card-label">Composite Signal</div>
+            <div class="signal-value" id="signalValue">—</div>
+            <div style="margin-top:5px;font-family:var(--font-data);font-size:10px;color:var(--text-dim)" id="signalSub">waiting…</div>
+          </div>
+          <div class="card">
+            <div class="card-label" id="priceLabel">Price</div>
+            <div class="price-value" id="priceValue">—</div>
+            <div class="price-change dim-c" id="priceChange">—</div>
+          </div>
+          <div class="card">
+            <div class="card-label">65m Strength</div>
+            <div class="strength-number dim-c" id="strNum">—</div>
+            <div class="str-bar-wrap"><div class="str-bar-fill" id="strFill"></div><div class="str-bar-mid"></div></div>
+          </div>
+        </div>
+        <div class="hud-card">
+          <div class="hud-grid">
+            <div class="hud-hdr">VWAP 5/65/D</div><div class="hud-hdr">RSI 5/65/D</div>
+            <div class="hud-hdr">TK 5/65/D</div><div class="hud-hdr">Trend 5/65/D</div>
+            <div class="hud-hdr">Cloud 5/65/D</div>
+          </div>
+          <div class="hud-grid">
+            <div class="hud-cell" id="c-vwap">—</div><div class="hud-cell" id="c-rsi">—</div>
+            <div class="hud-cell" id="c-tk">—</div><div class="hud-cell" id="c-trend">—</div>
+            <div class="hud-cell" id="c-cloud">—</div>
+          </div>
+          <div style="height:1px;background:var(--border)"></div>
+          <div class="hud-grid">
+            <div class="hud-hdr">65m Stack</div><div class="hud-hdr">Chikou 65/D</div>
+            <div class="hud-hdr">VWAP Slope</div><div class="hud-hdr">Daily Gate</div>
+            <div class="hud-hdr">Trend Bar</div>
+          </div>
+          <div class="hud-grid">
+            <div class="hud-cell" id="c-stack">—</div><div class="hud-cell" id="c-chikou">—</div>
+            <div class="hud-cell" id="c-slope">—</div><div class="hud-cell" id="c-gate">—</div>
+            <div class="hud-cell" id="c-bar">—</div>
+          </div>
+          <div style="height:1px;background:var(--border)"></div>
+          <div class="hud-grid4">
+            <div class="hud-hdr">RSI Div 65m</div><div class="hud-hdr">Daily TK</div>
+            <div class="hud-hdr">Daily Trend</div><div class="hud-hdr">Daily Cloud</div>
+          </div>
+          <div class="hud-grid4">
+            <div class="hud-cell" id="c-div">—</div><div class="hud-cell" id="c-dtkk">—</div>
+            <div class="hud-cell" id="c-dtrend">—</div><div class="hud-cell" id="c-dcloud">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ WATCHLIST MODULE ══ -->
+      <div>
+        <div class="module-label"><span>Watchlist</span><span style="font-size:9px;color:var(--text-dim)" id="wlStatus">—</span></div>
+        <div class="watchlist-card">
+          <div class="wl-controls">
+            <input class="wl-input" id="wlInput" placeholder="Add ticker…" maxlength="10" spellcheck="false">
+            <button class="wl-add" id="wlAddBtn">+ Add</button>
+            <button class="btn" id="wlRefreshBtn">↺ Refresh</button>
+          </div>
+          <div class="wl-head">
+            <div>Ticker</div><div>Price</div><div>Change</div>
+            <div>TK 65m</div><div>Cloud</div><div>Chikou</div><div>Signal</div>
+          </div>
+          <div id="wlBody"></div>
+        </div>
+      </div>
+
+      <!-- ══ FLOW SCANNER MODULE ══ -->
+      <div>
+        <div class="module-label">
+          <span>UOA Flow Scanner</span>
+          <span style="font-size:9px;color:var(--dim)" id="flowStatus">Paste tickers from Barchart UOA → Run</span>
+        </div>
+        <div class="flow-card">
+          <div class="flow-input-row">
+            <input class="flow-input" id="flowInput" placeholder="Paste tickers: NVDA, AAPL, META, TSLA, AMD… (comma or space separated)" spellcheck="false">
+            <button class="flow-run" id="flowRunBtn" onclick="runFlowScan()">⚡ Scan</button>
+            <button class="btn" onclick="clearFlowScan()" style="font-size:10px;padding:6px 10px;white-space:nowrap">Clear</button>
+          </div>
+          <div class="flow-head">
+            <div>Ticker</div><div>Price</div><div>Change</div>
+            <div>TK 65m</div><div>Cloud</div><div>Chikou</div><div>VWAP</div>
+            <div>Confluence</div>
+          </div>
+          <div id="flowBody">
+            <div class="flow-empty">
+              📋 Copy tickers from <strong style="color:var(--gold)">Barchart Unusual Options Activity</strong> and paste above.<br>
+              ZION scores each one against full Ichimoku structure in seconds.<br>
+              <span style="color:var(--teal)">High UOA + PRIME structure = the trade worth watching.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SECTORS MODULE ══ -->
+      <div>
+        <div class="module-label">S&amp;P 500 Sectors</div>
+        <div class="sectors-card">
+          <div class="breadth-row">
+            <span class="breadth-label">Breadth</span>
+            <div class="breadth-bar">
+              <div class="b-bull" id="bBull" style="width:0%"></div>
+              <div class="b-flat" id="bFlat" style="width:0%"></div>
+              <div class="b-bear" id="bBear" style="width:0%"></div>
+            </div>
+            <div class="breadth-counts" id="breadthCounts">loading…</div>
+          </div>
+          <div class="sec-head">
+            <div>Symbol</div><div style="text-align:left">Sector</div>
+            <div>Latest</div><div>Change</div><div>% Change</div>
+          </div>
+          <div id="sectorBody"></div>
+          <!-- Screener panel — expands below clicked sector row -->
+          <div class="screener-panel" id="screenerPanel">
+            <div class="scr-head">
+              <div>Ticker</div><div>Price</div><div>Change</div>
+              <div>TK 65m</div><div>Cloud</div><div>Chikou</div><div>Signal</div>
+            </div>
+            <div id="screenerBody"><div class="scr-loading">Click a sector to screen its top holdings</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ THEMED UNIVERSE SCREENER ══ -->
+      <div>
+        <div class="module-label"><span>Themed Universe</span><span class="theme-status" id="themeStatus">—</span></div>
+        <div class="theme-card">
+          <div class="theme-controls">
+            <span class="theme-filter-label">Theme:</span>
+            <button class="theme-btn active" data-theme="ALL" onclick="filterTheme(this)">All</button>
+            <button class="theme-btn" data-theme="AI Infra" onclick="filterTheme(this)">AI Infra</button>
+            <button class="theme-btn" data-theme="Defense" onclick="filterTheme(this)">Defense</button>
+            <button class="theme-btn" data-theme="Power" onclick="filterTheme(this)">Power</button>
+            <button class="theme-btn" data-theme="Space" onclick="filterTheme(this)">Space</button>
+            <button class="theme-btn" data-theme="Optics" onclick="filterTheme(this)">Optics</button>
+            <button class="theme-btn" data-theme="Enterprise AI" onclick="filterTheme(this)">Ent AI</button>
+            <button class="theme-btn" data-theme="Compute" onclick="filterTheme(this)">Compute</button>
+            <button class="theme-btn" data-theme="Defensive" onclick="filterTheme(this)">Defensive</button>
+            <button class="btn" id="themeRefreshBtn" style="margin-left:auto">↺</button>
+          </div>
+          <div class="theme-head">
+            <div>Ticker</div><div>Theme</div><div>Price</div><div>Notes</div>
+            <div>TK 65m</div><div>Cloud</div><div>Chikou</div><div>Signal</div>
+          </div>
+          <div class="theme-body" id="themeBody">
+            <div class="theme-empty">Loading universe…</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:10px;color:var(--text-dim);text-align:right;font-family:var(--font-data);padding-bottom:4px">
+        ZION · Zen Ichimoku Options Navigation · Massive API · not financial advice
+      </div>
+    </div>
+
+    <!-- ══ NOTES PANEL ══ -->
+    <div class="notes-panel">
+      <div class="notes-top">
+        <span class="notes-title">Trade Notes</span>
+        <span class="notes-saved" id="notesSaved">saved</span>
+      </div>
+      <div class="notes-list" id="notesList"></div>
+      <div class="notes-input-wrap">
+        <textarea class="notes-ta" id="noteInput" placeholder="Type a note — ticker &amp; signal auto-stamped…" rows="3"></textarea>
+        <div class="notes-actions">
+          <span class="notes-hint">Enter · Shift+Enter for newline</span>
+          <button class="btn-add" id="addNoteBtn">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS DRAWER ══ -->
+<div class="drawer" id="drawer">
+  <div>
+    <div class="dr-group-label">Massive API Key</div>
+    <!-- ═══════════════════════════════════════════
+         PASTE YOUR MASSIVE (POLYGON.IO) API KEY HERE
+         Or enter it in this field each session
+         ═══════════════════════════════════════════ -->
+    <input class="api-input" id="s-apikey" type="password" placeholder="Paste your Massive API key…" value="">
+    <div class="dr-note">Get your key at <strong>massive.com</strong> · Starter plan ($29/mo) recommended for full functionality.</div>
+  </div>
+  <div>
+    <div class="dr-group-label">Display</div>
+    <div class="dr-row"><label>Color-code cells</label><label class="toggle"><input type="checkbox" id="s-color" checked><div class="toggle-track"></div></label></div>
+    <div class="dr-row"><label>Daily gate for READY</label><label class="toggle"><input type="checkbox" id="s-gate" checked><div class="toggle-track"></div></label></div>
+  </div>
+  <div>
+    <div class="dr-group-label">Thresholds</div>
+    <div class="dr-slider"><label>VWAP Slope % <span id="sv-slope">0.10</span></label><input type="range" id="s-slope" min="0.01" max="1" step="0.01" value="0.10"></div>
+    <div class="dr-slider"><label>RSI Overbought <span id="sv-ob">70</span></label><input type="range" id="s-ob" min="55" max="90" step="1" value="70"></div>
+    <div class="dr-slider"><label>RSI Oversold <span id="sv-os">30</span></label><input type="range" id="s-os" min="10" max="45" step="1" value="30"></div>
+  </div>
+  <div>
+    <div class="dr-group-label">HUD Refresh</div>
+    <div class="dr-slider"><label>Interval (seconds) <span id="sv-int">30</span></label><input type="range" id="s-int" min="15" max="300" step="15" value="30"></div>
+  </div>
+  <div style="padding-top:4px;border-top:1px solid var(--border)">
+    <div class="dr-group-label" style="margin-bottom:6px">Watchlist Signal Key</div>
+    <div class="dr-note" style="line-height:2">
+      <span style="color:#00f5d4;font-family:var(--font-data)">PRIME ▲/▼</span> — 3+ conditions aligned<br>
+      <span style="color:#fb923c;font-family:var(--font-data)">WATCH</span> — 1-2 conditions aligned<br>
+      <span style="color:#4a6080;font-family:var(--font-data)">WAIT</span> — mixed / no alignment<br>
+      <span style="color:#ff4d6d;font-family:var(--font-data)">BEAR</span> — bearish structure
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  PASTE YOUR MASSIVE API KEY HERE (between the quotes)
+// ═══════════════════════════════════════════════════
+let API_KEY = (typeof ZION_CONFIG !== 'undefined' && ZION_CONFIG.apiKey) ? ZION_CONFIG.apiKey : '';
+
+// ── Base URL ──────────────────────────────────────
+const BASE = 'https://api.massive.com'; // Massive REST API base
+
+// ── Settings ──────────────────────────────────────
+let cfg = (typeof ZION_CONFIG !== 'undefined') ? {
+  colorCells:  ZION_CONFIG.colorCells  ?? true,
+  dailyGate:   ZION_CONFIG.dailyGate   ?? true,
+  slopeThresh: ZION_CONFIG.slopeThresh ?? 0.10,
+  rsiOB:       ZION_CONFIG.rsiOB       ?? 70,
+  rsiOS:       ZION_CONFIG.rsiOS       ?? 30,
+  hudInterval: ZION_CONFIG.hudInterval ?? 30000,
+} : {
+  colorCells:true, dailyGate:true,
+  slopeThresh:0.10, rsiOB:70, rsiOS:30,
+  hudInterval:30000,
+};
+
+// ── Utilities ─────────────────────────────────────
+const $  = id => document.getElementById(id);
+const fmt = (n,d=2) => typeof n==='number'
+  ? n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const icon = s => s==='Bull'?'↑':s==='Bear'?'↓':'↔';
+
+const cc = v => {
+  if(['Bull','Bull Stack','Bull Cloud','Above','READY ▲','Bull Div'].includes(v)) return 'bull-c';
+  if(['Bear','Bear Stack','Bear Cloud','Below','READY ▼','Bear Div'].includes(v)) return 'bear-c';
+  if(['WAIT','Mixed','Inside','Inside Cloud'].includes(v)) return 'wait-c';
+  return '';
+};
+const rsiCC  = (r,ob,os) => r>ob?'bear-c':r<os?'bull-c':'';
+const slopeCC = (s,t) => s>t?'bull-c':s<-t?'bear-c':'wait-c';
+
+const setCell = (id,text,cls='') => {
+  const el=$(id); el.textContent=text; el.className='hud-cell '+cls;
+};
+const setStatus = (msg,isErr=false) => {
+  $('statusTxt').textContent=msg;
+  $('statusTxt').className='status-txt'+(isErr?' err':'');
+};
+
+// ── Indicator math ────────────────────────────────
+const highest = (arr,n) => Math.max(...arr.slice(-n));
+const lowest  = (arr,n) => Math.min(...arr.slice(-n));
+const smaFn   = (arr,n) => arr.length<n?arr.reduce((a,b)=>a+b,0)/arr.length:arr.slice(-n).reduce((a,b)=>a+b,0)/n;
+
+const rsiFn = (closes,period=14) => {
+  if(closes.length<period+1) return 50;
+  let g=0,l=0;
+  for(let i=closes.length-period;i<closes.length;i++){
+    const d=closes[i]-closes[i-1]; d>0?g+=d:l-=d;
+  }
+  const ag=g/period,al=l/period;
+  return al===0?100:100-100/(1+ag/al);
+};
+
+// Massive returns vw (VWAP) per bar — use it directly when available
+// Falls back to computed VWAP if vw not present
+const vwapFn = bars => {
+  const withVW = bars.filter(b=>b.vw && b.volume);
+  if(withVW.length > bars.length * 0.5) {
+    let tv=0,v=0;
+    bars.forEach(b=>{ if(b.vw&&b.volume){tv+=b.vw*b.volume;v+=b.volume;} });
+    return v>0?tv/v:bars[bars.length-1].close;
+  }
+  let tv=0,v=0;
+  bars.forEach(b=>{ const tp=(b.high+b.low+b.close)/3; tv+=tp*b.volume; v+=b.volume; });
+  return v>0?tv/v:bars[bars.length-1].close;
+};
+
+const tenkanFn = (bars,n=9)  => bars.length<n?bars[bars.length-1].close:(highest(bars.map(b=>b.high),n)+lowest(bars.map(b=>b.low),n))/2;
+const kijunFn  = (bars,n=26) => bars.length<n?bars[bars.length-1].close:(highest(bars.map(b=>b.high),n)+lowest(bars.map(b=>b.low),n))/2;
+const spanBFn  = (bars,n=52) => bars.length<n?bars[bars.length-1].close:(highest(bars.map(b=>b.high),n)+lowest(bars.map(b=>b.low),n))/2;
+
+const cloudSt = (c,a,b) => c>Math.max(a,b)?'Bull Cloud':c<Math.min(a,b)?'Bear Cloud':'Inside Cloud';
+const stackSt = (v,t,m) => v>t&&t>m?'Bull Stack':v<t&&t<m?'Bear Stack':'Mixed';
+const chikouSt = (close,bars,offset=26) => {
+  if(bars.length<offset+1) return 'Inside';
+  return close>bars[bars.length-offset].high?'Above':close<bars[bars.length-offset].low?'Below':'Inside';
+};
+const strFn = (trend,tk,cloud,chikou) => {
+  let s=trend==='Bull'?1:trend==='Bear'?-1:0;
+  if(tk==='Bull')s++;else if(tk==='Bear')s--;
+  if(cloud==='Bull Cloud')s++;else if(cloud==='Bear Cloud')s--;
+  if(chikou==='Above')s++;else if(chikou==='Below')s--;
+  return s;
+};
+const trendBarFn = score => {
+  const b=['░░░░','█░░░','██░░','███░','████'][Math.min(Math.abs(score),4)];
+  return (score>0?'▲ ':score<0?'▼ ':'↔ ')+b;
+};
+const divFn = (closes,period=14,lb=10) => {
+  if(closes.length<lb*2) return 'None';
+  const rsiAll=closes.map((_,i,a)=>i<period?50:rsiFn(a.slice(0,i+1)));
+  const cN=closes[closes.length-1],cP=closes[closes.length-lb];
+  const rN=rsiAll[rsiAll.length-1],rP=rsiAll[rsiAll.length-lb];
+  if(cN>cP&&rN<rP) return 'Bear Div';
+  if(cN<cP&&rN>rP) return 'Bull Div';
+  return 'None';
+};
+
+// ── Massive API helpers ───────────────────────────
+// Massive (Polygon.io) bar endpoint:
+// GET /v2/aggs/ticker/{ticker}/range/{mult}/{timespan}/{from}/{to}
+// timespan: minute, hour, day
+// Returns results[]: {o,h,l,c,v,vw,t}
+
+const today = () => {
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+};
+const daysAgo = n => {
+  const d = new Date();
+  d.setDate(d.getDate()-n);
+  return d.toISOString().split('T')[0];
+};
+
+const fetchBars = async (symbol, mult, timespan, days=120) => {
+  const key = API_KEY.trim();
+  const from = daysAgo(days);
+  const to   = today();
+  // Use sort=desc to get newest bars first, then reverse to oldest-first
+  // This guarantees we always have the most recent data regardless of limit
+  const url  = `${BASE}/v2/aggs/ticker/${encodeURIComponent(symbol)}/range/${mult}/${timespan}/${from}/${to}?adjusted=true&sort=desc&limit=50000&apiKey=${key}`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(`HTTP ${r.status} (${symbol} ${mult}${timespan})`);
+  const j = await r.json();
+  if(j.status==='ERROR') throw new Error(j.error||'Massive API error');
+  if(!j.results?.length) throw new Error(`No data for ${symbol} — check ticker`);
+  // Map and sort oldest-first
+  const bars = j.results.map(b=>({
+    open:b.o, high:b.h, low:b.l, close:b.c,
+    volume:b.v||1, vw:b.vw||null,
+    ts:b.t,
+  }));
+  // API returns newest-first (desc), reverse to oldest-first for indicator math
+  bars.reverse();
+
+  // Filter to regular session only (9:30am–4:00pm ET) for hourly/minute bars
+  // Massive returns extended hours by default — TradingView Ichimoku uses regular session only
+  // Daily bars are unaffected (timespan==='day')
+  if(timespan !== 'day') {
+    return bars.filter(b => {
+      const d      = new Date(b.ts);
+      const etStr  = d.toLocaleString('en-US', {timeZone:'America/New_York', hour:'numeric', minute:'numeric', hour12:false});
+      const parts  = etStr.split(':');
+      const hh     = parseInt(parts[0]);
+      const mm     = parseInt(parts[1]) || 0;
+      const total  = hh * 60 + mm;
+      return total >= 540 && total < 960;
+    });
+  }
+  return bars;
+};
+
+// Snapshot — current price, change, prev close in one call
+const fetchSnapshot = async (symbol) => {
+  const key = API_KEY.trim();
+  const url  = `${BASE}/v2/snapshot/locale/us/markets/stocks/tickers/${encodeURIComponent(symbol)}?apiKey=${key}`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  if(j.status==='ERROR') throw new Error(j.error||'Snapshot error');
+  const t = j.ticker;
+  if(!t) throw new Error(`No snapshot for ${symbol}`);
+  const price    = t.lastTrade?.p || t.day?.c || t.prevDay?.c || 0;
+  const prevClose= t.prevDay?.c || price;
+  const change   = t.todaysChange    ?? (price - prevClose);
+  const changePct= t.todaysChangePerc ?? ((price-prevClose)/prevClose*100);
+  return { price, prevClose, change, changePct };
+};
+
+// Batch snapshot for multiple tickers (sectors + watchlist)
+const fetchSnapshots = async (symbols) => {
+  const key  = API_KEY.trim();
+  const syms = symbols.join(',');
+  const url  = `${BASE}/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${encodeURIComponent(syms)}&apiKey=${key}`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  const out = {};
+  (j.tickers||[]).forEach(t=>{
+    const price    = t.lastTrade?.p || t.day?.c || t.prevDay?.c || 0;
+    const prevClose= t.prevDay?.c || price;
+    out[t.ticker]  = {
+      price,
+      change:    t.todaysChange     ?? (price-prevClose),
+      pct:       t.todaysChangePerc ?? ((price-prevClose)/prevClose*100),
+    };
+  });
+  return out;
+};
+
+// ── Compute HUD signals ───────────────────────────
+const computeHUD = (bars5, bars65, barsD, livePrice) => {
+  const close    = livePrice;
+  const closes5  = bars5.map(b=>b.close);
+  const closes65 = bars65.map(b=>b.close);
+  const closesD  = barsD.map(b=>b.close);
+
+  const vwap5  = vwapFn(bars5);
+  const rsi5   = rsiFn(closes5);
+  const tk5    = tenkanFn(bars5);
+  const kj5    = kijunFn(bars5);
+  const sa5    = (tk5+kj5)/2;
+  const sb5    = spanBFn(bars5);
+  const tk5s   = tk5>kj5?'Bull':'Bear';
+  const cl5    = cloudSt(close,sa5,sb5);
+  const trend5 = close>smaFn(closes5,20)?'Bull':'Bear';
+
+  const vwap65 = vwapFn(bars65);
+  const rsi65  = rsiFn(closes65);
+  const tk65   = tenkanFn(bars65);
+  const kj65   = kijunFn(bars65);
+  const sa65   = (tk65+kj65)/2;
+  const sb65   = spanBFn(bars65);
+  const mbb65  = smaFn(closes65,20);
+  const tk65s  = tk65>kj65?'Bull':'Bear';
+  const cl65   = cloudSt(close,sa65,sb65);
+  const trend65= close>mbb65?'Bull':'Bear';
+  const ck65s  = chikouSt(close,bars65);
+  const stack  = stackSt(vwap65,tk65,mbb65);
+
+  const vwap65prev = bars65.length>5?vwapFn(bars65.slice(0,-5)):vwap65;
+  const slope65= ((vwap65-vwap65prev)/vwap65prev)*100;
+  const div65  = divFn(closes65);
+
+  const vwapD  = vwapFn(barsD);
+  const rsiD   = rsiFn(closesD);
+  const tkD    = tenkanFn(barsD);
+  const kjD    = kijunFn(barsD);
+  const saD    = (tkD+kjD)/2;
+  const sbD    = spanBFn(barsD);
+  const tkDs   = tkD>kjD?'Bull':'Bear';
+  const clD    = cloudSt(close,saD,sbD);
+  const trendD = close>smaFn(closesD,20)?'Bull':'Bear';
+  const ckDs   = chikouSt(close,barsD);
+
+  const str65  = strFn(trend65,tk65s,cl65,ck65s);
+  const gate   = cfg.dailyGate;
+  const bullR  = tk65s==='Bull'&&trend65==='Bull'&&stack==='Bull Stack'&&(!gate||(trendD==='Bull'&&tkDs==='Bull'));
+  const bearR  = tk65s==='Bear'&&trend65==='Bear'&&stack==='Bear Stack'&&(!gate||(trendD==='Bear'&&tkDs==='Bear'));
+  const signal = bullR?'READY ▲':bearR?'READY ▼':'WAIT';
+
+  return { close, vwap5, vwap65, vwapD, rsi5, rsi65, rsiD,
+    tk5s, tk65s, tkDs, trend5, trend65, trendD,
+    cl5, cl65, clD, ck65s, ckDs, stack, slope65, str65, div65, signal };
+};
+
+// ── Compute watchlist signal ──────────────────────
+// Scoring: TK bull 65m (+1), price above cloud 65m (+1),
+//          Chikou above (+1), VWAP slope positive (+1),
+//          TK bull Daily (+1) — max score 5
+// PRIME ▲ = 4-5 bull | PRIME ▼ = 4-5 bear
+// WATCH   = 2-3 bull  | BEAR   = 3+ bear
+// WAIT    = 0-1 or mixed
+
+const computeWLSignal = (bars65, barsD, livePrice) => {
+  if(!bars65?.length || !barsD?.length) return { signal:'—', score:0, cls:'dim-c' };
+  const c = livePrice;
+
+  const tk65  = tenkanFn(bars65);
+  const kj65  = kijunFn(bars65);
+  const sa65  = (tk65+kj65)/2;
+  const sb65  = spanBFn(bars65);
+  const tk65s = tk65>kj65?'Bull':'Bear';
+  const cl65  = cloudSt(c,sa65,sb65);
+  const ck65s = chikouSt(c,bars65);
+  const vwap65= vwapFn(bars65);
+  const vwap65prev = bars65.length>5?vwapFn(bars65.slice(0,-5)):vwap65;
+  const slope = ((vwap65-vwap65prev)/vwap65prev)*100;
+
+  const tkD   = tenkanFn(barsD);
+  const kjD   = kijunFn(barsD);
+  const tkDs  = tkD>kjD?'Bull':'Bear';
+  const saD   = (tkD+kjD)/2;
+  const sbD   = spanBFn(barsD);
+  const clD   = cloudSt(c,saD,sbD);
+
+  // Bull score
+  let bullScore = 0;
+  if(tk65s==='Bull') bullScore++;
+  if(cl65==='Bull Cloud') bullScore++;
+  if(ck65s==='Above') bullScore++;
+  if(slope>cfg.slopeThresh) bullScore++;
+  if(tkDs==='Bull'&&clD==='Bull Cloud') bullScore++;
+
+  // Bear score
+  let bearScore = 0;
+  if(tk65s==='Bear') bearScore++;
+  if(cl65==='Bear Cloud') bearScore++;
+  if(ck65s==='Below') bearScore++;
+  if(slope<-cfg.slopeThresh) bearScore++;
+  if(tkDs==='Bear'&&clD==='Bear Cloud') bearScore++;
+
+  const net = bullScore - bearScore;
+
+  let signal, cls;
+  if(bullScore>=4)      { signal='PRIME ▲'; cls='sig-prime'; }
+  else if(bullScore>=2) { signal='WATCH ▲'; cls='sig-watch'; }
+  else if(bearScore>=4) { signal='PRIME ▼'; cls='sig-bear';  }
+  else if(bearScore>=2) { signal='BEAR ▼';  cls='sig-bear';  }
+  else                  { signal='WAIT';    cls='sig-wait';  }
+
+  return { signal, bullScore, bearScore, net, cls };
+};
+
+// ── Render HUD ────────────────────────────────────
+let prevSignal = '';
+
+const renderHUD = (s, ticker, priceData) => {
+  const c = cfg.colorCells;
+  $('hudTicker').textContent = ticker;
+  $('priceLabel').textContent = `${ticker} · Price`;
+  $('priceValue').textContent = fmt(priceData.price);
+  const sign = priceData.change>=0?'+':'';
+  $('priceChange').textContent = `${sign}${fmt(priceData.change)}  (${sign}${fmt(priceData.changePct,2)}%)`;
+  $('priceChange').className = `price-change ${priceData.change>=0?'bull-c':'bear-c'}`;
+
+  const sv=$('signalValue');
+  sv.textContent=s.signal;
+  sv.className='signal-value '+(s.signal==='READY ▲'?'bull':s.signal==='READY ▼'?'bear':'');
+  const sc=$('signalCard');
+  sc.className='card signal-main '+(s.signal==='READY ▲'?'bull':s.signal==='READY ▼'?'bear':'');
+  if(s.signal!==prevSignal&&s.signal!=='WAIT'){sc.classList.add('firing');setTimeout(()=>sc.classList.remove('firing'),1600);}
+  prevSignal=s.signal;
+  $('signalSub').textContent=`65m alignment · daily gate ${cfg.dailyGate?'ON':'OFF'}`;
+
+  const strCls=s.str65>0?'bull-c':s.str65<0?'bear-c':'dim-c';
+  $('strNum').textContent=(s.str65>0?'+':'')+s.str65;
+  $('strNum').className=`strength-number ${strCls}`;
+  const pct=Math.abs(s.str65)/4*50;
+  const fill=$('strFill');
+  fill.style.width=`${pct}%`;
+  fill.style.left=s.str65>=0?'50%':`${50-pct}%`;
+  fill.style.background=s.str65>0?'var(--bull)':s.str65<0?'var(--bear)':'var(--text-dim)';
+
+  setCell('c-vwap',`${fmt(s.vwap5)}/${fmt(s.vwap65)}/${fmt(s.vwapD)}`,c?cc(s.trend65):'');
+  setCell('c-rsi', `${fmt(s.rsi5,1)}/${fmt(s.rsi65,1)}/${fmt(s.rsiD,1)}`,c?rsiCC(s.rsi65,cfg.rsiOB,cfg.rsiOS):'');
+  setCell('c-tk',  `${icon(s.tk5s)}/${icon(s.tk65s)}/${icon(s.tkDs)}`,c?cc(s.tk65s):'');
+  setCell('c-trend',`${icon(s.trend5)}/${icon(s.trend65)}/${icon(s.trendD)}`,c?cc(s.trend65):'');
+  setCell('c-cloud',`${s.cl5.replace(' Cloud','')}/${s.cl65.replace(' Cloud','')}/${s.clD.replace(' Cloud','')}`,c?cc(s.cl65):'');
+  setCell('c-stack', s.stack, c?cc(s.stack):'');
+  setCell('c-chikou',`${s.ck65s}/${s.ckDs}`,c?cc(s.ck65s):'');
+  setCell('c-slope', `${fmt(s.slope65,3)}%`,c?slopeCC(s.slope65,cfg.slopeThresh):'');
+  setCell('c-gate',  cfg.dailyGate?'ON':'OFF',cfg.dailyGate?'bull-c':'wait-c');
+  setCell('c-bar',   trendBarFn(s.str65),c?strCls:'');
+  setCell('c-div',   s.div65,c?cc(s.div65):'');
+  setCell('c-dtkk',  `${icon(s.tkDs)} ${s.tkDs}`,c?cc(s.tkDs):'');
+  setCell('c-dtrend',`${icon(s.trendD)} ${s.trendD}`,c?cc(s.trendD):'');
+  setCell('c-dcloud',s.clD.replace(' Cloud',''),c?cc(s.clD):'');
+};
+
+// ── Watchlist state + render ──────────────────────
+let watchlist = JSON.parse(localStorage.getItem('zion-watchlist')||'["QQQ","SPY","AAPL","NVDA"]');
+let wlData    = {}; // { SYMBOL: { price, change, pct, bars65, barsD, signal, cls } }
+
+const saveWL = () => localStorage.setItem('zion-watchlist', JSON.stringify(watchlist));
+
+const renderWatchlist = () => {
+  const body = $('wlBody');
+  if(!watchlist.length){
+    body.innerHTML='<div class="wl-empty">Add tickers above to start tracking structure signals.</div>';
+    return;
+  }
+  body.innerHTML='';
+  watchlist.forEach(sym => {
+    const d   = wlData[sym];
+    const row = document.createElement('div');
+    row.className = 'wl-row' + (d?'':' loading-row');
+    row.title = 'Click to load in HUD';
+
+    const price  = d ? fmt(d.price) : '…';
+    const change = d ? (d.pct>=0?'+':'')+fmt(d.pct,2)+'%' : '…';
+    const chgCls = d ? (d.pct>=0?'bull-c':'bear-c') : 'dim-c';
+    const tk65   = d?.tk65s ? icon(d.tk65s) : '—';
+    const tk65Cls= d?.tk65s ? cc(d.tk65s)   : '';
+    const cloud  = d?.cl65  ? d.cl65.replace(' Cloud','') : '—';
+    const cloudCls= d?.cl65 ? cc(d.cl65) : '';
+    const chikou = d?.ck65s ?? '—';
+    const ckCls  = d?.ck65s ? cc(d.ck65s) : '';
+    const sig    = d?.signal ?? '—';
+    const sigCls = d?.sigCls ?? 'dim-c';
+
+    row.innerHTML = `
+      <div class="wl-cell wl-sym heat-stripe-wl">${sym}</div>
+      <div class="wl-cell wl-price">${price}</div>
+      <div class="wl-cell ${chgCls}">${change}</div>
+      <div class="wl-cell ${tk65Cls}" style="text-align:center">${tk65}</div>
+      <div class="wl-cell ${cloudCls}" style="text-align:center">${cloud}</div>
+      <div class="wl-cell ${ckCls}" style="text-align:center">${chikou}</div>
+      <div class="wl-cell wl-signal ${sigCls}">${sig}</div>
+      <button class="wl-del" data-sym="${sym}">×</button>`;
+
+    row.addEventListener('click', e => {
+      if(e.target.classList.contains('wl-del')) return;
+      $('tickerInput').value = sym;
+      refreshHUD();
+    });
+    row.querySelector('.wl-del').addEventListener('click', e => {
+      e.stopPropagation();
+      watchlist = watchlist.filter(s=>s!==sym);
+      delete wlData[sym];
+      saveWL(); renderWatchlist();
+    });
+    body.appendChild(row);
+  });
+};
+
+const refreshWatchlist = async () => {
+  if(!watchlist.length || !API_KEY.trim()) return;
+  $('wlStatus').textContent = 'updating…';
+
+  // Step 1: batch snapshot for price/change on all tickers (1 API call)
+  let snaps = {};
+  try {
+    snaps = await fetchSnapshots(watchlist);
+  } catch(e) { console.warn('WL snapshot error:', e.message); }
+
+  // Step 2: fetch bars for signal computation — parallel, Massive has no rate limit
+  const barFetches = watchlist.map(async sym => {
+    try {
+      const [bars65, barsD] = await Promise.all([
+        fetchBars(sym, 1, 'hour', 120),
+        fetchBars(sym, 1, 'day',  365),
+      ]);
+      const snap  = snaps[sym] || {};
+      const price = snap.price || bars65[bars65.length-1]?.close || 0;
+      const wlSig = computeWLSignal(bars65, barsD, price);
+      const tk65  = tenkanFn(bars65);
+      const kj65  = kijunFn(bars65);
+      const sa65  = (tk65+kj65)/2;
+      const sb65  = spanBFn(bars65);
+      const ck65s = chikouSt(price, bars65);
+
+      wlData[sym] = {
+        price,
+        change: snap.change ?? 0,
+        pct:    snap.pct    ?? 0,
+        tk65s:  tk65>kj65?'Bull':'Bear',
+        cl65:   cloudSt(price,sa65,sb65),
+        ck65s,
+        signal: wlSig.signal,
+        sigCls: wlSig.cls,
+      };
+    } catch(e) {
+      console.warn(`WL ${sym}:`, e.message);
+      wlData[sym] = wlData[sym] || null;
+    }
+  });
+
+  await Promise.all(barFetches);
+  renderWatchlist();
+  $('wlStatus').textContent = `updated ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true})}`;
+};
+
+// ── Render Sectors ────────────────────────────────
+const SECTORS = [
+  {symbol:'XLI',name:'Industrial'}, {symbol:'XLB',name:'Materials'},
+  {symbol:'XLK',name:'Technology'}, {symbol:'XLY',name:'Cons Disc'},
+  {symbol:'XLV',name:'Healthcare'}, {symbol:'XLF',name:'Financials'},
+  {symbol:'XLU',name:'Utilities'},  {symbol:'XLC',name:'Comm Svcs'},
+  {symbol:'XLRE',name:'Real Estate'},{symbol:'XLP',name:'Cons Staples'},
+  {symbol:'XLE',name:'Energy'},
+];
+
+const renderSectors = (snaps) => {
+  const rows = SECTORS.map(s=>({
+    ...s, ...(snaps[s.symbol]||{price:null,change:null,pct:null})
+  })).sort((a,b)=>(b.pct||0)-(a.pct||0));
+
+  const up  =rows.filter(r=>r.pct>0.05).length;
+  const down=rows.filter(r=>r.pct<-0.05).length;
+  const flat=rows.length-up-down;
+  const tot =rows.length;
+  $('bBull').style.width=`${(up/tot)*100}%`;
+  $('bFlat').style.width=`${(flat/tot)*100}%`;
+  $('bBear').style.width=`${(down/tot)*100}%`;
+  $('breadthCounts').innerHTML=
+    `<span class="bull-c">${up} up</span>`+
+    `<span class="dim-c">${flat} flat</span>`+
+    `<span class="bear-c">${down} dn</span>`;
+
+  const maxP=Math.max(...rows.map(r=>Math.abs(r.pct||0)),0.01);
+  const body=$('sectorBody'); body.innerHTML='';
+  rows.forEach(r=>{
+    const bull=r.pct>0,bear=r.pct<0;
+    const cls=bull?'bull-c':bear?'bear-c':'';
+    const stripe=bull?'var(--bull)':bear?'var(--bear)':'var(--text-dim)';
+    const sign=bull?'+':'';
+    const barW=Math.min((Math.abs(r.pct||0)/maxP)*100,100);
+    const row=document.createElement('div'); row.className='sec-row';
+    row.style.cursor='pointer';
+    row.title=`Click to screen top ${r.symbol} holdings`;
+    row.addEventListener('click',()=>runScreener(r.symbol));
+    row.innerHTML=`
+      <div class="heat-stripe" style="background:${stripe}"></div>
+      <div class="sc sc-sym">${r.symbol}</div>
+      <div class="sc-name">${r.name}</div>
+      <div class="sc sc-num sc-latest">${r.price!==null?fmt(r.price):'—'}</div>
+      <div class="sc sc-num ${cls}">${r.change!==null?sign+fmt(r.change):'—'}</div>
+      <div class="sc sc-num">
+        <div class="pct-wrap">
+          <div class="mini-bar"><div class="mini-fill" style="width:${barW}%;background:${stripe}"></div></div>
+          <span class="${cls}">${r.pct!==null?sign+fmt(r.pct)+'%':'—'}</span>
+        </div>
+      </div>`;
+    body.appendChild(row);
+  });
+};
+
+const refreshSectors = async () => {
+  if(!API_KEY.trim()) return;
+  try {
+    const snaps = await fetchSnapshots(SECTORS.map(s=>s.symbol));
+    renderSectors(snaps);
+  } catch(e) { console.error('Sectors:', e.message); }
+};
+
+// ── HUD fetch ─────────────────────────────────────
+let isFetchingHUD = false;
+
+const refreshHUD = async () => {
+  if(isFetchingHUD) return;
+  if(!API_KEY.trim()){ setStatus('Open Settings → paste API key',true); $('liveDot').className='live-dot error'; return; }
+
+  const ticker = $('tickerInput').value.trim().toUpperCase() || 'AAPL';
+  isFetchingHUD=true;
+  $('liveDot').className='live-dot loading';
+  setStatus(`Fetching ${ticker}…`);
+
+  try {
+    // All in parallel — Massive has unlimited calls
+    const [bars5, bars65, barsD, snap] = await Promise.all([
+      fetchBars(ticker, 5, 'minute', 5),    // 5m bars, last 5 days
+      fetchBars(ticker, 1, 'hour',   120),  // 1h bars, last 120 days (~840 regular session bars)
+      fetchBars(ticker, 1, 'day',    365),  // daily bars, last 365 days
+      fetchSnapshot(ticker),
+    ]);
+
+    const signals  = computeHUD(bars5, bars65, barsD, snap.price);
+    renderHUD(signals, ticker, snap);
+    const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    setStatus(`Updated ${t}`);
+    $('liveDot').className=isLive?'live-dot':'live-dot paused';
+  } catch(err) {
+    setStatus(err.message,true);
+    $('liveDot').className='live-dot error';
+    console.error('HUD error:',err);
+  } finally {
+    isFetchingHUD=false;
+  }
+};
+
+// ── Timers ────────────────────────────────────────
+let hudTimer=null, wlTimer=null, secTimer=null;
+let isLive=true;
+
+const startLoops = () => {
+  if(hudTimer) clearInterval(hudTimer);
+  if(wlTimer)  clearInterval(wlTimer);
+  if(secTimer) clearInterval(secTimer);
+  hudTimer = setInterval(refreshHUD,       cfg.hudInterval);
+  wlTimer  = setInterval(refreshWatchlist, 60000);   // watchlist every 60s
+  secTimer = setInterval(refreshSectors,   90000);   // sectors every 90s
+  // Theme universe: refresh every 5 min (many tickers, cache helps)
+  setInterval(()=>{ themeCache={}; refreshTheme(); }, 300000);
+};
+const stopLoops = () => {
+  [hudTimer,wlTimer,secTimer].forEach(t=>clearInterval(t));
+  hudTimer=wlTimer=secTimer=null;
+};
+
+// ── Boot ──────────────────────────────────────────
+const boot = () => {
+  renderWatchlist();
+  renderTheme();
+  refreshHUD();
+  // Stagger loads so they don't all hit simultaneously
+  setTimeout(refreshSectors,   3000);
+  setTimeout(refreshWatchlist, 6000);
+  setTimeout(refreshTheme,     9000);  // theme universe loads last
+  startLoops();
+};
+
+// ── Clock ─────────────────────────────────────────
+// ── NYSE Market Calendar ──────────────────────────────
+const MARKET_HOLIDAYS = new Set([
+  '2025-01-01','2025-01-20','2025-02-17','2025-04-18','2025-05-26',
+  '2025-06-19','2025-07-04','2025-09-01','2025-11-27','2025-12-25',
+  '2026-01-01','2026-01-19','2026-02-16','2026-04-03','2026-05-25',
+  '2026-06-19','2026-07-03','2026-09-07','2026-11-26','2026-12-25',
+  '2027-01-01','2027-01-18','2027-02-15','2027-03-26','2027-05-31',
+  '2027-06-18','2027-07-05','2027-09-06','2027-11-25','2027-12-24',
+]);
+const EARLY_CLOSE = new Set([
+  '2025-07-03','2025-11-28','2025-12-24',
+  '2026-11-27','2026-12-24',
+  '2027-11-26',
+]);
+const toDateStr = d => d.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
+const isHoliday = et => MARKET_HOLIDAYS.has(toDateStr(et));
+const isWeekend = et => { const d=et.getDay(); return d===0||d===6; };
+const isEarly   = et => EARLY_CLOSE.has(toDateStr(et));
+
+const updateClock = () => {
+  const now = new Date();
+  const et  = new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const hh  = et.getHours(), mm = et.getMinutes();
+  const t   = `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')} ET`;
+  const mins = hh*60+mm;
+  const closeAt = isEarly(et) ? 780 : 960;
+
+  let session;
+  if(isWeekend(et))       session = et.getDay()===6 ? 'Saturday — Closed' : 'Sunday — Closed';
+  else if(isHoliday(et))  session = 'Market Holiday';
+  else if(mins>=570&&mins<closeAt) session = isEarly(et)?'Early Close Day':'Market Open';
+  else if(mins>=240&&mins<570)     session = 'Pre-Market';
+  else if(mins>=closeAt&&mins<1200)session = 'After Hours';
+  else                             session = 'Overnight';
+
+  $('sessionLabel').textContent = `${t} · ${session}`;
+};
+updateClock();
+setInterval(updateClock,30000);
+
+// ── Ticker change ─────────────────────────────────
+$('tickerInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.target.blur();refreshHUD();} });
+$('tickerInput').addEventListener('blur',()=>refreshHUD());
+
+// ── Pause ─────────────────────────────────────────
+$('pauseBtn').addEventListener('click',()=>{
+  isLive=!isLive;
+  $('pauseBtn').textContent=isLive?'Pause':'Resume';
+  $('pauseBtn').classList.toggle('active',!isLive);
+  $('liveDot').className='live-dot'+(isLive?'':' paused');
+  isLive?startLoops():stopLoops();
+});
+
+// ── Watchlist controls ────────────────────────────
+$('wlAddBtn').addEventListener('click',()=>{
+  const sym=$('wlInput').value.trim().toUpperCase();
+  if(!sym||watchlist.includes(sym)) return;
+  watchlist.push(sym);
+  saveWL(); renderWatchlist();
+  $('wlInput').value='';
+  // Fetch data for new ticker immediately
+  if(API_KEY.trim()) refreshWatchlist();
+});
+$('wlInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter') $('wlAddBtn').click();
+});
+$('wlRefreshBtn').addEventListener('click',()=>{
+  refreshWatchlist();
+  refreshSectors();
+});
+
+// ── Settings ──────────────────────────────────────
+$('settingsBtn').addEventListener('click',()=>{
+  const open=$('drawer').classList.toggle('open');
+  $('settingsBtn').classList.toggle('active',open);
+});
+$('s-apikey').addEventListener('change',e=>{ API_KEY=e.target.value.trim(); boot(); });
+$('s-apikey').addEventListener('blur',  e=>{ API_KEY=e.target.value.trim(); });
+
+const wireToggle=(id,key)=>$(id).addEventListener('change',e=>{cfg[key]=e.target.checked;});
+const wireSlider=(id,valId,key,xform)=>$(id).addEventListener('input',e=>{
+  const v=parseFloat(e.target.value);
+  cfg[key]=xform?xform(v):v;
+  $(valId).textContent=e.target.value;
+  if(key==='hudInterval'&&isLive) startLoops();
+});
+wireToggle('s-color','colorCells');
+wireToggle('s-gate', 'dailyGate');
+wireSlider('s-slope','sv-slope','slopeThresh');
+wireSlider('s-ob',  'sv-ob',  'rsiOB');
+wireSlider('s-os',  'sv-os',  'rsiOS');
+wireSlider('s-int', 'sv-int', 'hudInterval',v=>v*1000);
+
+// ── Notes ─────────────────────────────────────────
+let notes=JSON.parse(localStorage.getItem('zion-notes')||'[]');
+const saveNotes=()=>{
+  localStorage.setItem('zion-notes',JSON.stringify(notes));
+  const s=$('notesSaved'); s.classList.add('show');
+  setTimeout(()=>s.classList.remove('show'),1200);
+};
+const renderNotes=()=>{
+  const list=$('notesList'); list.innerHTML='';
+  if(!notes.length){
+    const e=document.createElement('div'); e.className='empty-notes';
+    e.textContent='No notes yet.\nType below — ticker & signal are stamped automatically.';
+    list.appendChild(e); return;
+  }
+  [...notes].reverse().forEach((note,ri)=>{
+    const i=notes.length-1-ri;
+    const item=document.createElement('div'); item.className='note-item';
+    const sc=note.signal==='READY ▲'?'#4ade80':note.signal==='READY ▼'?'#f87171':'#fb923c';
+    item.innerHTML=`
+      <div class="note-meta">
+        <div class="note-badges">
+          <span class="badge-ticker">${note.ticker}</span>
+          <span class="badge-signal" style="background:${sc}22;color:${sc};border:1px solid ${sc}44">${note.signal}</span>
+        </div>
+        <span>${note.time}</span>
+      </div>
+      <div class="note-text">${note.text}</div>
+      <button class="note-del">×</button>`;
+    item.querySelector('.note-del').addEventListener('click',()=>{notes.splice(i,1);saveNotes();renderNotes();});
+    list.appendChild(item);
+  });
+};
+const addNote=()=>{
+  const ta=$('noteInput'),text=ta.value.trim(); if(!text)return;
+  notes.push({
+    text,
+    ticker:$('tickerInput').value.trim().toUpperCase()||'AAPL',
+    signal:prevSignal||'WAIT',
+    time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}),
+  });
+  saveNotes(); renderNotes(); ta.value=''; ta.focus();
+};
+$('addNoteBtn').addEventListener('click',addNote);
+$('noteInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addNote();}});
+renderNotes();
+
+// ── Sector Holdings ──────────────────────────────────
+const SECTOR_HOLDINGS = {
+  'XLE':  ['XOM','CVX','EOG','SLB','PSX'],
+  'XLF':  ['BRK.B','JPM','V','MA','BAC'],
+  'XLB':  ['LIN','APD','ECL','SHW','FCX'],
+  'XLRE': ['PLD','AMT','EQIX','PSA','O'],
+  'XLK':  ['MSFT','NVDA','AAPL','AVGO','CRM'],
+  'XLI':  ['GE','RTX','CAT','HON','UNP'],
+  'XLV':  ['LLY','UNH','JNJ','ABBV','MRK'],
+  'XLY':  ['AMZN','TSLA','HD','MCD','NKE'],
+  'XLC':  ['META','GOOGL','NFLX','DIS','T'],
+  'XLU':  ['NEE','SO','DUK','AEP','D'],
+  'XLP':  ['PG','KO','PEP','COST','WMT'],
+};
+
+let activeSector  = null;
+let screenerCache = {};
+
+const renderScreener = (symbols) => {
+  const body = $('screenerBody');
+  const order = {'PRIME ▲':0,'WATCH ▲':1,'WAIT':2,'BEAR ▼':3,'PRIME ▼':4,'—':5};
+  const sorted = [...symbols].sort((a,b) => {
+    const da=screenerCache[a], db=screenerCache[b];
+    if(!da&&!db) return 0; if(!da) return 1; if(!db) return -1;
+    return (order[da.signal]??5)-(order[db.signal]??5);
+  });
+
+  const allLoading = sorted.every(s=>!screenerCache[s]);
+  if(allLoading){ body.innerHTML='<div class="scr-loading">Loading structure signals…</div>'; return; }
+
+  body.innerHTML='';
+  sorted.forEach(sym => {
+    const d   = screenerCache[sym];
+    const row = document.createElement('div');
+    row.className='scr-row';
+    row.title='Click to load in HUD';
+    const price  = d?fmt(d.price):'…';
+    const change = d?(d.pct>=0?'+':'')+fmt(d.pct,2)+'%':'…';
+    const chgCls = d?(d.pct>=0?'bull-c':'bear-c'):'dim-c';
+    const tk     = d?.tk65s?icon(d.tk65s):'—';
+    const tkCls  = d?.tk65s?cc(d.tk65s):'';
+    const cloud  = d?.cl65?d.cl65.replace(' Cloud',''):'—';
+    const clCls  = d?.cl65?cc(d.cl65):'';
+    const chikou = d?.ck65s??'—';
+    const ckCls  = d?.ck65s?cc(d.ck65s):'';
+    const sig    = d?.signal??'…';
+    const sigCls = d?.sigCls??'dim-c';
+    row.innerHTML=`
+      <div class="scr-cell scr-sym">${sym}</div>
+      <div class="scr-cell">${price}</div>
+      <div class="scr-cell ${chgCls}">${change}</div>
+      <div class="scr-cell ${tkCls}" style="text-align:center">${tk}</div>
+      <div class="scr-cell ${clCls}" style="text-align:center">${cloud}</div>
+      <div class="scr-cell ${ckCls}" style="text-align:center">${chikou}</div>
+      <div class="scr-cell wl-signal ${sigCls}">${sig}</div>`;
+    row.addEventListener('click',()=>{ $('tickerInput').value=sym; refreshHUD(); });
+    body.appendChild(row);
+  });
+};
+
+const runScreener = async (sectorSym) => {
+  const holdings = SECTOR_HOLDINGS[sectorSym];
+  if(!holdings) return;
+
+  if(activeSector===sectorSym){
+    activeSector=null;
+    $('screenerPanel').classList.remove('open');
+    document.querySelectorAll('.sec-row.active').forEach(r=>r.classList.remove('active'));
+    return;
+  }
+  activeSector=sectorSym;
+  $('screenerPanel').classList.add('open');
+  document.querySelectorAll('.sec-row.active').forEach(r=>r.classList.remove('active'));
+  renderScreener(holdings);
+
+  const toFetch=holdings.filter(s=>!screenerCache[s]);
+  if(!toFetch.length){ renderScreener(holdings); return; }
+
+  let snaps={};
+  try{ snaps=await fetchSnapshots(toFetch); }catch(e){ console.warn('Screener snap:',e.message); }
+
+  await Promise.all(toFetch.map(async sym => {
+    try{
+      const [bars65,barsD]=await Promise.all([
+        fetchBars(sym,1,'hour',120),
+        fetchBars(sym,1,'day',365),
+      ]);
+      const snap=snaps[sym]||{};
+      const price=snap.price||bars65[bars65.length-1]?.close||0;
+      const wlSig=computeWLSignal(bars65,barsD,price);
+      const tk65=tenkanFn(bars65), kj65=kijunFn(bars65);
+      const sa65=(tk65+kj65)/2, sb65=spanBFn(bars65);
+      screenerCache[sym]={
+        price, change:snap.change??0, pct:snap.pct??0,
+        tk65s:  tk65>kj65?'Bull':'Bear',
+        cl65:   cloudSt(price,sa65,sb65),
+        ck65s:  chikouSt(price,bars65),
+        signal: wlSig.signal, sigCls: wlSig.cls,
+      };
+    }catch(e){
+      console.warn(`Screener ${sym}:`,e.message);
+      screenerCache[sym]=null;
+    }
+    if(activeSector===sectorSym) renderScreener(holdings);
+  }));
+};
+
+// ── Themed Universe ──────────────────────────────────
+// Your curated universe — tickers + theme + notes
+// Rankings are computed live from Massive. Only the curation is yours.
+const UNIVERSE = [
+  // AI Infra
+  {sym:'ANET',  theme:'AI Infra',      tag:'AI switches'},
+  {sym:'AVGO',  theme:'AI Infra',      tag:'AI interconnect'},
+  {sym:'MRVL',  theme:'AI Infra',      tag:'AI networking'},
+  {sym:'APLD',  theme:'AI Infra',      tag:'RS leader'},
+  {sym:'CRWV',  theme:'AI Infra',      tag:'CoreWeave'},
+  {sym:'SMCI',  theme:'AI Infra',      tag:'AI servers'},
+  {sym:'LITE',  theme:'Optics',        tag:'AI optics'},
+  {sym:'AAOI',  theme:'Optics',        tag:'High beta'},
+  {sym:'CIEN',  theme:'Optics',        tag:'Stable'},
+  {sym:'COHR',  theme:'Optics',        tag:'High beta'},
+  {sym:'GLW',   theme:'Optics',        tag:'Corning ❤️'},
+  // Compute / Semis
+  {sym:'NVDA',  theme:'Compute',       tag:'AI compute'},
+  {sym:'AMD',   theme:'Compute',       tag:'AI compute'},
+  {sym:'MU',    theme:'Compute',       tag:'Memory'},
+  {sym:'ASML',  theme:'Compute',       tag:'Lithography'},
+  {sym:'TSM',   theme:'Compute',       tag:'Foundry'},
+  {sym:'SMH',   theme:'Compute',       tag:'Broad semis ETF'},
+  // Enterprise AI
+  {sym:'NOW',   theme:'Enterprise AI', tag:'Workflow AI'},
+  {sym:'CRM',   theme:'Enterprise AI', tag:'Enterprise AI'},
+  {sym:'ORCL',  theme:'Enterprise AI', tag:'Cloud AI'},
+  {sym:'SNOW',  theme:'Enterprise AI', tag:'Data cloud'},
+  {sym:'MDB',   theme:'Enterprise AI', tag:'Data infra'},
+  {sym:'TEAM',  theme:'Enterprise AI', tag:'Collaboration'},
+  // Defense
+  {sym:'LMT',   theme:'Defense',       tag:'Legacy defense'},
+  {sym:'RTX',   theme:'Defense',       tag:'Missiles'},
+  {sym:'PLTR',  theme:'Defense',       tag:'AI defense'},
+  {sym:'BA',    theme:'Defense',       tag:'Aerospace'},
+  {sym:'AVAV',  theme:'Defense',       tag:'Drones — high beta'},
+  {sym:'KTOS',  theme:'Defense',       tag:'Drones — spec'},
+  // Power
+  {sym:'VRT',   theme:'Power',         tag:'AI cooling'},
+  {sym:'ETN',   theme:'Power',         tag:'Grid upgrades'},
+  {sym:'CEG',   theme:'Power',         tag:'Nuclear utility'},
+  {sym:'OKLO',  theme:'Power',         tag:'Microreactors'},
+  {sym:'SMR',   theme:'Power',         tag:'Small modular'},
+  {sym:'UEC',   theme:'Power',         tag:'Uranium'},
+  // Space
+  {sym:'RKLB',  theme:'Space',         tag:'RS leader'},
+  {sym:'ASTS',  theme:'Space',         tag:'Satellite RS'},
+  {sym:'IRDM',  theme:'Space',         tag:'Stable satellite'},
+  // Defensive
+  {sym:'WMT',   theme:'Defensive',     tag:'Staples'},
+  {sym:'KO',    theme:'Defensive',     tag:'Staples'},
+  {sym:'PEP',   theme:'Defensive',     tag:'Staples'},
+  {sym:'JNJ',   theme:'Defensive',     tag:'Healthcare'},
+  {sym:'NEM',   theme:'Defensive',     tag:'Gold hedge'},
+  {sym:'XOM',   theme:'Defensive',     tag:'Energy hedge'},
+  {sym:'CVX',   theme:'Defensive',     tag:'Oil major — macro hedge'},
+  // Rotation / RS
+  {sym:'V',     theme:'Rotation',      tag:'Payments RS'},
+  {sym:'DAL',   theme:'Rotation',      tag:'Airline RS'},
+  {sym:'GS',    theme:'Rotation',      tag:'IB RS'},
+  {sym:'COST',  theme:'Rotation',      tag:'Retail RS'},
+];
+
+let themeCache    = {};  // { SYM: signal data }
+let activeTheme   = 'ALL';
+let themeFetching = false;
+
+const filterTheme = (btn) => {
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeTheme = btn.dataset.theme;
+  renderTheme();
+};
+
+const universeForTheme = () => activeTheme === 'ALL'
+  ? UNIVERSE
+  : UNIVERSE.filter(u => u.theme === activeTheme || u.theme.startsWith(activeTheme));
+
+const renderTheme = () => {
+  const body = $('themeBody');
+  const tickers = universeForTheme();
+  if(!tickers.length){ body.innerHTML='<div class="theme-empty">No tickers in this theme.</div>'; return; }
+
+  // Sort: PRIME ▲ first, then by signal order, then uncached last
+  const order = {'PRIME ▲':0,'WATCH ▲':1,'WAIT':2,'BEAR ▼':3,'PRIME ▼':4};
+  const sorted = [...tickers].sort((a,b)=>{
+    const da=themeCache[a.sym], db=themeCache[b.sym];
+    if(!da&&!db) return 0; if(!da) return 1; if(!db) return -1;
+    return (order[da.signal]??5)-(order[db.signal]??5);
+  });
+
+  body.innerHTML='';
+  sorted.forEach(u => {
+    const d   = themeCache[u.sym];
+    const row = document.createElement('div');
+    row.className = 'theme-row' + (d?'':' loading-row');
+    row.title = 'Click to load in HUD';
+
+    const price  = d?fmt(d.price):'…';
+    const chg    = d?(d.pct>=0?'+':'')+fmt(d.pct,2)+'%':'…';
+    const chgCls = d?(d.pct>=0?'bull-c':'bear-c'):'dim-c';
+    const tk     = d?.tk65s?icon(d.tk65s):'—';
+    const tkCls  = d?.tk65s?cc(d.tk65s):'';
+    const cloud  = d?.cl65?d.cl65.replace(' Cloud',''):'—';
+    const clCls  = d?.cl65?cc(d.cl65):'';
+    const chikou = d?.ck65s??'—';
+    const ckCls  = d?.ck65s?cc(d.ck65s):'';
+    const sig    = d?.signal??'…';
+    const sigCls = d?.sigCls??'dim-c';
+
+    // Theme color tag
+    const themeColors = {
+      'AI Infra':'#60a5fa','Optics':'#a78bfa','Compute':'#34d399',
+      'Enterprise AI':'#f59e0b','Defense':'#f87171','Power':'#fb923c',
+      'Space':'#00f5d4','Defensive':'#94a3b8','Rotation':'#4ade80',
+    };
+    const tagColor = themeColors[u.theme]||'#4a6080';
+
+    row.innerHTML=`
+      <div class="theme-cell theme-sym">${u.sym}</div>
+      <div class="theme-tag" style="color:${tagColor};font-size:9px;padding:5px 4px">${u.theme.split(' ')[0]}</div>
+      <div class="theme-cell ${chgCls}">${price}</div>
+      <div class="theme-cell" style="color:var(--text-dim);font-size:10px">${u.tag}</div>
+      <div class="theme-cell ${tkCls}" style="text-align:center">${tk}</div>
+      <div class="theme-cell ${clCls}" style="text-align:center">${cloud}</div>
+      <div class="theme-cell ${ckCls}" style="text-align:center">${chikou}</div>
+      <div class="theme-cell wl-signal ${sigCls}">${sig}</div>`;
+
+    row.addEventListener('click',()=>{ $('tickerInput').value=u.sym; refreshHUD(); });
+    body.appendChild(row);
+  });
+};
+
+const refreshTheme = async () => {
+  if(themeFetching || !API_KEY.trim()) return;
+  themeFetching = true;
+  $('themeStatus').textContent = 'loading…';
+
+  const allSyms = UNIVERSE.map(u=>u.sym);
+
+  // Batch snapshot — 1 API call for all tickers
+  let snaps = {};
+  try { snaps = await fetchSnapshots(allSyms); } catch(e) { console.warn('Theme snap:', e.message); }
+
+  // Fetch bars in parallel — Massive unlimited
+  await Promise.all(allSyms.map(async sym => {
+    if(themeCache[sym]) return; // already cached
+    try {
+      const [bars65, barsD] = await Promise.all([
+        fetchBars(sym, 1, 'hour', 120),
+        fetchBars(sym, 1, 'day',  365),
+      ]);
+      const snap  = snaps[sym] || {};
+      const price = snap.price || bars65[bars65.length-1]?.close || 0;
+      const wlSig = computeWLSignal(bars65, barsD, price);
+      const tk65  = tenkanFn(bars65), kj65 = kijunFn(bars65);
+      const sa65  = (tk65+kj65)/2,    sb65 = spanBFn(bars65);
+      themeCache[sym] = {
+        price, change: snap.change??0, pct: snap.pct??0,
+        tk65s:  tk65>kj65?'Bull':'Bear',
+        cl65:   cloudSt(price,sa65,sb65),
+        ck65s:  chikouSt(price,bars65),
+        signal: wlSig.signal, sigCls: wlSig.cls,
+      };
+    } catch(e) {
+      console.warn(`Theme ${sym}:`, e.message);
+      themeCache[sym] = null;
+    }
+    renderTheme(); // progressive render as each ticker loads
+  }));
+
+  themeFetching = false;
+  const t = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  $('themeStatus').textContent = `updated ${t}`;
+};
+
+$('themeRefreshBtn').addEventListener('click', () => {
+  themeCache = {}; // clear cache to force re-fetch
+  refreshTheme();
+});
+
+// ── Flow Scanner ──────────────────────────────────────
+let flowCache   = {};  // { SYMBOL: scored result }
+let flowRunning = false;
+
+const CONFLUENCE_LABEL = score => {
+  if(score >= 4)  return { label:'PRIME ▲', cls:'conf-prime' };
+  if(score >= 2)  return { label:'WATCH ▲', cls:'conf-watch' };
+  if(score <= -4) return { label:'PRIME ▼', cls:'conf-bear' };
+  if(score <= -2) return { label:'BEAR ▼',  cls:'conf-bear' };
+  if(score === 0) return { label:'WAIT',    cls:'conf-wait' };
+  // Mixed — UOA but structure unclear
+  return { label:'MIXED',  cls:'conf-conflict' };
+};
+
+// Confluence score — same as watchlist but with explicit net score
+const flowSignal = (bars65, barsD, price) => {
+  if(!bars65?.length || !barsD?.length) return { score:0, tk:'—', cloud:'—', chikou:'—', slope:'—' };
+
+  const tk65  = tenkanFn(bars65), kj65 = kijunFn(bars65);
+  const sa65  = (tk65+kj65)/2,    sb65 = spanBFn(bars65);
+  const tk65s = tk65>kj65?'Bull':'Bear';
+  const cl65  = cloudSt(price,sa65,sb65);
+  const ck65s = chikouSt(price,bars65);
+  const vwap65= vwapFn(bars65);
+  const vprev = bars65.length>5?vwapFn(bars65.slice(0,-5)):vwap65;
+  const slope = ((vwap65-vprev)/vprev)*100;
+
+  const tkD  = tenkanFn(barsD), kjD = kijunFn(barsD);
+  const saD  = (tkD+kjD)/2,    sbD = spanBFn(barsD);
+  const tkDs = tkD>kjD?'Bull':'Bear';
+  const clD  = cloudSt(price,saD,sbD);
+
+  let bull=0, bear=0;
+  if(tk65s==='Bull') bull++; else bear++;
+  if(cl65==='Bull Cloud') bull++; else if(cl65==='Bear Cloud') bear++;
+  if(ck65s==='Above') bull++; else if(ck65s==='Below') bear++;
+  if(slope>cfg.slopeThresh) bull++; else if(slope<-cfg.slopeThresh) bear++;
+  if(tkDs==='Bull'&&clD==='Bull Cloud') bull++; else if(tkDs==='Bear'&&clD==='Bear Cloud') bear++;
+
+  return {
+    score: bull-bear, bull, bear,
+    tk:     tk65s, cloud: cl65.replace(' Cloud',''),
+    chikou: ck65s, slope: slope>0?'↑':'↓',
+  };
+};
+
+const renderFlowResults = (symbols) => {
+  const body = $('flowBody');
+
+  // Sort by absolute score descending (strongest signal first, bull before bear)
+  const sorted = [...symbols].sort((a,b) => {
+    const da = flowCache[a], db = flowCache[b];
+    if(!da&&!db) return 0; if(!da) return 1; if(!db) return -1;
+    return Math.abs(db.score||0) - Math.abs(da.score||0);
+  });
+
+  const allLoading = sorted.every(s=>!flowCache[s]);
+  if(allLoading){ body.innerHTML='<div class="flow-empty">Scanning… fetching structure data from Massive</div>'; return; }
+
+  body.innerHTML='';
+  sorted.forEach(sym => {
+    const d   = flowCache[sym];
+    const row = document.createElement('div');
+    row.className = 'flow-row';
+    row.title = 'Click to load in HUD';
+
+    if(!d) {
+      row.innerHTML = `
+        <div class="flow-cell flow-sym">${sym}</div>
+        <div class="flow-cell dim-c" colspan="7">scanning…</div>`;
+      row.addEventListener('click',()=>{ $('tickerInput').value=sym; refreshHUD(); });
+      body.appendChild(row); return;
+    }
+
+    const price  = d.price??0;
+    const chg    = d.pct??0;
+    const chgCls = chg>=0?'bull-c':'bear-c';
+    const sign   = chg>=0?'+':'';
+    const conf   = CONFLUENCE_LABEL(d.score??0);
+    const tkCls  = d.tk==='Bull'?'bull-c':d.tk==='Bear'?'bear-c':'';
+    const clCls  = d.cloud==='Bull'?'bull-c':d.cloud==='Bear'?'bear-c':'wait-c';
+    const ckCls  = d.chikou==='Above'?'bull-c':d.chikou==='Below'?'bear-c':'wait-c';
+    const slCls  = d.slope==='↑'?'bull-c':'bear-c';
+
+    row.innerHTML = `
+      <div class="flow-cell flow-sym">${sym}</div>
+      <div class="flow-cell">${fmt(price)}</div>
+      <div class="flow-cell ${chgCls}">${sign}${fmt(chg,2)}%</div>
+      <div class="flow-cell ${tkCls}" style="text-align:center">${d.tk==='Bull'?'↑':d.tk==='Bear'?'↓':'—'}</div>
+      <div class="flow-cell ${clCls}" style="text-align:center">${d.cloud||'—'}</div>
+      <div class="flow-cell ${ckCls}" style="text-align:center">${d.chikou||'—'}</div>
+      <div class="flow-cell ${slCls}" style="text-align:center">${d.slope||'—'}</div>
+      <div class="flow-cell"><span class="flow-confluence ${conf.cls}">${conf.label}</span></div>`;
+
+    row.addEventListener('click',()=>{ $('tickerInput').value=sym; refreshHUD(); });
+    body.appendChild(row);
+  });
+};
+
+const runFlowScan = async () => {
+  if(flowRunning || !API_KEY.trim()) return;
+
+  const raw = $('flowInput').value.trim();
+  if(!raw){ $('flowStatus').textContent='Paste tickers first'; return; }
+
+  // Parse comma/space/newline separated tickers, clean them up
+  const symbols = [...new Set(
+    raw.split(/[\s,;|]+/)
+       .map(s=>s.replace(/[^A-Z.]/gi,'').toUpperCase())
+       .filter(s=>s.length>=1&&s.length<=5)
+  )].slice(0,30); // cap at 30
+
+  if(!symbols.length){ $('flowStatus').textContent='No valid tickers found'; return; }
+
+  flowRunning = true;
+  const btn = $('flowRunBtn');
+  btn.disabled = true;
+  btn.textContent = '⚡ Scanning…';
+  $('flowStatus').textContent = `Scanning ${symbols.length} tickers…`;
+
+  // Clear cache for fresh scan
+  flowCache = {};
+  renderFlowResults(symbols);
+
+  // Batch snapshot for prices
+  let snaps = {};
+  try { snaps = await fetchSnapshots(symbols); } catch(e) { console.warn('Flow snap:', e.message); }
+
+  // Fetch bars for all symbols in parallel — Massive unlimited
+  let done = 0;
+  await Promise.all(symbols.map(async sym => {
+    try {
+      const [bars65, barsD] = await Promise.all([
+        fetchBars(sym, 1, 'hour', 120),
+        fetchBars(sym, 1, 'day',  365),
+      ]);
+      const snap  = snaps[sym] || {};
+      const price = snap.price || bars65[bars65.length-1]?.close || 0;
+      const sig   = flowSignal(bars65, barsD, price);
+      flowCache[sym] = { price, pct:snap.pct??0, ...sig };
+    } catch(e) {
+      console.warn(`Flow ${sym}:`, e.message);
+      flowCache[sym] = { price:0, pct:0, score:0, tk:'—', cloud:'—', chikou:'—', slope:'—' };
+    }
+    done++;
+    $('flowStatus').textContent = `Scanning… ${done}/${symbols.length}`;
+    renderFlowResults(symbols);
+  }));
+
+  $('flowStatus').textContent = `${symbols.length} tickers scanned · ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true})}`;
+  btn.disabled  = false;
+  btn.textContent = '⚡ Scan';
+  flowRunning   = false;
+};
+
+const clearFlowScan = () => {
+  flowCache = {};
+  $('flowInput').value = '';
+  $('flowStatus').textContent = 'Paste tickers from Barchart UOA → Run';
+  $('flowBody').innerHTML = `<div class="flow-empty">
+    📋 Copy tickers from <strong style="color:var(--gold)">Barchart Unusual Options Activity</strong> and paste above.<br>
+    ZION scores each one against full Ichimoku structure in seconds.<br>
+    <span style="color:var(--teal)">High UOA + PRIME structure = the trade worth watching.</span>
+  </div>`;
+};
+
+// Allow Enter key to trigger scan
+document.addEventListener('DOMContentLoaded', () => {
+  const fi = $('flowInput');
+  if(fi) fi.addEventListener('keydown', e => { if(e.key==='Enter') runFlowScan(); });
+});
+
+// ── Go ────────────────────────────────────────────────
+boot();
+</script>
+</body>
+</html>

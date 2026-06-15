@@ -1,0 +1,745 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ZION Config — API key and settings live in ZION_Config.js -->
+<script src="ZION_Config.js"></script>
+<title>ZION Trade Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --bull:#4ade80; --teal:#00f5d4; --bear:#f87171;
+  --crimson:#ff4d6d; --wait:#fb923c; --blue:#60a5fa;
+  --gold:#fbbf24; --purple:#a78bfa;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html,body { min-height:100vh; background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:13px; line-height:1.5; }
+
+/* ── Nav ── */
+.nav { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:48px; background:var(--panel); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); }
+.nav-logo span { color:var(--teal); }
+.nav-links { display:flex; gap:6px; }
+.nav-link { font-size:11px; color:var(--dim); text-decoration:none; padding:4px 10px; border:1px solid transparent; border-radius:4px; transition:all .15s; cursor:pointer; }
+.nav-link:hover { color:var(--blue); border-color:var(--border2); }
+.nav-link.active { color:var(--teal); border-color:var(--teal); background:#00f5d410; }
+
+/* ── Layout ── */
+.main { display:grid; grid-template-columns:1fr 360px; gap:0; min-height:calc(100vh - 48px); }
+.left { padding:20px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; }
+.right { border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+
+/* ── Cards ── */
+.card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.card-header { padding:10px 16px; background:#070f1e; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.card-title { font-family:var(--font-data); font-size:9px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; }
+.card-body { padding:14px 16px; }
+
+/* ── Trade entry ── */
+.entry-wrap { display:flex; gap:8px; }
+.entry-input { flex:1; font-family:var(--font-data); font-size:12px; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; color:var(--hdr); padding:10px 14px; outline:none; transition:border-color .15s; }
+.entry-input:focus { border-color:var(--teal); }
+.entry-input::placeholder { color:var(--dim); font-size:11px; }
+.entry-btn { font-family:var(--font-data); font-size:11px; font-weight:700; padding:10px 16px; background:var(--teal); color:#050d1a; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; transition:background .15s; letter-spacing:.05em; }
+.entry-btn:hover { background:#00e0c0; }
+.entry-hint { font-size:10px; color:var(--dim); margin-top:8px; font-family:var(--font-data); line-height:1.6; }
+.entry-hint span { color:var(--teal); }
+
+/* ── Parse preview ── */
+.parse-preview { background:var(--panel2); border:1px solid var(--border2); border-radius:6px; padding:12px 14px; margin-top:10px; display:none; }
+.parse-preview.show { display:block; }
+.parse-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px; }
+.parse-item { text-align:center; }
+.parse-val { font-family:var(--font-data); font-size:13px; font-weight:700; color:var(--hdr); }
+.parse-lbl { font-size:9px; color:var(--dim); letter-spacing:.08em; text-transform:uppercase; margin-top:2px; }
+.parse-actions { display:flex; gap:8px; }
+.btn { font-family:var(--font-ui); font-size:11px; font-weight:500; padding:6px 14px; border-radius:4px; border:1px solid var(--border2); background:transparent; color:var(--dim); cursor:pointer; transition:all .15s; }
+.btn:hover { color:var(--text); border-color:var(--blue); }
+.btn.confirm { border-color:var(--teal); color:var(--teal); background:#00f5d410; }
+.btn.confirm:hover { background:#00f5d420; }
+.btn.danger { border-color:var(--crimson); color:var(--crimson); }
+
+/* ── Open positions ── */
+.pos-table { width:100%; border-collapse:collapse; }
+.pos-table th { font-family:var(--font-data); font-size:9px; letter-spacing:.08em; color:var(--dim); text-transform:uppercase; padding:6px 10px; text-align:left; border-bottom:1px solid var(--border); background:#070f1e; }
+.pos-table th:nth-child(n+4) { text-align:right; }
+.pos-table td { padding:8px 10px; border-bottom:1px solid var(--border); font-family:var(--font-data); font-size:11px; vertical-align:middle; }
+.pos-table tr:last-child td { border-bottom:none; }
+.pos-table tr:hover td { background:var(--panel2); }
+.pos-sym { font-weight:700; color:var(--blue); }
+.pos-contract { color:var(--text); }
+.dte-badge { display:inline-block; font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; }
+.dte-ok   { background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; }
+.dte-warn { background:#fb923c18; color:var(--wait); border:1px solid #fb923c33; }
+.dte-hot  { background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; }
+.pl-bull { color:var(--bull); }
+.pl-bear { color:var(--bear); }
+.close-btn { font-size:10px; padding:3px 8px; border-radius:3px; border:1px solid var(--border2); background:transparent; color:var(--dim); cursor:pointer; transition:all .15s; font-family:var(--font-ui); }
+.close-btn:hover { border-color:var(--crimson); color:var(--crimson); }
+.empty-state { padding:24px; text-align:center; color:var(--dim); font-family:var(--font-data); font-size:11px; line-height:1.8; }
+
+/* ── Stats bar ── */
+.stats-bar { display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--border); }
+.stat-cell { background:var(--panel); padding:12px 16px; text-align:center; }
+.stat-val { font-family:var(--font-data); font-size:18px; font-weight:700; color:var(--hdr); margin-bottom:2px; }
+.stat-lbl { font-size:9px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; }
+.stat-val.bull { color:var(--teal); }
+.stat-val.bear { color:var(--crimson); }
+.stat-val.gold { color:var(--gold); }
+
+/* ── History table ── */
+.hist-table { width:100%; border-collapse:collapse; }
+.hist-table th { font-family:var(--font-data); font-size:9px; letter-spacing:.08em; color:var(--dim); text-transform:uppercase; padding:6px 10px; text-align:left; border-bottom:1px solid var(--border); background:#070f1e; white-space:nowrap; }
+.hist-table th:nth-child(n+5) { text-align:right; }
+.hist-table td { padding:7px 10px; border-bottom:1px solid var(--border); font-family:var(--font-data); font-size:11px; }
+.hist-table tr:last-child td { border-bottom:none; }
+.hist-table tr:hover td { background:var(--panel2); }
+.result-win  { color:var(--teal); font-weight:700; }
+.result-loss { color:var(--crimson); font-weight:700; }
+
+/* ── Filter tabs ── */
+.filter-tabs { display:flex; gap:4px; padding:10px 16px; border-bottom:1px solid var(--border); background:#070f1e; }
+.filter-tab { font-size:10px; padding:3px 10px; border-radius:4px; border:1px solid transparent; color:var(--dim); cursor:pointer; transition:all .15s; font-family:var(--font-data); }
+.filter-tab:hover { color:var(--text); }
+.filter-tab.active { color:var(--teal); border-color:var(--teal); background:#00f5d410; }
+
+/* ── Close modal ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; display:none; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; }
+.modal { background:var(--panel); border:1px solid var(--border2); border-radius:10px; padding:24px; width:400px; max-width:90vw; }
+.modal-title { font-family:var(--font-data); font-size:12px; font-weight:700; color:var(--hdr); letter-spacing:.1em; margin-bottom:16px; }
+.modal-trade { font-family:var(--font-data); font-size:11px; color:var(--teal); margin-bottom:20px; padding:10px 14px; background:var(--panel2); border-radius:6px; border:1px solid var(--border2); }
+.modal-row { display:flex; gap:10px; margin-bottom:12px; align-items:center; }
+.modal-label { font-size:11px; color:var(--dim); width:120px; flex-shrink:0; }
+.modal-input { flex:1; font-family:var(--font-data); font-size:12px; background:var(--panel2); border:1px solid var(--border2); border-radius:4px; color:var(--hdr); padding:7px 10px; outline:none; transition:border-color .15s; }
+.modal-input:focus { border-color:var(--teal); }
+.modal-pl { font-family:var(--font-data); font-size:16px; font-weight:700; text-align:center; padding:14px; border-radius:6px; margin:16px 0; }
+.modal-pl.profit { background:#00f5d412; color:var(--teal); border:1px solid #00f5d430; }
+.modal-pl.loss   { background:#ff4d6d12; color:var(--crimson); border:1px solid #ff4d6d30; }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+.modal-notes { width:100%; font-family:var(--font-ui); font-size:12px; background:var(--panel2); border:1px solid var(--border2); border-radius:4px; color:var(--text); padding:8px 10px; outline:none; resize:none; min-height:60px; transition:border-color .15s; }
+.modal-notes:focus { border-color:var(--blue); }
+
+/* ── Discord card ── */
+.discord-card { background:#1e1f22; border:1px solid #2e3035; border-radius:8px; padding:14px 16px; margin-top:10px; font-family:var(--font-data); font-size:11px; line-height:1.8; display:none; position:relative; }
+.discord-card.show { display:block; }
+.discord-card pre { color:#dbdee1; white-space:pre-wrap; word-break:break-word; }
+.discord-copy { position:absolute; top:10px; right:10px; font-size:10px; padding:4px 10px; border-radius:4px; border:1px solid #4e5058; background:transparent; color:#b5bac1; cursor:pointer; transition:all .15s; font-family:var(--font-ui); }
+.discord-copy:hover { background:#4e5058; color:#fff; }
+.discord-copy.copied { border-color:var(--teal); color:var(--teal); }
+
+/* ── Journal (right panel) ── */
+.journal-header { padding:12px 16px; border-bottom:1px solid var(--border); background:#070f1e; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.journal-title { font-family:var(--font-data); font-size:9px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; }
+.journal-entries { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; }
+.journal-entries::-webkit-scrollbar { width:4px; }
+.journal-entries::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+.journal-entry { background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:12px 14px; }
+.je-date { font-family:var(--font-data); font-size:9px; color:var(--dim); margin-bottom:6px; display:flex; justify-content:space-between; }
+.je-text { font-size:12px; color:var(--text); line-height:1.65; white-space:pre-wrap; }
+.je-trades { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
+.je-trade-tag { font-family:var(--font-data); font-size:9px; padding:2px 6px; border-radius:3px; background:#00f5d415; color:var(--teal); border:1px solid #00f5d430; }
+.je-del { background:none; border:none; color:var(--dim); cursor:pointer; font-size:13px; padding:0 2px; transition:color .15s; }
+.je-del:hover { color:var(--crimson); }
+.journal-input-wrap { padding:12px; border-top:1px solid var(--border); flex-shrink:0; }
+.journal-ta { width:100%; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; color:var(--text); font-family:var(--font-ui); font-size:12px; line-height:1.55; padding:8px 10px; resize:none; outline:none; transition:border-color .15s; min-height:80px; }
+.journal-ta:focus { border-color:var(--blue); }
+.journal-ta::placeholder { color:var(--dim); }
+.journal-actions { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+.journal-hint { font-size:10px; color:var(--dim); }
+.journal-add { font-size:11px; font-weight:600; padding:5px 14px; border-radius:4px; border:1px solid var(--blue); background:#0f2545; color:var(--blue); cursor:pointer; font-family:var(--font-ui); }
+.journal-add:hover { background:#163560; }
+.journal-empty { flex:1; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--dim); text-align:center; padding:20px; line-height:1.8; font-family:var(--font-data); }
+
+/* ── Scrollable tables ── */
+.table-wrap { overflow-x:auto; }
+.table-wrap::-webkit-scrollbar { height:4px; }
+.table-wrap::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div class="nav-links">
+    <span class="nav-link active" onclick="switchTab('positions')">Positions</span>
+    <span class="nav-link" onclick="switchTab('history')">History</span>
+    <span class="nav-link" onclick="switchTab('stats')">Stats</span>
+  </div>
+  <div style="display:flex;gap:8px">
+    <a class="nav-link" href="ZION_Dashboard.html">← Dashboard</a>
+    <a class="nav-link" href="ZION_Pretrade.html">Pre-Trade</a>
+  </div>
+</nav>
+
+<div class="main">
+  <!-- ══ LEFT COLUMN ══ -->
+  <div class="left">
+
+    <!-- Trade Entry -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">New Trade Entry</span>
+        <span style="font-size:10px;color:var(--dim);font-family:var(--font-data)">natural language parser</span>
+      </div>
+      <div class="card-body">
+        <div class="entry-wrap">
+          <input class="entry-input" id="tradeInput" placeholder="URA $60c Exp 6/18/2026 (6) at 3.20" spellcheck="false" autocomplete="off">
+          <button class="entry-btn" onclick="parseTrade()">Parse →</button>
+        </div>
+        <div class="entry-hint">
+          Format: <span>TICKER $STRIKEp/c Exp MM/DD/YYYY (CONTRACTS) at PREMIUM</span><br>
+          Examples: <span>NVDA $900c Exp 7/18/2026 (2) at 12.50</span> · <span>SPY $480p Exp 6/20/2026 (10) at 1.05</span>
+        </div>
+        <!-- Parse preview -->
+        <div class="parse-preview" id="parsePreview">
+          <div class="parse-grid" id="parseGrid"></div>
+          <div id="discordPreview" class="discord-card">
+            <button class="discord-copy" id="copyBtn" onclick="copyDiscord()">Copy</button>
+            <pre id="discordText"></pre>
+          </div>
+          <div class="parse-actions" style="margin-top:10px">
+            <button class="btn confirm" onclick="confirmTrade()">✓ Confirm Trade</button>
+            <button class="btn" onclick="showDiscordCard()">Discord Card</button>
+            <button class="btn" onclick="clearParse()">✗ Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab content -->
+    <div id="tab-positions">
+      <!-- Open Positions -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Open Positions</span>
+          <span id="openCount" style="font-family:var(--font-data);font-size:10px;color:var(--dim)">0 positions</span>
+        </div>
+        <div class="table-wrap">
+          <table class="pos-table">
+            <thead>
+              <tr>
+                <th>Ticker</th><th>Contract</th><th>DTE</th>
+                <th style="text-align:right">Entry</th>
+                <th style="text-align:right">Contracts</th>
+                <th style="text-align:right">Cost</th>
+                <th style="text-align:right">Entry Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="positionsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-history" style="display:none">
+      <!-- History filters -->
+      <div class="card">
+        <div class="filter-tabs">
+          <span class="filter-tab active" onclick="filterHistory('all',this)">All</span>
+          <span class="filter-tab" onclick="filterHistory('win',this)">Winners</span>
+          <span class="filter-tab" onclick="filterHistory('loss',this)">Losers</span>
+          <span class="filter-tab" onclick="filterHistory('call',this)">Calls</span>
+          <span class="filter-tab" onclick="filterHistory('put',this)">Puts</span>
+        </div>
+        <div class="table-wrap">
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Ticker</th><th>Contract</th><th>Entry</th><th>Exit</th>
+                <th style="text-align:right">Premium In</th>
+                <th style="text-align:right">Premium Out</th>
+                <th style="text-align:right">P/L</th>
+                <th style="text-align:right">%</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-stats" style="display:none">
+      <!-- Stats -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Performance Summary</span></div>
+        <div class="stats-bar" id="statsBar">
+          <div class="stat-cell"><div class="stat-val gold" id="stat-trades">0</div><div class="stat-lbl">Total Trades</div></div>
+          <div class="stat-cell"><div class="stat-val bull" id="stat-wins">0</div><div class="stat-lbl">Winners</div></div>
+          <div class="stat-cell"><div class="stat-val bear" id="stat-losses">0</div><div class="stat-lbl">Losers</div></div>
+          <div class="stat-cell"><div class="stat-val gold" id="stat-winpct">—</div><div class="stat-lbl">Win Rate</div></div>
+          <div class="stat-cell"><div class="stat-val" id="stat-pl">$0</div><div class="stat-lbl">Total P/L</div></div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px">
+            <div>
+              <div style="font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;font-family:var(--font-data)">This Week</div>
+              <div id="stats-week" style="font-family:var(--font-data);font-size:11px;color:var(--dim)">No closed trades this week</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;font-family:var(--font-data)">This Month</div>
+              <div id="stats-month" style="font-family:var(--font-data);font-size:11px;color:var(--dim)">No closed trades this month</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;font-family:var(--font-data)">Best Trade</div>
+              <div id="stats-best" style="font-family:var(--font-data);font-size:11px;color:var(--dim)">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ RIGHT COLUMN — JOURNAL ══ -->
+  <div class="right">
+    <div class="journal-header">
+      <span class="journal-title">Trading Journal</span>
+      <span id="journalSaved" style="font-size:9px;color:var(--dim);font-family:var(--font-data);opacity:0;transition:opacity .3s">saved</span>
+    </div>
+    <div class="journal-entries" id="journalEntries"></div>
+    <div class="journal-input-wrap">
+      <textarea class="journal-ta" id="journalInput" placeholder="How did the session go? What did you learn? What did you ignore that you shouldn't have?&#10;&#10;Trades open/closed auto-stamp when you add this entry." rows="4"></textarea>
+      <div class="journal-actions">
+        <span class="journal-hint">Shift+Enter for newline · Enter to add</span>
+        <button class="journal-add" onclick="addJournalEntry()">Add Entry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLOSE TRADE MODAL ══ -->
+<div class="modal-overlay" id="closeModal">
+  <div class="modal">
+    <div class="modal-title">CLOSE POSITION</div>
+    <div class="modal-trade" id="modalTradeSummary"></div>
+    <div class="modal-row">
+      <span class="modal-label">Closing Premium</span>
+      <input class="modal-input" id="closePrice" type="number" step="0.01" placeholder="0.00" oninput="calcModalPL()">
+    </div>
+    <div class="modal-row">
+      <span class="modal-label">Close Date</span>
+      <input class="modal-input" id="closeDate" type="date">
+    </div>
+    <div class="modal-pl" id="modalPL">Enter closing premium to calculate P/L</div>
+    <div class="modal-row">
+      <span class="modal-label">Notes</span>
+      <textarea class="modal-notes" id="closeNotes" placeholder="Why did you close? What did the structure show? Theta burn? Target hit?"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn confirm" onclick="confirmClose()">Confirm Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Storage ─────────────────────────────────────────
+const KEYS = { trades:'zion-trades', journal:'zion-journal' };
+const load = k => JSON.parse(localStorage.getItem(k)||'[]');
+const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+
+let trades  = load(KEYS.trades);
+let journal = load(KEYS.journal);
+let pending = null;  // parsed trade waiting for confirm
+let closing = null;  // trade being closed
+
+// ── Tab switching ────────────────────────────────────
+const switchTab = id => {
+  ['positions','history','stats'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===id?'block':'none';
+  });
+  document.querySelectorAll('.nav-link').forEach((el,i) => {
+    el.classList.toggle('active', ['positions','history','stats'][i]===id);
+  });
+  if(id==='history') renderHistory('all');
+  if(id==='stats')   renderStats();
+};
+
+// ── Natural language parser ──────────────────────────
+// Handles: TICKER $STRIKEp/c Exp MM/DD/YYYY (CONTRACTS) at PREMIUM
+// Also:    TICKER STRIKEc/p MM/DD/YYYY CONTRACTS at PREMIUM  (relaxed)
+const parseTrade = () => {
+  const raw = document.getElementById('tradeInput').value.trim();
+  if(!raw) return;
+
+  // Ticker
+  const ticker = (raw.match(/^([A-Z.]+)/i)||[])[1]?.toUpperCase();
+
+  // Strike + type — $60c or $60p or 60c or 60p
+  const strikeMatch = raw.match(/\$?(\d+(?:\.\d+)?)\s*(c|call|p|put)/i);
+  const strike  = strikeMatch ? parseFloat(strikeMatch[1]) : null;
+  const typeRaw = strikeMatch ? strikeMatch[2].toLowerCase() : null;
+  const type    = typeRaw?.startsWith('c') ? 'CALL' : typeRaw?.startsWith('p') ? 'PUT' : null;
+
+  // Expiration
+  const expMatch = raw.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  let expDate = null;
+  if(expMatch) {
+    const y = expMatch[3].length===2 ? '20'+expMatch[3] : expMatch[3];
+    expDate = `${y}-${String(expMatch[1]).padStart(2,'0')}-${String(expMatch[2]).padStart(2,'0')}`;
+  }
+
+  // Contracts — (6) or 6 cons or 6 contracts
+  const conMatch = raw.match(/\((\d+)\)|(\d+)\s*con/i);
+  const contracts = conMatch ? parseInt(conMatch[1]||conMatch[2]) : null;
+
+  // Premium — at 3.20 or @3.20
+  const premMatch = raw.match(/(?:at|@)\s*(\d+(?:\.\d+)?)/i);
+  const premium = premMatch ? parseFloat(premMatch[1]) : null;
+
+  if(!ticker||!strike||!type||!expDate||!contracts||!premium) {
+    alert('Could not parse trade. Check format:\nNVDA $900c Exp 7/18/2026 (2) at 12.50');
+    return;
+  }
+
+  const totalCost = contracts * 100 * premium;
+  const dte = Math.ceil((new Date(expDate) - new Date()) / 86400000);
+
+  pending = { ticker, strike, type, expDate, contracts, premium, totalCost, dte,
+              entryDate: new Date().toISOString().split('T')[0], id: Date.now() };
+
+  // Render preview
+  const grid = document.getElementById('parseGrid');
+  grid.innerHTML = [
+    ['Ticker', ticker],
+    ['Contract', `$${strike}${type==='CALL'?'C':'P'}`],
+    ['Expiration', expDate],
+    ['DTE', dte+'d'],
+    ['Contracts', contracts],
+    ['Premium', '$'+premium.toFixed(2)],
+    ['Total Cost', '$'+totalCost.toLocaleString('en-US',{minimumFractionDigits:2})],
+    ['Type', type],
+  ].map(([lbl,val])=>`<div class="parse-item"><div class="parse-val">${val}</div><div class="parse-lbl">${lbl}</div></div>`).join('');
+
+  document.getElementById('parsePreview').classList.add('show');
+  document.getElementById('discordPreview').classList.remove('show');
+  buildDiscordCard(pending);
+};
+
+// ── Discord card builder ─────────────────────────────
+const buildDiscordCard = t => {
+  const dirEmoji = t.type==='CALL' ? '🟢' : '🔴';
+  const text =
+`${dirEmoji} **${t.ticker} $${t.strike}${t.type==='CALL'?'C':'P'} ${t.expDate}**
+📋 ${t.contracts} contract${t.contracts>1?'s':''} @ $${t.premium.toFixed(2)}
+💰 Total Risk: $${t.totalCost.toLocaleString('en-US',{minimumFractionDigits:2})}
+📅 DTE: ${t.dte} days
+🔍 Structure: ZION signal aligned — full read on dashboard
+⚠️ Not financial advice. Trade your own plan.`;
+  document.getElementById('discordText').textContent = text;
+};
+
+const showDiscordCard = () => {
+  document.getElementById('discordPreview').classList.toggle('show');
+};
+
+const copyDiscord = () => {
+  const text = document.getElementById('discordText').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById('copyBtn');
+    btn.textContent='Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); },2000);
+  });
+};
+
+// ── Confirm trade ────────────────────────────────────
+const confirmTrade = () => {
+  if(!pending) return;
+  trades.push({...pending, status:'open'});
+  save(KEYS.trades, trades);
+  renderPositions();
+  clearParse();
+  document.getElementById('tradeInput').value='';
+  // Auto-add journal stamp
+  const stamp = `📋 OPENED: ${pending.ticker} $${pending.strike}${pending.type==='CALL'?'C':'P'} exp ${pending.expDate} · ${pending.contracts} con @ $${pending.premium.toFixed(2)} · Cost: $${pending.totalCost.toLocaleString('en-US',{minimumFractionDigits:2})}`;
+  prependJournalStamp(stamp);
+};
+
+const clearParse = () => {
+  pending = null;
+  document.getElementById('parsePreview').classList.remove('show');
+};
+
+// ── Render open positions ────────────────────────────
+const dteBadge = dte => {
+  if(dte<=5)  return `<span class="dte-badge dte-hot">${dte}d ⚠</span>`;
+  if(dte<=14) return `<span class="dte-badge dte-warn">${dte}d</span>`;
+  return `<span class="dte-badge dte-ok">${dte}d</span>`;
+};
+
+// ── Manage / Monitor / Leave status cycle ─────────
+const cycleStatus = id => {
+  const t = trades.find(t=>t.id===id);
+  if(!t) return;
+  const cycle = {leave:'manage', manage:'monitor', monitor:'leave'};
+  t.mgmtStatus = cycle[t.mgmtStatus||'leave'];
+  saveTrades();
+  renderPositions();
+};
+
+const renderPositions = () => {
+  const open = trades.filter(t=>t.status==='open');
+  document.getElementById('openCount').textContent = `${open.length} position${open.length!==1?'s':''}`;
+  const tbody = document.getElementById('positionsBody');
+
+  if(!open.length){
+    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state">No open positions.<br>Enter a trade above to get started.</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = open.map(t => {
+    const dte = Math.ceil((new Date(t.expDate) - new Date()) / 86400000);
+    return `<tr>
+      <td class="pos-sym">${t.ticker}</td>
+      <td class="pos-contract">$${t.strike}${t.type==='CALL'?'C':'P'} ${t.expDate}</td>
+      <td>${dteBadge(dte)}</td>
+      <td style="text-align:right">$${t.premium.toFixed(2)}</td>
+      <td style="text-align:right">${t.contracts}</td>
+      <td style="text-align:right">$${t.totalCost.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      <td style="text-align:right;color:var(--dim)">${t.entryDate}</td>
+      <td>
+        <span class="status-${t.mgmtStatus||'leave'}" onclick="cycleStatus(${t.id})" title="Click to cycle: MANAGE → MONITOR → LEAVE">
+          ${(t.mgmtStatus||'leave')==='manage'?'⚡ MANAGE':(t.mgmtStatus||'leave')==='monitor'?'👁 MONITOR':'✓ LEAVE'}
+        </span>
+      </td>
+      <td><button class="close-btn" onclick="openCloseModal(${t.id})">Close</button></td>
+    </tr>\`;
+  }).join('');
+};
+
+// ── Close modal ──────────────────────────────────────
+const openCloseModal = id => {
+  closing = trades.find(t=>t.id===id);
+  if(!closing) return;
+  document.getElementById('modalTradeSummary').textContent =
+    `${closing.ticker} $${closing.strike}${closing.type==='CALL'?'C':'P'} exp ${closing.expDate} · ${closing.contracts} contracts · Entered @ $${closing.premium.toFixed(2)}`;
+  document.getElementById('closePrice').value='';
+  document.getElementById('closeDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('closeNotes').value='';
+  document.getElementById('modalPL').textContent='Enter closing premium to calculate P/L';
+  document.getElementById('modalPL').className='modal-pl';
+  document.getElementById('closeModal').classList.add('show');
+};
+
+const calcModalPL = () => {
+  if(!closing) return;
+  const closeP = parseFloat(document.getElementById('closePrice').value)||0;
+  const pl     = (closeP - closing.premium) * closing.contracts * 100;
+  const pct    = ((closeP - closing.premium) / closing.premium * 100);
+  const el     = document.getElementById('modalPL');
+  el.className = `modal-pl ${pl>=0?'profit':'loss'}`;
+  el.textContent = `${pl>=0?'+':''}$${pl.toLocaleString('en-US',{minimumFractionDigits:2})} (${pct>=0?'+':''}${pct.toFixed(1)}%)`;
+};
+
+const closeModal = () => {
+  document.getElementById('closeModal').classList.remove('show');
+  closing = null;
+};
+
+const confirmClose = () => {
+  if(!closing) return;
+  const closeP   = parseFloat(document.getElementById('closePrice').value);
+  const closeDate= document.getElementById('closeDate').value;
+  const notes    = document.getElementById('closeNotes').value.trim();
+  if(isNaN(closeP)||!closeDate){ alert('Enter closing premium and date'); return; }
+
+  const pl  = (closeP - closing.premium) * closing.contracts * 100;
+  const pct = (closeP - closing.premium) / closing.premium * 100;
+
+  const idx = trades.findIndex(t=>t.id===closing.id);
+  trades[idx] = { ...closing, status:'closed', closePrice:closeP, closeDate, pl, pct, closeNotes:notes };
+  save(KEYS.trades, trades);
+  renderPositions();
+
+  // Auto-stamp journal
+  const stamp = `${pl>=0?'✅':'❌'} CLOSED: ${closing.ticker} $${closing.strike}${closing.type==='CALL'?'C':'P'} · ${pl>=0?'+':''}$${pl.toLocaleString('en-US',{minimumFractionDigits:2})} (${pct>=0?'+':''}${pct.toFixed(1)}%)${notes?' — '+notes:''}`;
+  prependJournalStamp(stamp);
+  closeModal();
+};
+
+// ── Render history ───────────────────────────────────
+const renderHistory = (filter) => {
+  let closed = trades.filter(t=>t.status==='closed');
+  if(filter==='win')  closed = closed.filter(t=>t.pl>=0);
+  if(filter==='loss') closed = closed.filter(t=>t.pl<0);
+  if(filter==='call') closed = closed.filter(t=>t.type==='CALL');
+  if(filter==='put')  closed = closed.filter(t=>t.type==='PUT');
+
+  const tbody = document.getElementById('historyBody');
+  if(!closed.length){
+    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state">No closed trades${filter!=='all'?' matching this filter':''}.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = [...closed].reverse().map(t=>`<tr>
+    <td class="pos-sym">${t.ticker}</td>
+    <td>$${t.strike}${t.type==='CALL'?'C':'P'} ${t.expDate}</td>
+    <td style="color:var(--dim)">${t.entryDate}</td>
+    <td style="color:var(--dim)">${t.closeDate}</td>
+    <td style="text-align:right">$${t.premium.toFixed(2)}</td>
+    <td style="text-align:right">$${t.closePrice.toFixed(2)}</td>
+    <td style="text-align:right" class="${t.pl>=0?'pl-bull':'pl-bear'}">${t.pl>=0?'+':''}$${Math.abs(t.pl).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+    <td style="text-align:right" class="${t.pl>=0?'pl-bull':'pl-bear'}">${t.pct>=0?'+':''}${t.pct.toFixed(1)}%</td>
+    <td class="${t.pl>=0?'result-win':'result-loss'}">${t.pl>=0?'WIN':'LOSS'}</td>
+  </tr>`).join('');
+};
+
+const filterHistory = (filter, el) => {
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderHistory(filter);
+};
+
+// ── Stats ────────────────────────────────────────────
+const renderStats = () => {
+  const closed = trades.filter(t=>t.status==='closed');
+  const wins   = closed.filter(t=>t.pl>=0);
+  const losses = closed.filter(t=>t.pl<0);
+  const totalPL= closed.reduce((s,t)=>s+t.pl,0);
+  const winPct = closed.length ? (wins.length/closed.length*100).toFixed(1)+'%' : '—';
+
+  document.getElementById('stat-trades').textContent = closed.length;
+  document.getElementById('stat-wins').textContent   = wins.length;
+  document.getElementById('stat-losses').textContent = losses.length;
+  document.getElementById('stat-winpct').textContent = winPct;
+  const plEl = document.getElementById('stat-pl');
+  plEl.textContent = `${totalPL>=0?'+':''}$${Math.abs(totalPL).toLocaleString('en-US',{minimumFractionDigits:2})}`;
+  plEl.className = `stat-val ${totalPL>=0?'bull':'bear'}`;
+
+  // Week / Month
+  const now   = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay());
+  const monthStart= new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const weekTrades  = closed.filter(t=>new Date(t.closeDate)>=weekStart);
+  const monthTrades = closed.filter(t=>new Date(t.closeDate)>=monthStart);
+
+  const periodSummary = (arr, el) => {
+    if(!arr.length){ document.getElementById(el).textContent='No closed trades'; return; }
+    const pl  = arr.reduce((s,t)=>s+t.pl,0);
+    const wins= arr.filter(t=>t.pl>=0).length;
+    document.getElementById(el).innerHTML =
+      `<span style="color:${pl>=0?'var(--teal)':'var(--crimson)'}">${pl>=0?'+':''}$${Math.abs(pl).toLocaleString('en-US',{minimumFractionDigits:2})}</span> · ${wins}/${arr.length} wins`;
+  };
+  periodSummary(weekTrades,'stats-week');
+  periodSummary(monthTrades,'stats-month');
+
+  const best = closed.length ? closed.reduce((a,b)=>a.pl>b.pl?a:b) : null;
+  document.getElementById('stats-best').innerHTML = best
+    ? `<span style="color:var(--teal)">${best.ticker} $${best.strike}${best.type==='CALL'?'C':'P'} +$${best.pl.toLocaleString('en-US',{minimumFractionDigits:2})} (${best.pct.toFixed(1)}%)</span>`
+    : '—';
+};
+
+// ── Journal ──────────────────────────────────────────
+const renderJournal = () => {
+  const container = document.getElementById('journalEntries');
+  if(!journal.length){
+    container.innerHTML='<div class="journal-empty">No journal entries yet.<br>Drop your session notes below.<br>Trades auto-stamp when opened and closed.</div>';
+    return;
+  }
+  container.innerHTML='';
+  [...journal].reverse().forEach((entry,ri)=>{
+    const i = journal.length-1-ri;
+    const el = document.createElement('div');
+    el.className='journal-entry';
+    const tradesHtml = entry.trades?.length
+      ? `<div class="je-trades">${entry.trades.map(t=>`<span class="je-trade-tag">${t}</span>`).join('')}</div>`:'';
+    el.innerHTML=`
+      <div class="je-date">
+        <span>${entry.date} · ${entry.time}</span>
+        <button class="je-del" onclick="deleteJournalEntry(${i})">×</button>
+      </div>
+      <div class="je-text">${entry.text}</div>
+      ${tradesHtml}`;
+    container.appendChild(el);
+  });
+};
+
+const addJournalEntry = () => {
+  const ta   = document.getElementById('journalInput');
+  const text = ta.value.trim();
+  if(!text) return;
+
+  // Auto-tag open positions
+  const openTickers = trades.filter(t=>t.status==='open').map(t=>`${t.ticker} $${t.strike}${t.type==='CALL'?'C':'P'}`);
+  const now = new Date();
+  journal.push({
+    text,
+    date: now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}),
+    trades: openTickers,
+    id: Date.now(),
+  });
+  save(KEYS.journal, journal);
+  renderJournal();
+  ta.value='';
+
+  // Flash saved
+  const saved = document.getElementById('journalSaved');
+  saved.style.opacity='1';
+  setTimeout(()=>saved.style.opacity='0',1500);
+};
+
+const prependJournalStamp = text => {
+  const now = new Date();
+  journal.push({
+    text,
+    date: now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}),
+    trades:[],
+    id: Date.now(),
+    isStamp:true,
+  });
+  save(KEYS.journal, journal);
+  renderJournal();
+};
+
+const deleteJournalEntry = i => {
+  journal.splice(i,1);
+  save(KEYS.journal, journal);
+  renderJournal();
+};
+
+// ── Keyboard shortcuts ───────────────────────────────
+document.getElementById('tradeInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter') parseTrade();
+});
+document.getElementById('journalInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); addJournalEntry(); }
+});
+document.getElementById('closeModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('closeModal')) closeModal();
+});
+
+// ── Seed trades from Robinhood snapshot (June 13 2026) ───
+(function(){
+  const existing = localStorage.getItem('zion-trades');
+  if(!existing || JSON.parse(existing).length === 0) {
+    localStorage.setItem('zion-trades', JSON.stringify([{"ticker": "URA", "strike": 60, "type": "CALL", "expDate": "2026-06-18", "contracts": 6, "premium": 3.2, "totalCost": 1920.0, "dte": 4, "entryDate": "2026-06-13", "status": "open", "id": 1781360934851}, {"ticker": "AAPL", "strike": 310, "type": "CALL", "expDate": "2026-07-10", "contracts": 3, "premium": 11.15, "totalCost": 3345.0, "dte": 26, "entryDate": "2026-06-13", "status": "open", "id": 1781360931749}, {"ticker": "ORCL", "strike": 235, "type": "CALL", "expDate": "2026-07-24", "contracts": 1, "premium": 24.0, "totalCost": 2400.0, "dte": 40, "entryDate": "2026-06-13", "status": "open", "id": 1781360934506}, {"ticker": "IBKR", "strike": 85, "type": "CALL", "expDate": "2026-09-18", "contracts": 1, "premium": 6.6, "totalCost": 660.0, "dte": 96, "entryDate": "2026-06-13", "status": "open", "id": 1781360931562}, {"ticker": "IBKR", "strike": 95, "type": "CALL", "expDate": "2026-12-18", "contracts": 2, "premium": 7.2, "totalCost": 1440.0, "dte": 187, "entryDate": "2026-06-13", "status": "open", "id": 1781360930677}, {"ticker": "ZETA", "strike": 17.5, "type": "CALL", "expDate": "2027-01-15", "contracts": 3, "premium": 4.87, "totalCost": 1461.0, "dte": 215, "entryDate": "2026-06-13", "status": "open", "id": 1781360931168}, {"ticker": "ORCL", "strike": 195, "type": "CALL", "expDate": "2027-06-17", "contracts": 1, "premium": 49.95, "totalCost": 4995.0, "dte": 368, "entryDate": "2026-06-13", "status": "open", "id": 1781360936939}, {"ticker": "NIO", "strike": 5.5, "type": "CALL", "expDate": "2027-12-17", "contracts": 2, "premium": 2.74, "totalCost": 548.0, "dte": 551, "entryDate": "2026-06-13", "status": "open", "id": 1781360938438}, {"ticker": "TTD", "strike": 25, "type": "CALL", "expDate": "2028-01-21", "contracts": 2, "premium": 9.0, "totalCost": 1800.0, "dte": 586, "entryDate": "2026-06-13", "status": "open", "id": 1781360935194}, {"ticker": "BULL", "strike": 7.5, "type": "CALL", "expDate": "2027-01-15", "contracts": 5, "premium": 1.38, "totalCost": 690.0, "dte": 215, "entryDate": "2026-06-13", "status": "open", "id": 1781360939714}, {"ticker": "URA", "strike": 60, "type": "CALL", "expDate": "2027-01-15", "contracts": 2, "premium": 9.6, "totalCost": 1920.0, "dte": 215, "entryDate": "2026-06-13", "status": "open", "id": 1781360933878}, {"ticker": "BULL", "strike": 10, "type": "CALL", "expDate": "2028-01-21", "contracts": 7, "premium": 1.72, "totalCost": 1204.0, "dte": 586, "entryDate": "2026-06-13", "status": "open", "id": 1781360939262}]));
+    trades = JSON.parse(localStorage.getItem('zion-trades'));
+  }
+})();
+
+// ── Boot ─────────────────────────────────────────────
+renderPositions();
+renderJournal();
+</script>
+</body>
+</html>

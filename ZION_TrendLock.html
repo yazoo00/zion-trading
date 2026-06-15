@@ -1,0 +1,826 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Trend-Lock</title>
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --bull:#4ade80; --teal:#00f5d4; --bear:#f87171;
+  --crimson:#ff4d6d; --wait:#fb923c; --blue:#60a5fa;
+  --gold:#fbbf24; --purple:#a78bfa;
+  --tenkan:#3c78ff; --kijun:#ff4d6d;
+  --spana:#00f5d4; --spanb:#ff4d6d;
+  --vwap:#fb923c; --bb:#a78bfa;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+}
+html,body { min-height:100vh; background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:13px; }
+
+/* ── Nav ── */
+.nav { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:48px; background:var(--panel); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); }
+.nav-logo span { color:var(--teal); }
+.nav-right { display:flex; gap:8px; align-items:center; }
+.nav-link { font-size:11px; color:var(--dim); text-decoration:none; padding:4px 10px; border:1px solid transparent; border-radius:4px; transition:all .15s; }
+.nav-link:hover { color:var(--blue); border-color:var(--border2); }
+
+/* ── Search bar ── */
+.search-bar { display:flex; gap:8px; padding:14px 20px; background:var(--panel); border-bottom:1px solid var(--border); align-items:center; }
+.ticker-input { font-family:var(--font-data); font-size:14px; font-weight:700; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; color:var(--hdr); padding:8px 14px; outline:none; transition:border-color .15s; text-transform:uppercase; letter-spacing:.1em; width:120px; }
+.ticker-input:focus { border-color:var(--teal); }
+.scan-btn { font-family:var(--font-data); font-size:11px; font-weight:700; padding:8px 18px; background:var(--teal); color:#050d1a; border:none; border-radius:6px; cursor:pointer; letter-spacing:.08em; transition:background .15s; white-space:nowrap; }
+.scan-btn:hover { background:#00e0c0; }
+.scan-btn:disabled { background:var(--border2); color:var(--dim); cursor:default; }
+.scan-status { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.quick-tickers { display:flex; gap:6px; flex-wrap:wrap; }
+.qt { font-family:var(--font-data); font-size:10px; padding:4px 10px; border-radius:4px; border:1px solid var(--border2); background:transparent; color:var(--dim); cursor:pointer; transition:all .15s; }
+.qt:hover { border-color:var(--teal); color:var(--teal); }
+
+/* ── Main layout ── */
+.main { padding:16px 20px; max-width:1300px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+
+/* ── Header row ── */
+.ticker-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.th-left { display:flex; align-items:baseline; gap:14px; }
+.th-ticker { font-family:var(--font-data); font-size:28px; font-weight:700; color:var(--hdr); }
+.th-price { font-family:var(--font-data); font-size:22px; font-weight:700; }
+.th-change { font-family:var(--font-data); font-size:13px; }
+.th-name { font-size:12px; color:var(--dim); }
+.th-time { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+
+/* ── Lock status badge ── */
+.lock-badge { display:flex; align-items:center; gap:10px; padding:10px 20px; border-radius:8px; font-family:var(--font-data); font-weight:700; font-size:13px; letter-spacing:.1em; border:2px solid; }
+.lock-engaged  { background:#00f5d415; border-color:var(--teal); color:var(--teal); }
+.lock-partial  { background:#fb923c15; border-color:var(--wait); color:var(--wait); }
+.lock-bear     { background:#ff4d6d15; border-color:var(--crimson); color:var(--crimson); }
+.lock-wait     { background:#4a608020; border-color:var(--dim); color:var(--dim); }
+.lock-icon { font-size:20px; }
+
+/* ── Chart panels ── */
+.charts-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+@media(max-width:900px){ .charts-row { grid-template-columns:1fr; } }
+.chart-panel { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.cp-header { padding:8px 14px; background:#070f1e; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.cp-title { font-family:var(--font-data); font-size:10px; font-weight:700; color:var(--hdr); letter-spacing:.1em; }
+.cp-sub { font-family:var(--font-data); font-size:9px; color:var(--dim); }
+.cp-body { padding:10px 14px; }
+.cp-values { display:flex; flex-direction:column; gap:5px; }
+.cv-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.cv-label { font-size:10px; color:var(--dim); display:flex; align-items:center; gap:5px; white-space:nowrap; }
+.cv-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.cv-val { font-family:var(--font-data); font-size:11px; font-weight:700; }
+.cv-signal { font-family:var(--font-data); font-size:9px; padding:2px 6px; border-radius:3px; }
+.sig-bull  { background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; }
+.sig-bear  { background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; }
+.sig-wait  { background:#4a608020; color:var(--dim); border:1px solid #4a608040; }
+.sig-above { background:#60a5fa18; color:var(--blue); border:1px solid #60a5fa33; }
+
+/* ── Alignment table ── */
+.align-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.align-table { width:100%; border-collapse:collapse; }
+.align-table th { font-family:var(--font-data); font-size:9px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; padding:8px 14px; text-align:left; background:#070f1e; border-bottom:1px solid var(--border); }
+.align-table th:nth-child(n+2) { text-align:center; }
+.align-table td { padding:9px 14px; border-bottom:1px solid var(--border); font-family:var(--font-data); font-size:11px; }
+.align-table tr:last-child td { border-bottom:none; }
+.align-table tr:hover td { background:var(--panel2); }
+.align-table td:nth-child(n+2) { text-align:center; }
+.comp-name { color:var(--hdr); font-weight:600; }
+.locked-badge   { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:3px; background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; font-size:9px; font-weight:700; }
+.unlocked-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:3px; background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; font-size:9px; font-weight:700; }
+.neutral-badge  { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:3px; background:#4a608020; color:var(--dim); border:1px solid #4a608040; font-size:9px; }
+
+/* ── Bottom row ── */
+.bottom-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+@media(max-width:900px){ .bottom-row { grid-template-columns:1fr; } }
+
+/* ── Key levels ── */
+.levels-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.lc-header { padding:8px 14px; background:#070f1e; border-bottom:1px solid var(--border); font-family:var(--font-data); font-size:9px; letter-spacing:.12em; color:var(--dim); text-transform:uppercase; }
+.lc-body { padding:10px 14px; display:flex; flex-direction:column; gap:8px; }
+.level-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; border-radius:4px; background:var(--panel2); }
+.lr-label { font-size:10px; color:var(--dim); }
+.lr-val { font-family:var(--font-data); font-size:12px; font-weight:700; color:var(--hdr); }
+.lr-note { font-size:9px; color:var(--dim); font-family:var(--font-data); }
+
+/* ── Structural takeaway ── */
+.takeaway-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.ta-header { padding:8px 14px; background:#070f1e; border-bottom:1px solid var(--border); font-family:var(--font-data); font-size:9px; letter-spacing:.12em; color:var(--dim); text-transform:uppercase; }
+.ta-body { padding:14px; display:flex; flex-direction:column; gap:8px; }
+.ta-item { display:flex; gap:8px; align-items:flex-start; font-size:12px; color:var(--text); line-height:1.5; }
+.ta-check { color:var(--teal); font-weight:700; flex-shrink:0; margin-top:1px; }
+.ta-x { color:var(--crimson); font-weight:700; flex-shrink:0; margin-top:1px; }
+.ta-warn { color:var(--wait); font-weight:700; flex-shrink:0; margin-top:1px; }
+.ta-verdict { margin-top:8px; padding:10px 14px; border-radius:6px; font-family:var(--font-data); font-size:11px; font-weight:700; text-align:center; }
+
+/* ── Watch next ── */
+.watch-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.wc-header { padding:8px 14px; background:#070f1e; border-bottom:1px solid var(--border); font-family:var(--font-data); font-size:9px; letter-spacing:.12em; color:var(--dim); text-transform:uppercase; }
+.wc-body { padding:14px; display:flex; flex-direction:column; gap:6px; }
+.wc-item { display:flex; gap:8px; font-size:11px; color:var(--text); line-height:1.5; padding:6px 8px; background:var(--panel2); border-radius:4px; border-left:2px solid var(--teal); }
+
+/* ── Empty state ── */
+.empty-state { padding:60px 24px; text-align:center; color:var(--dim); font-family:var(--font-data); font-size:11px; line-height:2; }
+.empty-state .big { font-size:32px; margin-bottom:16px; }
+
+/* ── Mini sparkline ── */
+.sparkline { width:100%; height:50px; margin-top:10px; }
+
+/* ── Score ring ── */
+.score-ring { display:flex; align-items:center; gap:14px; padding:12px 14px; background:var(--panel2); border-radius:6px; margin-top:10px; }
+.sr-ring { width:44px; height:44px; border-radius:50%; border:3px solid; display:flex; align-items:center; justify-content:center; font-family:var(--font-data); font-size:14px; font-weight:700; flex-shrink:0; }
+.sr-label { font-size:11px; color:var(--text); line-height:1.6; }
+.sr-label strong { color:var(--hdr); display:block; font-size:12px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div class="nav-right">
+    <a class="nav-link" href="ZION_Dashboard.html">← Dashboard</a>
+    <a class="nav-link" href="ZION_Command.html">Command</a>
+  </div>
+</nav>
+
+<!-- Search -->
+<div class="search-bar">
+  <input class="ticker-input" id="tickerInput" placeholder="NVDA" maxlength="6" spellcheck="false" onkeydown="if(event.key==='Enter')runTrendLock()">
+  <button class="scan-btn" id="scanBtn" onclick="runTrendLock()">⚡ Trend-Lock</button>
+  <span class="scan-status" id="scanStatus">Enter a ticker to generate the full multi-timeframe alignment diagram</span>
+  <div class="quick-tickers">
+    <button class="qt" onclick="quickLoad('SPY')">SPY</button>
+    <button class="qt" onclick="quickLoad('QQQ')">QQQ</button>
+    <button class="qt" onclick="quickLoad('NVDA')">NVDA</button>
+    <button class="qt" onclick="quickLoad('AAPL')">AAPL</button>
+    <button class="qt" onclick="quickLoad('PLTR')">PLTR</button>
+    <button class="qt" onclick="quickLoad('ORCL')">ORCL</button>
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="main" id="mainContent">
+  <div class="empty-state">
+    <div class="big">🔒</div>
+    Enter a ticker above and hit Trend-Lock.<br>
+    ZION will fetch 5m · 65m · Daily data from Massive<br>
+    and generate the full alignment diagram.<br><br>
+    <span style="color:var(--teal)">5m = Energy &nbsp;·&nbsp; 65m = Structure &nbsp;·&nbsp; Daily = Gate</span>
+  </div>
+</div>
+
+<script>
+// ── Config ─────────────────────────────────────────
+let API_KEY = (typeof getApiKey !== 'undefined') ? getApiKey() : (typeof ZION_CONFIG !== 'undefined' ? ZION_CONFIG.apiKey : '');
+
+const BASE = 'https://api.massive.com';
+const fmt  = (n,d=2) => n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct  = n => n==null?'—':(n>=0?'+':'')+fmt(n)+'%';
+const bull  = v => v >= 0;
+
+// ── Ichimoku helpers ──────────────────────────────
+const highest = (arr,n) => Math.max(...arr.slice(-n).map(b=>b.high));
+const lowest  = (arr,n) => Math.min(...arr.slice(-n).map(b=>b.low));
+const tenkan  = b => b.length>=9  ? (highest(b,9)+lowest(b,9))/2   : null;
+const kijun   = b => b.length>=26 ? (highest(b,26)+lowest(b,26))/2 : null;
+const spanA   = b => { const t=tenkan(b),k=kijun(b); return t&&k?(t+k)/2:null; };
+const spanB   = b => b.length>=52 ? (highest(b,52)+lowest(b,52))/2 : null;
+const vwapFn  = bars => {
+  let tvp=0,tv=0;
+  bars.forEach(b=>{ const tp=(b.high+b.low+b.close)/3; tvp+=tp*b.volume; tv+=b.volume; });
+  return tv>0?tvp/tv:null;
+};
+
+// ── Cloud position ─────────────────────────────────
+const cloudPos = (price,sa,sb) => {
+  if(!sa||!sb||!price) return {label:'—',bull:null};
+  if(price>Math.max(sa,sb)) return {label:'Above Cloud',bull:true};
+  if(price<Math.min(sa,sb)) return {label:'Below Cloud',bull:false};
+  return {label:'Inside Cloud',bull:null};
+};
+
+// ── RSI ───────────────────────────────────────────
+const rsi = (bars,period=14) => {
+  if(bars.length<period+1) return null;
+  let gains=0,losses=0;
+  for(let i=bars.length-period;i<bars.length;i++){
+    const d=bars[i].close-bars[i-1].close;
+    if(d>0) gains+=d; else losses+=Math.abs(d);
+  }
+  const ag=gains/period, al=losses/period;
+  if(al===0) return 100;
+  const rs=ag/al;
+  return 100-(100/(1+rs));
+};
+
+// ── VWAP slope ────────────────────────────────────
+const vwapSlope = bars => {
+  if(bars.length<10) return null;
+  const v1=vwapFn(bars.slice(0,-5));
+  const v2=vwapFn(bars);
+  if(!v1||!v2) return null;
+  return ((v2-v1)/v1)*100;
+};
+
+// ── Fetch bars ────────────────────────────────────
+const fetchBars = async (sym, mult, span, limit=300) => {
+  const to   = Date.now();
+  const from = to - (limit * mult * (span==='minute'?60000:span==='hour'?3600000:86400000) * 2);
+  const url  = `${BASE}/v2/aggs/ticker/${sym}/range/${mult}/${span}/${from}/${to}?adjusted=true&sort=desc&limit=${limit}&apiKey=${API_KEY}`;
+  const r    = await fetch(url);
+  const d    = await r.json();
+  if(!d.results?.length) return [];
+  return d.results.map(b=>({open:b.o,high:b.h,low:b.l,close:b.c,volume:b.v,t:b.t})).reverse();
+};
+
+// ── Fetch snapshot ────────────────────────────────
+const fetchSnap = async sym => {
+  const url = `${BASE}/v2/snapshot/locale/us/markets/stocks/tickers/${sym}?apiKey=${API_KEY}`;
+  const r   = await fetch(url);
+  const d   = await r.json();
+  const t   = d.ticker;
+  if(!t) return {};
+  return {
+    price: t.day?.c || t.lastTrade?.p,
+    prevClose: t.prevDay?.c,
+    pct: t.todaysChangePerc,
+    change: t.todaysChange,
+    hod: t.day?.h,
+    lod: t.day?.l,
+    vol: t.day?.v,
+  };
+};
+
+// ── Analyze timeframe ─────────────────────────────
+const analyzeFrame = (bars, price) => {
+  if(!bars.length) return null;
+  const t   = tenkan(bars);
+  const k   = kijun(bars);
+  const sa  = spanA(bars);
+  const sb  = spanB(bars);
+  const vw  = vwapFn(bars);
+  const rs  = rsi(bars);
+  const sl  = vwapSlope(bars);
+  const cp  = cloudPos(price,sa,sb);
+  const tkBull = t&&k ? t>k : null;
+
+  // Chikou — current close vs close 26 bars ago
+  const chikouBull = bars.length>26 ? price > bars[bars.length-27].close : null;
+
+  return { t, k, sa, sb, vw, rs, sl, cp, tkBull, chikouBull, price };
+};
+
+// ── Score a timeframe ─────────────────────────────
+const scoreFrame = f => {
+  if(!f) return 0;
+  let s=0;
+  if(f.tkBull===true)  s++; else if(f.tkBull===false) s--;
+  if(f.cp.bull===true) s++; else if(f.cp.bull===false) s--;
+  if(f.chikouBull===true) s++; else if(f.chikouBull===false) s--;
+  if(f.sl!=null) { if(f.sl>0.05) s++; else if(f.sl<-0.05) s--; }
+  if(f.rs!=null) { if(f.rs>50) s++; else if(f.rs<50) s--; }
+  return s;
+};
+
+// ── Lock status ───────────────────────────────────
+const lockStatus = (s5,s65,sD) => {
+  const total = s5+s65+sD;
+  if(total>=9)  return {label:'TREND-LOCK ENGAGED 🔒', cls:'lock-engaged', icon:'🔒', desc:'All three timeframes fully aligned. Continuation is the path of least resistance.'};
+  if(total>=5)  return {label:'TREND-LOCK PARTIAL ⚡', cls:'lock-partial', icon:'⚡', desc:'Structure and gate aligned. Energy (5m) not fully locked — wait for 5m confirmation.'};
+  if(total>=2)  return {label:'WATCH — BUILDING 👁', cls:'lock-wait',   icon:'👁', desc:'Some alignment developing. Not yet actionable. Monitor for lock development.'};
+  if(total<=-5) return {label:'BEAR LOCK ENGAGED 🔻', cls:'lock-bear',  icon:'🔻', desc:'All timeframes bearish. Structure supports puts. No long entries.'};
+  if(total<=-2) return {label:'BEAR DEVELOPING 🔻',   cls:'lock-bear',  icon:'⚠',  desc:'Bearish structure building. Caution on longs.'};
+  return {label:'NO LOCK — WAIT ⏸', cls:'lock-wait', icon:'⏸', desc:'Mixed signals across timeframes. ZION says wait for alignment.'};
+};
+
+// ── Alignment badge ───────────────────────────────
+const alignBadge = (val5, val65, threshold=0) => {
+  const b5  = val5  > threshold;
+  const b65 = val65 > threshold;
+  if(b5&&b65)   return '<span class="locked-badge">✓ LOCKED</span>';
+  if(!b5&&!b65) return '<span class="unlocked-badge">✗ SPLIT</span>';
+  return '<span class="neutral-badge">~ PARTIAL</span>';
+};
+
+// ── Signal text ───────────────────────────────────
+const sigTxt = (v,pos,neg,neu='—') => v==null?neu:v?pos:neg;
+const sigCls = (v,pos='sig-bull',neg='sig-bear',neu='sig-wait') => v==null?neu:v?pos:neg;
+
+// ── Draw sparkline ────────────────────────────────
+const drawSparkline = (bars, color='#00f5d4') => {
+  if(!bars.length) return '';
+  const prices = bars.slice(-40).map(b=>b.close);
+  const mn = Math.min(...prices), mx = Math.max(...prices);
+  const range = mx-mn||1;
+  const W=300,H=44;
+  const pts = prices.map((p,i)=>{
+    const x=(i/(prices.length-1))*W;
+    const y=H-((p-mn)/range)*H;
+    return `${x},${y}`;
+  }).join(' ');
+  return `<svg class="sparkline" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.8"/>
+  </svg>`;
+};
+
+// ── Main render ───────────────────────────────────
+const render = (sym, snap, f5, f65, fD, bars5, bars65, barsD) => {
+  const price  = snap.price || f65?.price || 0;
+  const chg    = snap.pct   || 0;
+  const chgCls = chg>=0 ? 'color:var(--teal)' : 'color:var(--crimson)';
+  const s5=scoreFrame(f5), s65=scoreFrame(f65), sD=scoreFrame(fD);
+  const lock = lockStatus(s5,s65,sD);
+  const totalScore = s5+s65+sD;
+
+  // Key levels
+  const hod     = fmt(snap.hod||0);
+  const lod     = fmt(snap.lod||0);
+  const kijun65 = fmt(f65?.k||0);
+  const kijun5  = fmt(f5?.k||0);
+  const vwap65  = fmt(f65?.vw||0);
+  const sa65    = fmt(f65?.sa||0);
+  const sb65    = fmt(f65?.sb||0);
+
+  // Takeaways
+  const takeaways = [];
+  if(f65?.tkBull===true)  takeaways.push({ok:true,  text:'65m TK bullish — Tenkan above Kijun, structure aligned'});
+  if(f65?.tkBull===false) takeaways.push({ok:false, text:'65m TK bearish — Tenkan below Kijun, structure weak'});
+  if(f65?.cp.bull===true)  takeaways.push({ok:true,  text:`Price above 65m cloud — ${f65.cp.label}`});
+  if(f65?.cp.bull===false) takeaways.push({ok:false, text:`Price below 65m cloud — ${f65.cp.label}`});
+  if(f65?.cp.bull===null)  takeaways.push({ok:null,  text:`Price ${f65?.cp.label} — no man's land`});
+  if(f65?.chikouBull===true)  takeaways.push({ok:true,  text:'Chikou above historical candles — confirmation clear'});
+  if(f65?.chikouBull===false) takeaways.push({ok:false, text:'Chikou below historical candles — confirmation weak'});
+  if(f65?.sl!=null) {
+    const slopeOk = f65.sl>0.05;
+    takeaways.push({ok:slopeOk, text:`65m VWAP slope ${f65.sl>0?'rising':'falling'} (${fmt(f65.sl,3)}%) — institutional ${f65.sl>0?'support':'distribution'}`});
+  }
+  if(fD?.tkBull===true)  takeaways.push({ok:true,  text:'Daily gate OPEN — TK bullish on Daily'});
+  if(fD?.tkBull===false) takeaways.push({ok:false, text:'Daily gate CLOSED — TK bearish on Daily, no long entries'});
+
+  // ── Breakout conditions ──────────────────────────
+  const kijunPrice = f65?.k || 0;
+  const cloudTop   = f65 ? Math.max(f65.sa||0, f65.sb||0) : 0;
+  const cloudBot   = f65 ? Math.min(f65.sa||0, f65.sb||0) : 0;
+  const above65    = cloudTop > 0 ? `$${fmt(cloudTop)}` : '—';
+  const kijun65fmt = `$${fmt(kijunPrice)}`;
+
+  const tr = (scenario, trigger, target, confirm, color='var(--teal)') =>
+    `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:6px 10px;color:${color};font-weight:600;font-family:var(--font-data);font-size:10px">${scenario}</td>
+      <td style="padding:6px 10px;color:var(--text);font-size:11px">${trigger}</td>
+      <td style="padding:6px 10px;color:var(--dim);font-size:10px">${confirm}</td>
+    </tr>`;
+
+  const breakoutRows = [
+    tr('Bull Breakout',    `Reclaim + hold ${kijun65fmt}`,  `${above65}+`,    'VWAP slope positive, RSI > 55'),
+    tr('Cloud Breakout',   `Close above cloud top ${above65}`, `Next cloud level`, 'Chikou clear, TK bullish'),
+    tr('PRIME ▲ Full',    'All 5 conditions aligned',       'New HOD attempt', 'ZION signal PRIME ▲, sector green'),
+    tr('Failed Breakout',  `Rejection + close below ${kijun65fmt}`, 'Re-test lower', 'Watch RSI drop below 50', 'var(--crimson)'),
+  ].join('');
+
+  // Invalidation zones — cascading stops
+  const iv = (level, type, consequence, isBear=false) =>
+    `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:6px 10px;font-family:var(--font-data);font-size:11px;font-weight:700;color:${isBear?'var(--crimson)':'var(--wait)'}">$${fmt(level)}</td>
+      <td style="padding:6px 10px;color:var(--text);font-size:11px">${type}</td>
+      <td style="padding:6px 10px;color:${isBear?'var(--crimson)':'var(--dim)'};font-size:10px">${consequence}</td>
+    </tr>`;
+
+  const invalidationRows = [
+    iv(f65?.vw||0,   'VWAP loss',   'Institutional support gone — reassess'),
+    iv(f65?.k||0,    'Kijun loss',  'Structural stop — thesis broken, exit'),
+    iv(cloudTop||0,  'Cloud top loss', 'Bull structure compromised'),
+    iv(cloudBot||0,  'Cloud bottom',  'Inside cloud — no man's land'),
+    iv(f65?.sb||0,   'Span B loss', 'Bear thesis takes control', true),
+  ].join('');
+
+  // Retest conditions
+  const rt = (level, label, expected, action, isExit=false) =>
+    `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:6px 10px;font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--blue)">$${fmt(level)}<br><span style="font-size:9px;color:var(--dim)">${label}</span></td>
+      <td style="padding:6px 10px;color:var(--text);font-size:11px">${expected}</td>
+      <td style="padding:6px 10px;color:${isExit?'var(--crimson)':'var(--teal)'};font-size:10px;font-weight:${isExit?'700':'400'}">${action}</td>
+    </tr>`;
+
+  const retestRows = [
+    rt(f65?.vw||0,  'VWAP',      'First pullback target — should hold', 'Look for bounce + RSI > 55'),
+    rt(f65?.k||0,   'Kijun',     'Last line of trend defense',          'Strong reaction expected; stop below'),
+    rt(cloudTop||0, 'Cloud Top', 'Key reclaim zone',                    'Hold = bullish continuation'),
+    rt(cloudBot||0, 'Cloud Bot', 'Only on deep pullback',               'Re-evaluate full bias if tested'),
+    rt(f65?.sb||0,  'Span B',    'Structural retest — critical',        'Exit all longs; wait for re-base', true),
+  ].join('');
+
+  // Watch next
+  const watchItems = [];
+  if(f65?.k) watchItems.push(`Kijun support at ${kijun65} — structural stop level`);
+  if(f5?.tkBull===false&&f65?.tkBull===true) watchItems.push('5m TK cross back bullish would confirm energy returning');
+  if(f65?.rs!=null) watchItems.push(`65m RSI at ${fmt(f65.rs,0)} — ${f65.rs>70?'overbought, watch for divergence':f65.rs<40?'weak momentum, wait for recovery':'healthy range, trend intact'}`);
+  if(f65?.vw) watchItems.push(`VWAP ${vwap65} — ${f65.sl>0?'slope positive, hold above for bullish bias':'slope flat/negative, VWAP acting as resistance'}`);
+  if(fD?.cp.bull===true&&f65?.cp.bull===true) watchItems.push('Daily + 65m both above cloud — strong structural alignment maintained');
+
+  // ── VWAP-MBB Resistance Score ─────────────────────
+  // Factor 1: VWAP slope (from 65m)
+  const vwapSlp = f65?.sl || 0;
+  let rsVwap=0, rsVwapLabel='', rsVwapDesc='', rsVwapColor='var(--dim)';
+  if(vwapSlp > 0.05)      { rsVwap=0; rsVwapLabel='Rising ↑';  rsVwapDesc='Weak resistance'; rsVwapColor='var(--teal)'; }
+  else if(vwapSlp > -0.05){ rsVwap=1; rsVwapLabel='Flat →';    rsVwapDesc='Strong resistance'; rsVwapColor='var(--wait)'; }
+  else                     { rsVwap=2; rsVwapLabel='Falling ↓'; rsVwapDesc='Very strong lid'; rsVwapColor='var(--crimson)'; }
+
+  // Factor 2: BB mid (20 SMA) slope — estimate from recent bars
+  const bb20Slope = (() => {
+    if(bars65.length < 25) return 0;
+    const sma = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+    const s1 = sma(bars65.slice(-20).map(b=>b.close));
+    const s2 = sma(bars65.slice(-25,-5).map(b=>b.close));
+    return ((s1-s2)/s2)*100;
+  })();
+  let rsBB=0, rsBBLabel='', rsBBDesc='', rsBBColor='var(--dim)';
+  if(bb20Slope > 0.1)       { rsBB=0; rsBBLabel='Curling Up ↑';   rsBBDesc='Weakening lid'; rsBBColor='var(--teal)'; }
+  else if(bb20Slope > -0.1) { rsBB=1; rsBBLabel='Flat →';         rsBBDesc='Neutral'; rsBBColor='var(--wait)'; }
+  else                       { rsBB=2; rsBBLabel='Curling Down ↓'; rsBBDesc='Strengthening lid'; rsBBColor='var(--crimson)'; }
+
+  // Factor 3: distance from VWAP
+  const vwap65val = f65?.vw || 0;
+  const pctFromVwap = vwap65val > 0 ? ((price - vwap65val)/vwap65val)*100 : 0;
+  let rsDist=0, rsDistLabel='', rsDistDesc='', rsDistColor='var(--dim)';
+  if(pctFromVwap > 2)        { rsDist=2; rsDistLabel='Far Above';   rsDistDesc='Likely rejection zone'; rsDistColor='var(--crimson)'; }
+  else if(pctFromVwap > 0.5) { rsDist=1; rsDistLabel='Approaching'; rsDistDesc='Possible break';       rsDistColor='var(--wait)'; }
+  else if(pctFromVwap > -0.5){ rsDist=0; rsDistLabel='Hugging';     rsDistDesc='Equilibrium zone';     rsDistColor='var(--teal)'; }
+  else                        { rsDist=0; rsDistLabel='Below VWAP';  rsDistDesc='Not at resistance';    rsDistColor='var(--teal)'; }
+
+  const rsTotal = rsVwap + rsBB + rsDist;
+  let rsTotalColor='var(--teal)', rsTotalDesc='';
+  if(rsTotal <= 2)      { rsTotalColor='var(--teal)';   rsTotalDesc='Weak — Breakout Likely'; }
+  else if(rsTotal <= 4) { rsTotalColor='var(--wait)';   rsTotalDesc='Medium — Chop/Fakeouts'; }
+  else                  { rsTotalColor='var(--crimson)'; rsTotalDesc='Strong — Rejection Likely'; }
+
+  // Squeeze state
+  const bbRange = bars65.length > 20 ? (() => {
+    const recent = bars65.slice(-5);
+    const older  = bars65.slice(-20,-5);
+    const rangeOf = arr => Math.max(...arr.map(b=>b.high)) - Math.min(...arr.map(b=>b.low));
+    const r1 = rangeOf(recent), r2 = rangeOf(older);
+    return (r1-r2)/r2;
+  })() : 0;
+  let sqState='', sqDesc='', sqColor='var(--dim)';
+  if(bbRange < -0.3)      { sqState='🗜 COILING';   sqDesc='Bands compressing — squeeze building';    sqColor='var(--gold)'; }
+  else if(bbRange < 0.1)  { sqState='⚖ EQUILIBRIUM'; sqDesc='Bands flat — volatility neutral, watch for trigger'; sqColor='var(--blue)'; }
+  else if(bbRange < 0.5)  { sqState='📤 RELEASING';  sqDesc='Bands expanding — volatility releasing'; sqColor='var(--wait)'; }
+  else                     { sqState='💥 EXPANDING';  sqDesc='Full expansion — trend in motion';       sqColor='var(--teal)'; }
+
+  document.getElementById('mainContent').innerHTML = `
+
+    <!-- Header -->
+    <div class="ticker-header">
+      <div class="th-left">
+        <div class="th-ticker">${sym}</div>
+        <div class="th-price" style="${chgCls}">$${fmt(price)}</div>
+        <div class="th-change" style="${chgCls}">${pct(chg)} today</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="lock-badge ${lock.cls}">
+          <span class="lock-icon">${lock.icon}</span>
+          ${lock.label}
+        </div>
+        <div class="th-time">Last updated: ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true})} ET</div>
+      </div>
+    </div>
+
+    <!-- Score ring -->
+    <div class="score-ring">
+      <div class="sr-ring" style="border-color:${totalScore>=5?'var(--teal)':totalScore<=-5?'var(--crimson)':totalScore>=2?'var(--wait)':'var(--dim)'};color:${totalScore>=5?'var(--teal)':totalScore<=-5?'var(--crimson)':totalScore>=2?'var(--wait)':'var(--dim)'}">
+        ${totalScore>0?'+':''}${totalScore}
+      </div>
+      <div class="sr-label">
+        <strong>Composite Score: ${totalScore>0?'+':''}${totalScore} / 15</strong>
+        ${lock.desc}
+      </div>
+      <div style="margin-left:auto;display:flex;gap:10px">
+        <div style="text-align:center"><div style="font-family:var(--font-data);font-size:16px;font-weight:700;color:${s5>=3?'var(--teal)':s5<=-3?'var(--crimson)':'var(--wait)'}">${s5>0?'+':''}${s5}</div><div style="font-size:9px;color:var(--dim)">5m Energy</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-data);font-size:16px;font-weight:700;color:${s65>=3?'var(--teal)':s65<=-3?'var(--crimson)':'var(--wait)'}">${s65>0?'+':''}${s65}</div><div style="font-size:9px;color:var(--dim)">65m Structure</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-data);font-size:16px;font-weight:700;color:${sD>=3?'var(--teal)':sD<=-3?'var(--crimson)':'var(--wait)'}">${sD>0?'+':''}${sD}</div><div style="font-size:9px;color:var(--dim)">Daily Gate</div></div>
+      </div>
+    </div>
+
+    <!-- ══ VWAP-MBB RESISTANCE STRENGTH SCORE ══ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+
+      <!-- Factor 1: VWAP Slope -->
+      <div style="padding:12px 14px;border-right:1px solid var(--border)">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">VWAP Slope</div>
+        <div style="font-family:var(--font-data);font-size:13px;font-weight:700" id="rs-vwap-label">—</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:3px" id="rs-vwap-desc">—</div>
+      </div>
+
+      <!-- Factor 2: BB (MBB) Slope -->
+      <div style="padding:12px 14px;border-right:1px solid var(--border)">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">BB Mid Slope</div>
+        <div style="font-family:var(--font-data);font-size:13px;font-weight:700" id="rs-bb-label">—</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:3px" id="rs-bb-desc">—</div>
+      </div>
+
+      <!-- Factor 3: Distance -->
+      <div style="padding:12px 14px;border-right:1px solid var(--border)">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Price vs VWAP</div>
+        <div style="font-family:var(--font-data);font-size:13px;font-weight:700" id="rs-dist-label">—</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:3px" id="rs-dist-desc">—</div>
+      </div>
+
+      <!-- Total Score -->
+      <div style="padding:12px 14px;background:#070f1e">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Resistance Score</div>
+        <div style="font-family:var(--font-data);font-size:20px;font-weight:700" id="rs-score-val">—</div>
+        <div style="font-size:10px;margin-top:3px;font-weight:600" id="rs-score-desc">—</div>
+      </div>
+
+    </div>
+
+    <!-- Squeeze State Badge -->
+    <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px">
+      <div style="font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Squeeze State</div>
+      <div style="font-family:var(--font-data);font-size:11px;font-weight:700;padding:4px 12px;border-radius:4px" id="squeezeState">—</div>
+      <div style="font-size:11px;color:var(--dim)" id="squeezeDesc">—</div>
+      <div style="margin-left:auto;font-family:var(--font-data);font-size:9px;color:var(--dim)">1pm–2pm Smart Money Return window · Watch for volume + TK steepen</div>
+    </div>
+
+    <!-- Three chart panels -->
+    <div class="charts-row">
+
+      <!-- 5m -->
+      <div class="chart-panel">
+        <div class="cp-header">
+          <span class="cp-title">5M · ENERGY</span>
+          <span class="cp-sub">Short-term momentum</span>
+        </div>
+        <div class="cp-body">
+          <div class="cp-values">
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--vwap)"></span>VWAP</span><span class="cv-val">$${fmt(f5?.vw||0)}</span><span class="cv-signal ${f5?.sl>0.05?'sig-bull':f5?.sl<-0.05?'sig-bear':'sig-wait'}">${f5?.sl!=null?(f5.sl>0.05?'Rising':f5.sl<-0.05?'Falling':'Flat'):'—'}</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--tenkan)"></span>Tenkan (T)</span><span class="cv-val">$${fmt(f5?.t||0)}</span><span class="cv-signal ${f5?.tkBull===true?'sig-bull':f5?.tkBull===false?'sig-bear':'sig-wait'}">${sigTxt(f5?.tkBull,'Above Kijun','Below Kijun')}</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--kijun)"></span>Kijun (K)</span><span class="cv-val">$${fmt(f5?.k||0)}</span><span class="cv-signal sig-wait">Support</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--spana)"></span>Cloud</span><span class="cv-val" style="font-size:10px">${f5?.cp.label||'—'}</span><span class="cv-signal ${f5?.cp.bull===true?'sig-bull':f5?.cp.bull===false?'sig-bear':'sig-wait'}">${f5?.cp.bull===true?'Bullish':f5?.cp.bull===false?'Bearish':'Neutral'}</span></div>
+            <div class="cv-row"><span class="cv-label">RSI (14)</span><span class="cv-val">${fmt(f5?.rs||0,0)}</span><span class="cv-signal ${(f5?.rs||0)>50?'sig-bull':(f5?.rs||0)<40?'sig-bear':'sig-wait'}">${(f5?.rs||0)>60?'Strong':(f5?.rs||0)>50?'Above 50':(f5?.rs||0)>40?'Weak':'Below 40'}</span></div>
+          </div>
+          ${drawSparkline(bars5,'#3c78ff')}
+        </div>
+      </div>
+
+      <!-- 65m -->
+      <div class="chart-panel">
+        <div class="cp-header">
+          <span class="cp-title">65M · STRUCTURE</span>
+          <span class="cp-sub">Primary signal timeframe</span>
+        </div>
+        <div class="cp-body">
+          <div class="cp-values">
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--vwap)"></span>VWAP</span><span class="cv-val">$${fmt(f65?.vw||0)}</span><span class="cv-signal ${f65?.sl>0.1?'sig-bull':f65?.sl<-0.1?'sig-bear':'sig-wait'}">${f65?.sl!=null?(f65.sl>0.1?'Rising':f65.sl<-0.1?'Falling':'Flat'):'—'}</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--tenkan)"></span>Tenkan (T)</span><span class="cv-val">$${fmt(f65?.t||0)}</span><span class="cv-signal ${f65?.tkBull===true?'sig-bull':f65?.tkBull===false?'sig-bear':'sig-wait'}">${sigTxt(f65?.tkBull,'Above Kijun','Below Kijun')}</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--kijun)"></span>Kijun (K)</span><span class="cv-val">$${fmt(f65?.k||0)}</span><span class="cv-signal sig-wait">Structural stop</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--spana)"></span>Cloud</span><span class="cv-val" style="font-size:10px">${f65?.cp.label||'—'}</span><span class="cv-signal ${f65?.cp.bull===true?'sig-bull':f65?.cp.bull===false?'sig-bear':'sig-wait'}">${f65?.cp.bull===true?'Bullish':f65?.cp.bull===false?'Bearish':'Neutral'}</span></div>
+            <div class="cv-row"><span class="cv-label">Chikou</span><span class="cv-val">${f65?.chikouBull===true?'Above':'Below'}</span><span class="cv-signal ${f65?.chikouBull===true?'sig-bull':f65?.chikouBull===false?'sig-bear':'sig-wait'}">${f65?.chikouBull===true?'Confirmed':'Weak'}</span></div>
+            <div class="cv-row"><span class="cv-label">RSI (14)</span><span class="cv-val">${fmt(f65?.rs||0,0)}</span><span class="cv-signal ${(f65?.rs||0)>50?'sig-bull':(f65?.rs||0)<40?'sig-bear':'sig-wait'}">${(f65?.rs||0)>60?'Strong':(f65?.rs||0)>50?'Above 50':(f65?.rs||0)>40?'Weak':'Below 40'}</span></div>
+          </div>
+          ${drawSparkline(bars65,'#00f5d4')}
+        </div>
+      </div>
+
+      <!-- Daily -->
+      <div class="chart-panel">
+        <div class="cp-header">
+          <span class="cp-title">DAILY · GATE</span>
+          <span class="cp-sub">HTF alignment — veto power</span>
+        </div>
+        <div class="cp-body">
+          <div class="cp-values">
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--vwap)"></span>VWAP</span><span class="cv-val">$${fmt(fD?.vw||0)}</span><span class="cv-signal ${fD?.sl>0?'sig-bull':fD?.sl<0?'sig-bear':'sig-wait'}">${fD?.sl!=null?(fD.sl>0?'Rising':'Falling'):'—'}</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--tenkan)"></span>Tenkan (T)</span><span class="cv-val">$${fmt(fD?.t||0)}</span><span class="cv-signal ${fD?.tkBull===true?'sig-bull':fD?.tkBull===false?'sig-bear':'sig-wait'}">${sigTxt(fD?.tkBull,'Above Kijun','Below Kijun')}</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--kijun)"></span>Kijun (K)</span><span class="cv-val">$${fmt(fD?.k||0)}</span><span class="cv-signal sig-wait">HTF support</span></div>
+            <div class="cv-row"><span class="cv-label"><span class="cv-dot" style="background:var(--spana)"></span>Cloud</span><span class="cv-val" style="font-size:10px">${fD?.cp.label||'—'}</span><span class="cv-signal ${fD?.cp.bull===true?'sig-bull':fD?.cp.bull===false?'sig-bear':'sig-wait'}">${fD?.cp.bull===true?'Gate Open':fD?.cp.bull===false?'Gate Closed':'Gate Cloudy'}</span></div>
+            <div class="cv-row"><span class="cv-label">RSI (14)</span><span class="cv-val">${fmt(fD?.rs||0,0)}</span><span class="cv-signal ${(fD?.rs||0)>50?'sig-bull':(fD?.rs||0)<40?'sig-bear':'sig-wait'}">${(fD?.rs||0)>60?'Strong':(fD?.rs||0)>50?'Above 50':(fD?.rs||0)>40?'Weak':'Below 40'}</span></div>
+          </div>
+          ${drawSparkline(barsD,'#fbbf24')}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Alignment table -->
+    <div class="align-card">
+      <table class="align-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>5m · Energy</th>
+            <th>65m · Structure</th>
+            <th>Daily · Gate</th>
+            <th>Alignment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="comp-name">VWAP Slope</td>
+            <td><span class="cv-signal ${f5?.sl>0.05?'sig-bull':f5?.sl<-0.05?'sig-bear':'sig-wait'}">${f5?.sl!=null?fmt(f5.sl,3)+'%':'—'}</span></td>
+            <td><span class="cv-signal ${f65?.sl>0.1?'sig-bull':f65?.sl<-0.1?'sig-bear':'sig-wait'}">${f65?.sl!=null?fmt(f65.sl,3)+'%':'—'}</span></td>
+            <td><span class="cv-signal ${fD?.sl>0?'sig-bull':fD?.sl<0?'sig-bear':'sig-wait'}">${fD?.sl!=null?fmt(fD.sl,3)+'%':'—'}</span></td>
+            <td>${(f5?.sl>0&&f65?.sl>0)?'<span class="locked-badge">✓ LOCKED</span>':'<span class="neutral-badge">~ CHECK</span>'}</td>
+          </tr>
+          <tr>
+            <td class="comp-name">Tenkan / Kijun</td>
+            <td><span class="cv-signal ${f5?.tkBull===true?'sig-bull':f5?.tkBull===false?'sig-bear':'sig-wait'}">${sigTxt(f5?.tkBull,'TK Bull','TK Bear')}</span></td>
+            <td><span class="cv-signal ${f65?.tkBull===true?'sig-bull':f65?.tkBull===false?'sig-bear':'sig-wait'}">${sigTxt(f65?.tkBull,'TK Bull','TK Bear')}</span></td>
+            <td><span class="cv-signal ${fD?.tkBull===true?'sig-bull':fD?.tkBull===false?'sig-bear':'sig-wait'}">${sigTxt(fD?.tkBull,'TK Bull','TK Bear')}</span></td>
+            <td>${(f5?.tkBull&&f65?.tkBull)?'<span class="locked-badge">✓ LOCKED</span>':(f5?.tkBull===false&&f65?.tkBull===false)?'<span class="unlocked-badge">✗ BEAR</span>':'<span class="neutral-badge">~ PARTIAL</span>'}</td>
+          </tr>
+          <tr>
+            <td class="comp-name">Cloud Position</td>
+            <td><span class="cv-signal ${f5?.cp.bull===true?'sig-bull':f5?.cp.bull===false?'sig-bear':'sig-wait'}" style="font-size:8px">${f5?.cp.label||'—'}</span></td>
+            <td><span class="cv-signal ${f65?.cp.bull===true?'sig-bull':f65?.cp.bull===false?'sig-bear':'sig-wait'}" style="font-size:8px">${f65?.cp.label||'—'}</span></td>
+            <td><span class="cv-signal ${fD?.cp.bull===true?'sig-bull':fD?.cp.bull===false?'sig-bear':'sig-wait'}" style="font-size:8px">${fD?.cp.label||'—'}</span></td>
+            <td>${(f5?.cp.bull&&f65?.cp.bull)?'<span class="locked-badge">✓ LOCKED</span>':(f5?.cp.bull===false&&f65?.cp.bull===false)?'<span class="unlocked-badge">✗ BEAR</span>':'<span class="neutral-badge">~ PARTIAL</span>'}</td>
+          </tr>
+          <tr>
+            <td class="comp-name">RSI Momentum</td>
+            <td><span class="cv-signal ${(f5?.rs||0)>50?'sig-bull':(f5?.rs||0)<40?'sig-bear':'sig-wait'}">${fmt(f5?.rs||0,0)}</span></td>
+            <td><span class="cv-signal ${(f65?.rs||0)>50?'sig-bull':(f65?.rs||0)<40?'sig-bear':'sig-wait'}">${fmt(f65?.rs||0,0)}</span></td>
+            <td><span class="cv-signal ${(fD?.rs||0)>50?'sig-bull':(fD?.rs||0)<40?'sig-bear':'sig-wait'}">${fmt(fD?.rs||0,0)}</span></td>
+            <td>${(f5?.rs>50&&f65?.rs>50)?'<span class="locked-badge">✓ LOCKED</span>':(f5?.rs<50&&f65?.rs<50)?'<span class="unlocked-badge">✗ WEAK</span>':'<span class="neutral-badge">~ PARTIAL</span>'}</td>
+          </tr>
+          <tr>
+            <td class="comp-name">Chikou Span</td>
+            <td><span class="cv-signal sig-wait">N/A · 5m</span></td>
+            <td><span class="cv-signal ${f65?.chikouBull===true?'sig-bull':f65?.chikouBull===false?'sig-bear':'sig-wait'}">${sigTxt(f65?.chikouBull,'Above','Below')}</span></td>
+            <td><span class="cv-signal ${fD?.chikouBull===true?'sig-bull':fD?.chikouBull===false?'sig-bear':'sig-wait'}">${sigTxt(fD?.chikouBull,'Above','Below')}</span></td>
+            <td>${f65?.chikouBull===true?'<span class="locked-badge">✓ CLEAR</span>':f65?.chikouBull===false?'<span class="unlocked-badge">✗ BLOCKED</span>':'<span class="neutral-badge">~ CHECK</span>'}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Bottom row -->
+    <div class="bottom-row">
+
+      <!-- Key levels -->
+      <div class="levels-card">
+        <div class="lc-header">Key Levels · ${sym}</div>
+        <div class="lc-body">
+          <div class="level-row"><span class="lr-label">High of Day</span><span class="lr-val" style="color:var(--teal)">$${hod}</span><span class="lr-note">HOD</span></div>
+          <div class="level-row"><span class="lr-label">Current Price</span><span class="lr-val">$${fmt(price)}</span><span class="lr-note ${chg>=0?'style="color:var(--teal)"':'style="color:var(--crimson)"'}">${pct(chg)}</span></div>
+          <div class="level-row"><span class="lr-label">Low of Day</span><span class="lr-val" style="color:var(--crimson)">$${lod}</span><span class="lr-note">LOD</span></div>
+          <div class="level-row"><span class="lr-label">65m VWAP</span><span class="lr-val" style="color:var(--vwap)">$${vwap65}</span><span class="lr-note">Institutional anchor</span></div>
+          <div class="level-row"><span class="lr-label">65m Kijun</span><span class="lr-val" style="color:var(--kijun)">$${kijun65}</span><span class="lr-note">Structural stop</span></div>
+          <div class="level-row"><span class="lr-label">65m Span A</span><span class="lr-val" style="color:var(--spana)">$${sa65}</span><span class="lr-note">Cloud support</span></div>
+          <div class="level-row"><span class="lr-label">65m Span B</span><span class="lr-val" style="color:var(--spanb)">$${sb65}</span><span class="lr-note">Deep cloud support</span></div>
+          <div class="level-row"><span class="lr-label">5m Kijun</span><span class="lr-val" style="color:var(--wait)">$${kijun5}</span><span class="lr-note">Energy stop</span></div>
+        </div>
+      </div>
+
+      <!-- Structural takeaway -->
+      <div class="takeaway-card">
+        <div class="ta-header">Structural Takeaway · 65m</div>
+        <div class="ta-body">
+          ${takeaways.map(t=>`
+            <div class="ta-item">
+              <span class="${t.ok===true?'ta-check':t.ok===false?'ta-x':'ta-warn'}">${t.ok===true?'✓':t.ok===false?'✗':'⚠'}</span>
+              ${t.text}
+            </div>`).join('')}
+          <div class="ta-verdict" style="background:${totalScore>=5?'#00f5d412':totalScore<=-5?'#ff4d6d12':'#fb923c12'};color:${totalScore>=5?'var(--teal)':totalScore<=-5?'var(--crimson)':'var(--wait)'}">
+            STRUCTURE = ${totalScore>=5?'BULLISH':totalScore<=-5?'BEARISH':totalScore>=2?'LEANING BULL':totalScore<=-2?'LEANING BEAR':'NEUTRAL'}
+          </div>
+        </div>
+      </div>
+
+      <!-- What to watch -->
+      <div class="watch-card">
+        <div class="wc-header">What to Watch Next</div>
+        <div class="wc-body">
+          ${watchItems.map(w=>`<div class="wc-item">◆ ${w}</div>`).join('')}
+          ${watchItems.length===0?'<div style="color:var(--dim);font-size:11px;padding:8px">No specific watch items — structure is mixed.</div>':''}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ BREAKOUT · INVALIDATION · RETEST ══ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:0">
+
+      <!-- Breakout Conditions -->
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="padding:8px 14px;background:#070f1e;border-bottom:1px solid var(--border);font-family:var(--font-data);font-size:9px;letter-spacing:.12em;color:var(--teal);text-transform:uppercase">🚀 Breakout Conditions</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <tr style="background:#050d1a">
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Scenario</th>
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Trigger</th>
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Confirmation</th>
+          </tr>
+          ${breakoutRows}
+        </table>
+      </div>
+
+      <!-- Invalidation Zones -->
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="padding:8px 14px;background:#070f1e;border-bottom:1px solid var(--border);font-family:var(--font-data);font-size:9px;letter-spacing:.12em;color:var(--crimson);text-transform:uppercase">🛡 Invalidation Zones</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <tr style="background:#050d1a">
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Level</th>
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Type</th>
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Consequence</th>
+          </tr>
+          ${invalidationRows}
+        </table>
+      </div>
+
+      <!-- Retest Conditions -->
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="padding:8px 14px;background:#070f1e;border-bottom:1px solid var(--border);font-family:var(--font-data);font-size:9px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase">↩ Retest Conditions</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <tr style="background:#050d1a">
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Level</th>
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Expected</th>
+            <th style="padding:6px 10px;text-align:left;font-family:var(--font-data);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)">Action</th>
+          </tr>
+          ${retestRows}
+        </table>
+      </div>
+
+    </div>
+
+  `;
+};
+
+// ── Run ───────────────────────────────────────────
+const runTrendLock = async () => {
+  const sym = document.getElementById('tickerInput').value.trim().toUpperCase();
+  if(!sym) return;
+  if(!API_KEY) {
+    document.getElementById('scanStatus').textContent='⚠ Add your Massive API key to ZION_Config.js';
+    return;
+  }
+  const btn = document.getElementById('scanBtn');
+  btn.disabled=true; btn.textContent='Scanning…';
+  document.getElementById('scanStatus').textContent=`Fetching 5m · 65m · Daily for ${sym}…`;
+
+  try {
+    const [snap, bars5, bars65, barsD] = await Promise.all([
+      fetchSnap(sym),
+      fetchBars(sym,5,'minute',200),
+      fetchBars(sym,65,'minute',200),
+      fetchBars(sym,1,'day',300),
+    ]);
+
+    const price = snap.price || bars65[bars65.length-1]?.close || 0;
+    const f5  = analyzeFrame(bars5, price);
+    const f65 = analyzeFrame(bars65, price);
+    const fD  = analyzeFrame(barsD, price);
+
+    render(sym, snap, f5, f65, fD, bars5, bars65, barsD);
+    // Populate resistance score panels
+  document.getElementById('rs-vwap-label').textContent = rsVwapLabel;
+  document.getElementById('rs-vwap-label').style.color  = rsVwapColor;
+  document.getElementById('rs-vwap-desc').textContent   = rsVwapDesc;
+  document.getElementById('rs-bb-label').textContent    = rsBBLabel;
+  document.getElementById('rs-bb-label').style.color    = rsBBColor;
+  document.getElementById('rs-bb-desc').textContent     = rsBBDesc;
+  document.getElementById('rs-dist-label').textContent  = rsDistLabel;
+  document.getElementById('rs-dist-label').style.color  = rsDistColor;
+  document.getElementById('rs-dist-desc').textContent   = rsDistDesc;
+  const scoreEl = document.getElementById('rs-score-val');
+  scoreEl.textContent    = `${rsTotal}/6`;
+  scoreEl.style.color    = rsTotalColor;
+  document.getElementById('rs-score-desc').textContent  = rsTotalDesc;
+  document.getElementById('rs-score-desc').style.color  = rsTotalColor;
+  // Squeeze state
+  const sqEl = document.getElementById('squeezeState');
+  sqEl.textContent         = sqState;
+  sqEl.style.background    = sqColor+'22';
+  sqEl.style.color         = sqColor;
+  sqEl.style.border        = `1px solid ${sqColor}44`;
+  document.getElementById('squeezeDesc').textContent = sqDesc;
+  document.getElementById('scanStatus').textContent=`${sym} · Updated ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true})}`;
+  } catch(e) {
+    document.getElementById('scanStatus').textContent=`Error: ${e.message}`;
+    console.error(e);
+  }
+
+  btn.disabled=false; btn.textContent='⚡ Trend-Lock';
+};
+
+const quickLoad = sym => {
+  document.getElementById('tickerInput').value=sym;
+  runTrendLock();
+};
+
+document.getElementById('tickerInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter') runTrendLock();
+});
+</script>
+</body>
+</html>
