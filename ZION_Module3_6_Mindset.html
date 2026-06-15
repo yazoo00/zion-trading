@@ -1,0 +1,771 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Academy · Module 3.6: ZION Mind</title>
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --bull:#4ade80; --teal:#00f5d4; --bear:#f87171;
+  --crimson:#ff4d6d; --wait:#fb923c; --blue:#60a5fa;
+  --gold:#fbbf24; --purple:#a78bfa;
+  /* Module 3.6 accent — deep blue-green, calm, intentional */
+  --accent:#0ea5e9;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:14px; line-height:1.7; overflow-x:hidden; }
+
+/* ── Nav ── */
+.nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(5,13,26,.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); }
+.nav-logo span { color:var(--accent); }
+.nav-links { display:flex; gap:4px; }
+.nav-link { font-size:11px; color:var(--dim); padding:4px 10px; border-radius:4px; transition:color .15s,background .15s; cursor:pointer; text-decoration:none; }
+.nav-link:hover,.nav-link.active { color:var(--accent); background:#0ea5e910; }
+.nav-right { display:flex; align-items:center; gap:12px; }
+.progress-label { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.progress-bar { width:120px; height:3px; background:var(--border2); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width .4s ease; width:0%; }
+
+/* ── Sections ── */
+.module-section { display:none; }
+.module-section.visible { display:block; }
+#section-hero { display:block; }
+.section { padding:100px 24px; max-width:860px; margin:0 auto; }
+.section-eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+.section-eyebrow::after { content:''; flex:1; height:1px; background:var(--border); }
+.section-title { font-family:var(--font-disp); font-size:clamp(28px,4vw,48px); font-weight:700; color:var(--hdr); line-height:1.2; margin-bottom:20px; }
+.section-intro { font-size:16px; color:var(--text); line-height:1.85; margin-bottom:48px; max-width:720px; }
+
+/* ── Hero ── */
+.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 24px 80px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 40%, #0ea5e910 0%, transparent 65%); pointer-events:none; }
+.module-eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.25em; color:var(--accent); text-transform:uppercase; margin-bottom:20px; }
+.hero-title { font-family:var(--font-disp); font-size:clamp(38px,6vw,76px); font-weight:700; color:var(--hdr); line-height:1.1; margin-bottom:16px; }
+.hero-title em { font-style:italic; color:var(--accent); }
+.hero-sub { font-size:17px; color:var(--text); max-width:600px; line-height:1.75; margin:0 auto 40px; }
+.hero-cta { display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:12px 28px; border-radius:6px; border:none; cursor:pointer; transition:background .2s,transform .15s; letter-spacing:.04em; }
+.hero-cta:hover { background:#0284c7; transform:translateY(-1px); }
+.hero-prereq { margin-top:20px; font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.hero-prereq a { color:var(--purple); text-decoration:none; }
+
+/* ── Key points ── */
+.key-points { display:flex; flex-direction:column; gap:10px; margin:24px 0; }
+.key-point { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; background:var(--panel); border-radius:6px; border-left:3px solid transparent; transition:border-color .2s; }
+.key-point:hover { border-left-color:var(--accent); }
+.kp-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:8px; }
+.kp-text { font-size:13px; color:var(--text); line-height:1.65; }
+.kp-text strong { color:var(--hdr); }
+
+/* ── Insight boxes ── */
+.insight-box { background:linear-gradient(135deg,#0ea5e910,#060e1e); border:1px solid #0ea5e930; border-radius:8px; padding:20px 24px; margin:28px 0; position:relative; }
+.insight-box::before { content:'"'; font-family:var(--font-disp); font-size:60px; color:var(--accent); opacity:.3; position:absolute; top:-10px; left:16px; line-height:1; }
+.insight-text { font-family:var(--font-disp); font-style:italic; font-size:16px; color:var(--hdr); line-height:1.65; padding-left:8px; }
+.insight-attr { font-family:var(--font-data); font-size:10px; color:var(--accent); letter-spacing:.1em; margin-top:10px; padding-left:8px; }
+
+/* ── Statement cards ── */
+.statement { background:var(--panel2); border:1px solid var(--border2); border-radius:10px; padding:24px 28px; margin:28px 0; border-left:4px solid var(--accent); }
+.statement-text { font-family:var(--font-disp); font-size:20px; font-weight:700; color:var(--hdr); line-height:1.4; margin-bottom:10px; }
+.statement-sub { font-size:13px; color:var(--text); line-height:1.7; }
+
+/* ── Two column ── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:28px 0; }
+@media(max-width:600px){ .two-col { grid-template-columns:1fr; } }
+.col-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:18px 20px; }
+.col-label { font-family:var(--font-data); font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }
+.col-title { font-weight:600; color:var(--hdr); font-size:14px; margin-bottom:8px; }
+.col-desc { font-size:12px; color:var(--text); line-height:1.65; }
+
+/* ── Money mindset table ── */
+.mindset-table { width:100%; border-collapse:collapse; margin:28px 0; }
+.mindset-table th { font-family:var(--font-data); font-size:9px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; padding:8px 14px; text-align:left; background:#070f1e; border-bottom:1px solid var(--border); }
+.mindset-table td { padding:10px 14px; border-bottom:1px solid var(--border); font-size:13px; }
+.mindset-table tr:last-child td { border-bottom:none; }
+.mindset-table tr:hover td { background:var(--panel2); }
+.fear-col { color:var(--crimson); }
+.zion-col { color:var(--teal); }
+
+/* ── Pre-session ritual ── */
+.ritual-timeline { display:flex; flex-direction:column; gap:0; margin:28px 0; position:relative; }
+.ritual-timeline::before { content:''; position:absolute; left:20px; top:24px; bottom:24px; width:2px; background:linear-gradient(to bottom, var(--accent), var(--border)); }
+.ritual-step { display:grid; grid-template-columns:44px 1fr; gap:16px; margin-bottom:16px; position:relative; z-index:1; }
+.rs-node { width:44px; height:44px; border-radius:50%; background:var(--panel2); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-family:var(--font-data); font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; }
+.rs-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 18px; transition:border-color .2s; }
+.rs-card:hover { border-color:var(--accent); }
+.rs-time { font-family:var(--font-data); font-size:9px; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; }
+.rs-title { font-weight:600; color:var(--hdr); font-size:13px; margin-bottom:6px; }
+.rs-desc { font-size:12px; color:var(--text); line-height:1.6; }
+.rs-zion { font-size:11px; color:var(--accent); margin-top:8px; }
+
+/* ── Morning read checklist ── */
+.morning-check { background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin:28px 0; }
+.mc-header { padding:12px 18px; background:#070f1e; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.mc-title { font-family:var(--font-data); font-size:10px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; }
+.mc-score { font-family:var(--font-data); font-size:11px; color:var(--dim); }
+.mc-item { display:flex; align-items:flex-start; gap:12px; padding:11px 18px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .12s; }
+.mc-item:last-child { border-bottom:none; }
+.mc-item:hover { background:var(--panel2); }
+.mc-check { width:18px; height:18px; border-radius:3px; border:1px solid var(--border2); background:var(--panel2); flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all .2s; }
+.mc-item.done .mc-check { background:#0ea5e922; border-color:var(--accent); color:var(--accent); }
+.mc-item.done .mc-check::after { content:'✓'; }
+.mc-item.done .mc-label { color:var(--dim); }
+.mc-label { font-size:12px; color:var(--text); flex:1; line-height:1.55; }
+.mc-label strong { color:var(--hdr); display:block; margin-bottom:2px; font-size:13px; }
+.mc-verdict { padding:12px 18px; font-family:var(--font-data); font-size:11px; font-weight:700; text-align:center; color:var(--dim); transition:all .3s; border-top:1px solid var(--border); }
+
+/* ── P/L reframe ── */
+.reframe-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:28px 0; }
+@media(max-width:600px){ .reframe-grid { grid-template-columns:1fr; } }
+.reframe-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center; }
+.rf-old { font-size:12px; color:var(--crimson); text-decoration:line-through; margin-bottom:8px; line-height:1.5; }
+.rf-arrow { font-size:18px; color:var(--dim); margin:4px 0; }
+.rf-new { font-size:12px; color:var(--teal); font-weight:600; line-height:1.5; }
+
+/* ── Quiz ── */
+.quiz-block { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:24px; margin:40px 0; }
+.quiz-label { font-family:var(--font-data); font-size:9px; letter-spacing:.2em; color:var(--gold); text-transform:uppercase; margin-bottom:14px; }
+.quiz-question { font-size:15px; font-weight:600; color:var(--hdr); margin-bottom:16px; line-height:1.5; }
+.quiz-options { display:flex; flex-direction:column; gap:8px; }
+.quiz-opt { display:flex; align-items:flex-start; gap:12px; padding:12px 16px; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; cursor:pointer; transition:all .15s; font-size:13px; color:var(--text); }
+.quiz-opt:hover { border-color:var(--accent); color:var(--hdr); }
+.quiz-opt.correct { border-color:var(--teal); background:#00f5d412; color:var(--teal); pointer-events:none; }
+.quiz-opt.wrong   { border-color:var(--crimson); background:#ff4d6d12; color:var(--crimson); pointer-events:none; }
+.quiz-opt.disabled { pointer-events:none; opacity:.45; }
+.quiz-opt.correct.disabled { opacity:1; }
+.quiz-letter { font-family:var(--font-data); font-weight:700; font-size:11px; color:var(--dim); flex-shrink:0; margin-top:1px; }
+.quiz-feedback { margin-top:14px; padding:12px 16px; border-radius:6px; font-size:13px; line-height:1.6; display:none; }
+.quiz-feedback.show { display:block; }
+.quiz-feedback.good { background:#00f5d412; border:1px solid #00f5d430; color:var(--teal); }
+.quiz-feedback.bad  { background:#ff4d6d12; border:1px solid #ff4d6d30; color:var(--bear); }
+
+/* ── Divider / Nav ── */
+.divider { border:none; border-top:1px solid var(--border); margin:0; }
+.next-section { display:flex; justify-content:center; padding:60px 24px; }
+.next-btn { display:inline-flex; align-items:center; gap:10px; background:transparent; border:1px solid var(--border2); color:var(--dim); font-family:var(--font-ui); font-size:13px; padding:10px 24px; border-radius:6px; cursor:pointer; transition:all .2s; }
+.next-btn:hover { border-color:var(--accent); color:var(--accent); background:#0ea5e908; }
+
+/* ── Completion ── */
+.completion { text-align:center; padding:100px 24px; max-width:640px; margin:0 auto; }
+.completion-icon { font-size:48px; margin-bottom:20px; }
+.completion-title { font-family:var(--font-disp); font-size:36px; color:var(--hdr); margin-bottom:16px; }
+.completion-text { font-size:15px; color:var(--text); line-height:1.85; margin-bottom:40px; }
+.completion-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn-primary { background:var(--accent); color:#fff; font-weight:700; font-size:13px; padding:12px 28px; border-radius:6px; border:none; cursor:pointer; text-decoration:none; display:inline-block; }
+.btn-secondary { background:transparent; color:var(--blue); font-size:13px; padding:12px 28px; border-radius:6px; border:1px solid var(--blue); cursor:pointer; text-decoration:none; display:inline-block; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div class="nav-links">
+    <span class="nav-link active" onclick="showSection('hero')">Intro</span>
+    <span class="nav-link" onclick="showSection('gatekeeper')">Gatekeeper</span>
+    <span class="nav-link" onclick="showSection('feelings')">Feelings</span>
+    <span class="nav-link" onclick="showSection('money')">Money Mind</span>
+    <span class="nav-link" onclick="showSection('direction')">Direction</span>
+    <span class="nav-link" onclick="showSection('ritual')">Ritual</span>
+    <span class="nav-link" onclick="showSection('morning')">Morning Read</span>
+  </div>
+  <div class="nav-right">
+    <span class="progress-label" id="progressLabel">0% complete</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div id="section-hero" class="module-section visible">
+<section class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="module-eyebrow">ZION · Module 03.6 · ZION Mind</div>
+    <h1 class="hero-title">The chart is<br><em>the gatekeeper.</em></h1>
+    <div style="background:linear-gradient(135deg,#0ea5e912,#060e1e);border:1px solid #0ea5e930;border-radius:10px;padding:22px 32px;max-width:520px;margin:0 auto 32px;text-align:center;position:relative;z-index:1">
+      <div style="font-family:var(--font-disp);font-style:italic;font-size:18px;color:var(--hdr);line-height:1.75;margin-bottom:12px">When the mind is calm,<br>the chart reveals its truth.<br>When the chart is clear,<br>the mind becomes calm.</div>
+      <div style="font-family:var(--font-data);font-size:10px;color:var(--accent);letter-spacing:.2em">心静则明</div>
+    </div>
+    <p class="hero-sub">Not your P/L. Not your feelings. Not yesterday's loss or this morning's mood. The chart tells the truth. Everything else is noise — including you. This module is about building the mental infrastructure to let the chart speak without your emotions interrupting.</p>
+    <button class="hero-cta" onclick="showSection('gatekeeper')">→ Begin Module 3.6</button>
+    <div class="hero-prereq">Prerequisites: <a href="ZION_Module3_Operator.html">Module 3</a> · <a href="ZION_Module3_5_Operator_Advanced.html">Module 3.5</a></div>
+  </div>
+</section>
+<div class="next-section"><button class="next-btn" onclick="showSection('gatekeeper')">Begin →</button></div>
+</div>
+
+<!-- ══ THE GATEKEEPER ══ -->
+<div id="section-gatekeeper" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 01</div>
+  <h2 class="section-title">The Chart is the Gatekeeper — <em style="font-family:var(--font-disp);font-style:italic">Not Your P/L</em></h2>
+  <p class="section-intro">Most traders manage their positions based on how much money they've made or lost. ZION traders manage positions based on what the chart structure says. These two approaches produce completely different decisions — and completely different results.</p>
+
+  <div class="statement">
+    <div class="statement-text">The chart tells you when to enter. The chart tells you when to exit. The chart tells you when to wait. Your P/L tells you none of these things.</div>
+    <div class="statement-sub">Your P/L is a scoreboard. You don't make game decisions based on the scoreboard — you make them based on what's happening on the field. The chart is the field. Read the field.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card" style="border-left:3px solid var(--crimson)">
+      <div class="col-label" style="color:var(--crimson)">P/L as Gatekeeper — How Most Trade</div>
+      <div class="col-title">Emotional Decision Making</div>
+      <div class="col-desc">Down 40% → hold because "I can't take the loss." Up 20% → exit because "I don't want to give it back." Entry triggers: "I need to make back what I lost yesterday." Exit triggers: "I feel good about locking in this gain." The P/L drives every decision. The chart is barely consulted.</div>
+    </div>
+    <div class="col-card" style="border-left:3px solid var(--teal)">
+      <div class="col-label" style="color:var(--teal)">Chart as Gatekeeper — How ZION Trades</div>
+      <div class="col-title">Structural Decision Making</div>
+      <div class="col-desc">Entry: PRIME ▲ signal, full stack aligned, pre-trade checklist clear. Hold: Kijun intact, structure bullish, thesis unchanged. Exit: Kijun broken on 65m close, or profit target hit, or structure flipped. The chart drives every decision. The P/L is a result, not a signal.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--accent)"></div>
+      <div class="kp-text"><strong>"I'm up 30% — I should lock it in."</strong> This is P/L as gatekeeper. The question isn't how much you're up — it's what the chart says. If the structure is still intact, Kijun holding, cloud green, VWAP slope positive — the thesis is alive. Taking profit because a number feels good is letting your feelings override the system.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>"I'm down 50% — I can't sell now."</strong> This is also P/L as gatekeeper. The question isn't how much you're down — it's what the chart says. If the Kijun broke, the thesis is gone. The 50% loss doesn't change that. Holding because the loss feels too big to realize is sunk cost thinking. The chart already told you to exit. The P/L is irrelevant.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Detaching from the money is a skill, not an attitude.</strong> You don't achieve it by telling yourself not to care. You achieve it by having a system so clear that the structural signal is louder than the emotional signal. When the Kijun is your stop, you don't have to decide whether the loss is "too big" — the chart already decided. Your job is to execute what the chart says.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>ZION is built for this.</strong> The pre-trade checklist removes emotion from the entry. The Kijun stop removes emotion from the exit. The sector panel removes emotion from the bias. The signal stack removes emotion from the read. Every tool in ZION is designed to make the chart's voice louder than your feelings' voice. That's not an accident.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The position is not your money. It is a thesis — a structured argument that the chart supports a move in a given direction. When the chart invalidates the thesis, the position ends. Not when the P/L reaches a number that feels right. When the chart says so.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-gatekeeper">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">You're holding a call that's up 45%. The 65m chart shows the Kijun is still intact, price is above cloud, and the ZION HUD still shows PRIME ▲. Your profit target was 60%. What does the chart say to do?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-gatekeeper','a','c')"><span class="quiz-letter">A</span><span>Take profit now — 45% is a great gain and I don't want to give it back.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-gatekeeper','b','c')"><span class="quiz-letter">B</span><span>Set a mental stop at breakeven and let it run but be ready to exit fast.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-gatekeeper','c','c')"><span class="quiz-letter">C</span><span>Hold. The chart says PRIME ▲, structure is intact, thesis is alive. Let the chart tell you when to exit — not the P/L. Your target was 60% and the structure supports it.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-gatekeeper-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('feelings')">Next: Discipline Over Feelings →</button></div>
+</div>
+
+<!-- ══ FEELINGS ══ -->
+<div id="section-feelings" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 02</div>
+  <h2 class="section-title">Discipline Over Feelings — <em style="font-family:var(--font-disp);font-style:italic">Every Single Time</em></h2>
+  <p class="section-intro">Feelings are not your enemy. They're information. The problem is that in trading, they're almost always wrong information — especially in the moments when they feel most convincing. The discipline to act on the system instead of the feeling is the entire edge.</p>
+
+  <div style="background:var(--panel2);border:1px solid var(--accent);border-radius:10px;padding:28px 32px;margin:28px 0;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;right:0;bottom:0;left:0;background:radial-gradient(ellipse at 80% 50%,#0ea5e908,transparent 70%);pointer-events:none"></div>
+    <div style="font-family:var(--font-disp);font-style:italic;font-size:20px;color:var(--hdr);line-height:1.65;margin-bottom:16px;position:relative">Feelings are liars. They'll tell you to stay in bed, skip the workout, delay the work, and chase comfort. Discipline doesn't care if you're tired, bored, or unmotivated — it shows up anyway. Feelings fade. Discipline compounds.</div>
+    <div style="font-family:var(--font-data);font-size:10px;color:var(--accent);letter-spacing:.12em;position:relative">Discipline Over Feelings. Every. Fucking. Time.</div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--accent)"></div>
+      <div class="kp-text"><strong>The feeling is most convincing exactly when it's most wrong.</strong> The urge to revenge trade is strongest right after a loss — when you're least suited to make a good decision. The urge to hold past your stop is strongest when you're most attached to the position. The urge to chase a breakout is strongest when FOMO is peaking. Every time a feeling is screaming at you, that's the moment to pause and check the chart.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Trading on feelings is exhausting. Trading on structure is calm.</strong> When your decisions are driven by fear and greed, every session is emotionally draining. Every tick against you is a threat. Every tick in your favor is a temptation to exit early. When your decisions are driven by structure, you know exactly what you're waiting for — and waiting is easy when you know what you're waiting for.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>The pre-trade checklist is your firewall against feelings.</strong> Before the feeling can make a trade, it has to get through ten items. By item four, most emotional trades reveal themselves for what they are. The checklist doesn't eliminate feelings — it creates enough distance between the feeling and the action that the chart can get a word in.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>Discipline is a promise you keep to yourself.</strong> Not to the market. Not to your Discord community. To yourself. Every time you follow the system when the feeling says don't, you're making a deposit into your discipline account. Every time you override the system because of a feeling, you're making a withdrawal. Track which direction your balance is going.</div>
+    </div>
+  </div>
+
+  <!-- Feelings vs Chart decision table -->
+  <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:12px">The Feeling vs The Chart — Common Scenarios</div>
+  <table class="mindset-table">
+    <thead>
+      <tr>
+        <th>The Situation</th>
+        <th class="fear-col">What Feelings Say</th>
+        <th class="zion-col">What the Chart Says</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Down 40% on a position</td>
+        <td class="fear-col">Can't sell — the loss is too real</td>
+        <td class="zion-col">Is Kijun broken? If yes, exit. Full stop.</td>
+      </tr>
+      <tr>
+        <td>Up 30% before target</td>
+        <td class="fear-col">Take it — don't let it turn into a loss</td>
+        <td class="zion-col">Is structure intact? If yes, hold to target.</td>
+      </tr>
+      <tr>
+        <td>3 losing trades this week</td>
+        <td class="fear-col">Need to make it back — find a trade</td>
+        <td class="zion-col">HUD showing WAIT? Then wait. The market doesn't owe you recovery.</td>
+      </tr>
+      <tr>
+        <td>Ticker ripping without you</td>
+        <td class="fear-col">Chase it — this move is real</td>
+        <td class="zion-col">Did you miss the signal? Wait for retest or next setup.</td>
+      </tr>
+      <tr>
+        <td>Big news event today</td>
+        <td class="fear-col">This will move — get in before it does</td>
+        <td class="zion-col">What does structure say? News without structure is gambling.</td>
+      </tr>
+      <tr>
+        <td>Position gapping against you</td>
+        <td class="fear-col">Hold — it'll gap back</td>
+        <td class="zion-col">Where's the Kijun? Where's the cloud? What does structure say now?</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="quiz-block" id="quiz-feelings">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">You've had 3 losing trades this week, all stopped out correctly at the Kijun. It's Thursday morning. The ZION HUD shows WAIT on everything in your watchlist. What's the disciplined response?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-feelings','a','c')"><span class="quiz-letter">A</span><span>Find something that's moving and get in — I need to recover the week's losses.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-feelings','b','c')"><span class="quiz-letter">B</span><span>Take a small position in a familiar ticker just to feel productive.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-feelings','c','c')"><span class="quiz-letter">C</span><span>Honor the WAIT signal. Review the three stopped trades — were they system trades or emotion trades? Update the journal. Come back when the chart gives a signal. The week's P/L is irrelevant to the next trade decision.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-feelings-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('money')">Next: The Psychology of Money →</button></div>
+</div>
+
+<!-- ══ MONEY MIND ══ -->
+<div id="section-money" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 03</div>
+  <h2 class="section-title">The Psychology of Money — <em style="font-family:var(--font-disp);font-style:italic">Reframing the Position</em></h2>
+  <p class="section-intro">Morgan Housel's core insight: investing success stems more from behavior than skill. The same is true for options trading. Two traders can read the same chart, take the same setup, and get completely different results — because their relationship with money changes how they execute. Reframing what the position IS changes everything.</p>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--accent)"></div>
+      <div class="kp-text"><strong>The position is a thesis, not money.</strong> When you enter a call, you're not putting $2,000 into a position — you're making a structured argument that the market will move in your direction based on Ichimoku structure, sector rotation, and VWAP context. The $2,000 is the cost of making that argument. If the argument is invalidated (Kijun breaks), you stop making it. The money is irrelevant to the logic.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Compounding is the real game.</strong> A 60% win rate with 2:1 reward-to-risk, applied consistently over 50 trades, produces a very different result than the same math applied inconsistently with emotional overrides. The edge only compounds if you apply it every time. One revenge trade can wipe out ten disciplined wins. Protect the compound effect.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>Volatility is the cost of admission, not a threat.</strong> Housel's insight: if you invest for decades you'll experience severe market crashes. The traders who turn those crashes into opportunities rather than threats are the ones who prepared mentally for them. In options: if you trade long enough, you'll hold positions through sharp moves against you. Prepared operators use their stop. Unprepared ones freeze.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Avoid forecasting. Focus on what you can control.</strong> The market is unpredictable. Trying to predict it leads to overconfidence and bad decisions. What you CAN control: your entry criteria, your position size, your stop placement, your pre-trade checklist completion, your journal discipline. ZION doesn't predict. ZION navigates. Navigate what's there, not what you think is coming.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>Panic decisions are permanent scars.</strong> Housel's most powerful example: if you panic sold in March 2020, that decision affected your portfolio for the rest of your life. The same applies to options. A panic exit at the worst moment — before the structure has actually broken — turns a temporary drawdown into a permanent loss. The Kijun stop removes panic from the equation. The chart decides, not your fear.</div>
+    </div>
+  </div>
+
+  <!-- Reframe grid -->
+  <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:16px">Reframe the Language — Change the Psychology</div>
+  <div class="reframe-grid">
+    <div class="reframe-card">
+      <div class="rf-old">"I'm losing money on this trade"</div>
+      <div class="rf-arrow">↓</div>
+      <div class="rf-new">"My thesis is being tested. What does the structure say?"</div>
+    </div>
+    <div class="reframe-card">
+      <div class="rf-old">"I need to make back what I lost"</div>
+      <div class="rf-arrow">↓</div>
+      <div class="rf-new">"The next trade has nothing to do with the last one"</div>
+    </div>
+    <div class="reframe-card">
+      <div class="rf-old">"I can't afford to be wrong here"</div>
+      <div class="rf-arrow">↓</div>
+      <div class="rf-new">"I sized correctly. I can afford exactly this loss."</div>
+    </div>
+    <div class="reframe-card">
+      <div class="rf-old">"This trade will make or break my month"</div>
+      <div class="rf-arrow">↓</div>
+      <div class="rf-new">"This is one trade in a long series. The edge compounds."</div>
+    </div>
+    <div class="reframe-card">
+      <div class="rf-old">"I should have sold earlier"</div>
+      <div class="rf-arrow">↓</div>
+      <div class="rf-new">"I followed my exit rules. The process was correct."</div>
+    </div>
+    <div class="reframe-card">
+      <div class="rf-old">"The market is out to get me"</div>
+      <div class="rf-arrow">↓</div>
+      <div class="rf-new">"The market is neutral. It generates information. I read it."</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">If you control your emotions, you are already way ahead of most. The biggest chunk of investing success — and trading success — stems from behavior rather than skill. The chart gives you the skill read. Your psychology determines whether you execute it.</p>
+    <div class="insight-attr">— Adapted from Morgan Housel · The Psychology of Money</div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('direction')">Next: Direction Not Speed →</button></div>
+</div>
+
+<!-- ══ DIRECTION ══ -->
+<div id="section-direction" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 04</div>
+  <h2 class="section-title">Direction Not Speed — <em style="font-family:var(--font-disp);font-style:italic">The Right Mountain</em></h2>
+  <p class="section-intro">One of the most important decisions a trader makes is choosing what kind of trader to be. Not which indicators to use — that's secondary. The primary decision is: which mountain are you climbing? Because it's better to climb slowly up the right one than to sprint up the wrong one.</p>
+
+  <div style="background:var(--panel2);border:1px solid var(--accent);border-radius:10px;padding:28px 32px;margin:28px 0;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">⛰️</div>
+    <div style="font-family:var(--font-disp);font-style:italic;font-size:22px;color:var(--hdr);line-height:1.5;margin-bottom:12px">It's better to climb slowly up the RIGHT mountain than to climb fast up the WRONG one.</div>
+    <div style="font-size:13px;color:var(--text);line-height:1.7;max-width:500px;margin:0 auto">Focus on direction, not speed. The wrong mountain — climbed fast — still leaves you in the wrong place. The right mountain — climbed slowly and deliberately — gets you exactly where you're going.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card" style="border-left:3px solid var(--crimson)">
+      <div class="col-label" style="color:var(--crimson)">The Wrong Mountain — Fast</div>
+      <div class="col-title">0DTE · Scalping · FOMO Chasing</div>
+      <div class="col-desc">High frequency. High cortisol. Screen time measured in hours not minutes. Win or lose fast, then do it again. Some people make this work — it requires exceptional skill, exceptional speed, and the ability to emotionally reset dozens of times per day. For most people, it's the wrong mountain. They climb it fast, reach the summit exhausted, and realize they're in the wrong place.</div>
+    </div>
+    <div class="col-card" style="border-left:3px solid var(--teal)">
+      <div class="col-label" style="color:var(--teal)">The Right Mountain — Deliberate</div>
+      <div class="col-title">Structure Trading · ZION</div>
+      <div class="col-desc">Low frequency. Calm operator state. 1-2 hours of screen time per day. Read the structure in the morning. Wait for PRIME ▲. Enter with defined risk. Let the thesis develop over days. Exit when the chart says. Review. Repeat. Slower. Quieter. Sustainable. The same potential — different clock, different stress level, different relationship with money.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--accent)"></div>
+      <div class="kp-text"><strong>Speed is not the goal. Direction is.</strong> The trader who takes 10 high-quality structure trades per month and wins 6 of them at 2:1 reward-to-risk is outperforming the trader who takes 100 low-quality trades and wins 55 of them. Fewer, better trades compound faster than many mediocre ones. ZION is a low-frequency, high-conviction system. That's the design.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Switching mountains mid-climb is expensive.</strong> The trader who starts as a structure trader, has a bad week, and switches to 0DTE to "make it back faster" is abandoning the right mountain for the wrong one at the worst possible moment. Every time you change strategy during a drawdown, you reset the learning curve and multiply the cost. Pick your mountain. Stay on it.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>ZION is your mountain.</strong> You chose structure trading because it fits your life — your schedule, your temperament, your background in reading complex systems with patience and precision. You didn't come to trading to be glued to a screen all day. You came to build a sustainable edge that pays you while you live your life. That's the right mountain. Keep climbing it.</div>
+    </div>
+  </div>
+
+  <div class="quiz-block" id="quiz-direction">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">You've had a frustrating week of WAIT signals — no clean setups. Your trading buddy is making money on 0DTE plays every day. You're tempted to try it. What does "direction not speed" tell you?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-direction','a','c')"><span class="quiz-letter">A</span><span>Try a few 0DTE plays — diversifying your approach is smart.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-direction','b','c')"><span class="quiz-letter">B</span><span>Watch your buddy's approach closely and consider switching systems if it keeps working.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-direction','c','c')"><span class="quiz-letter">C</span><span>Your buddy is on a different mountain. Their results don't tell you anything about yours. A week of WAIT signals means the system is working — it's protecting you from bad trades. Stay on your mountain.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-direction-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('ritual')">Next: The Pre-Session Ritual →</button></div>
+</div>
+
+<!-- ══ PRE-SESSION RITUAL ══ -->
+<div id="section-ritual" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 05</div>
+  <h2 class="section-title">The Pre-Session Ritual — <em style="font-family:var(--font-disp);font-style:italic">Setting the State Intentionally</em></h2>
+  <p class="section-intro">Your operator state at 9:30am is not an accident. It's the result of everything you did — or didn't do — in the hours before the market opened. The traders who show up in the right headspace every day don't get lucky. They build a ritual that sets the state intentionally, every single morning.</p>
+
+  <div class="ritual-timeline">
+
+    <div class="ritual-step">
+      <div class="rs-node">1</div>
+      <div class="rs-card">
+        <div class="rs-time">Night Before</div>
+        <div class="rs-title">Prepare, Don't React</div>
+        <div class="rs-desc">Review the day's trades in the journal. Note what the structure showed. Identify any tickers on your watchlist with developing setups. Check the economic calendar for tomorrow's catalyst risk. Set alerts if needed. Then close the platform. Tomorrow's trades don't get better by staring at the screen tonight.</div>
+        <div class="rs-zion">ZION: Journal entry, watchlist review, alerts set, platform closed. Sleep without open positions dominating your thoughts.</div>
+      </div>
+    </div>
+
+    <div class="ritual-step">
+      <div class="rs-node">2</div>
+      <div class="rs-card">
+        <div class="rs-time">Morning — Before Market</div>
+        <div class="rs-title">Body First, Charts Second</div>
+        <div class="rs-desc">Before you open a single chart — eat, move, hydrate. This isn't optional wellness advice. It's operator performance science. Decision quality degrades significantly when you're tired, hungry, or sedentary. The trader who opens the platform at 9:28am after rolling out of bed is not operating at the same level as the one who ate, walked, and is mentally clear.</div>
+        <div class="rs-zion">Module 3.5: Kaizen tracker includes physical movement and nutrition for exactly this reason. The chart read is only as good as the brain doing the reading.</div>
+      </div>
+    </div>
+
+    <div class="ritual-step">
+      <div class="rs-node">3</div>
+      <div class="rs-card">
+        <div class="rs-time">9:00 – 9:25 AM ET</div>
+        <div class="rs-title">The ZION Morning Read</div>
+        <div class="rs-desc">Open the Command Center. Check the sector panel — which sectors are leading pre-market? Check your watchlist — any significant gaps? Review the structure on your top 3-5 tickers. Not to trade yet — to build context. You're gathering information, not making decisions. The market hasn't opened. Your job right now is to listen, not act.</div>
+        <div class="rs-zion">ZION: Command Center → Dashboard → Sector Panel → Watchlist. In that order. Every morning. The habit stack.</div>
+      </div>
+    </div>
+
+    <div class="ritual-step">
+      <div class="rs-node">4</div>
+      <div class="rs-card">
+        <div class="rs-time">9:25 – 9:30 AM ET</div>
+        <div class="rs-title">Operator State Check</div>
+        <div class="rs-desc">Before the open — one minute. One question: "Am I in the right state to trade today?" Not "do I have setups" — you'll evaluate those after the open. Right now: am I calm? Am I trading from a clear head or carrying emotional residue from yesterday? Am I trading because there are good setups or because I need to trade? Honest answer. No judgment. If the answer is wrong, today is a watching day.</div>
+        <div class="rs-zion">ZION Pre-Trade checklist: Operator State section. Run it before every entry, but check the overall state here, before any entry is even considered.</div>
+      </div>
+    </div>
+
+    <div class="ritual-step">
+      <div class="rs-node">5</div>
+      <div class="rs-card">
+        <div class="rs-time">9:30 – 10:00 AM ET</div>
+        <div class="rs-title">Watch. Don't Trade.</div>
+        <div class="rs-desc">Amateur Hour. Let the open volatility resolve. Let VWAP establish direction. Let the first 65m bar develop. Watch what the market is doing — not what you expected it to do. This is information gathering, not trading. The best setups from the morning session usually become clear after 10:00am, not at 9:31am.</div>
+        <div class="rs-zion">ZION: Your first 65m bar hasn't even closed yet. You have no signal to trade on. Watch. Note what you see. The Pro Setup Window opens at 10:00am.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The trader who shows up calm, prepared, and in the right headspace every day doesn't win every trade. But they execute their system consistently. And consistent execution of an edge — over time — is how accounts grow. The ritual isn't about trading. It's about becoming the kind of person whose trades you'd want to follow.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('morning')">Final Section: The Morning Read →</button></div>
+</div>
+
+<!-- ══ MORNING READ ══ -->
+<div id="section-morning" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 06 · Daily Practice</div>
+  <h2 class="section-title">The Morning Read — <em style="font-family:var(--font-disp);font-style:italic">Is Today a Trading Day?</em></h2>
+  <p class="section-intro">The most important question you ask every morning isn't "what should I trade?" It's "should I trade today?" ZION gives you a structured way to answer that question — using the chart, not your feelings. Here's the complete morning read workflow.</p>
+
+  <!-- Morning checklist -->
+  <div class="morning-check" id="morningCheck">
+    <div class="mc-header">
+      <span class="mc-title">ZION Morning Read — Daily Checklist</span>
+      <span class="mc-score" id="mcScore">0/10</span>
+    </div>
+
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Sector Panel — Who's Leading?</strong>Check the S&P 500 sector panel. Is your target sector green and leading? Sector rotation matters more than individual stock signals on most days.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Breadth Regime — What's the Market Doing?</strong>TREND or ROTATION = favorable. FRAGILE RALLY = caution. LIQUIDATION or DE-RISKING = watch only. DE-RISKING days are not ZION trading days.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Daily Gate — Is the HTF Aligned?</strong>Check the Daily chart on your top tickers. TK bullish, price above green cloud? Gate open. TK bearish or price below cloud? Gate closed — no long entries regardless of 65m signal.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Economic Calendar — Any Landmines Today?</strong>CPI, FOMC, major earnings in your watchlist? These events can invalidate any structure read instantly. Know what's coming before you commit capital.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Watchlist Scan — Any PRIME ▲ Signals?</strong>Check the HUD on your top 5-10 tickers. Any showing PRIME ▲ with strength +3 or higher? These are your candidates. Not yet entries — candidates.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>VWAP Direction — Is Institutional Money Moving?</strong>After the first 65m bar closes (10:30am ET), check VWAP slope on your candidates. Rising VWAP = institutional support. Flat or declining = wait.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>UOA Check — Is There Unusual Flow?</strong>Paste top UOA tickers from Barchart into the Flow Scanner. Any overlap with your PRIME ▲ candidates? Smart money + structure alignment = conviction.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Operator State — Am I Ready?</strong>Honest check. Calm? Clear? Not carrying yesterday's trades emotionally? Not trading to recover a loss? Not trading because it's been quiet and I'm bored? If any of these fail — watching day.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Position Sizing Pre-Checked</strong>Before any entry: 1-3% max risk per trade calculated. Kijun stop distance known. Contract count determined. No improvising size at entry.</div>
+    </div>
+    <div class="mc-item" onclick="toggleMC(this)">
+      <div class="mc-check"></div>
+      <div class="mc-label"><strong>Trading Day or Watching Day — Decision Made</strong>Based on everything above: am I in a market environment that supports entries, with structural setups, in the right operator state, with defined risk? Yes = trading day. Any major fail = watching day. Both are valid. Both are professional.</div>
+    </div>
+
+    <div class="mc-verdict" id="mcVerdict">Complete the morning read above to determine: Trading Day or Watching Day.</div>
+  </div>
+
+  <div class="key-points" style="margin-top:32px">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--accent)"></div>
+      <div class="kp-text"><strong>A watching day is not a failed day.</strong> A watching day where you correctly identified that conditions don't support entries — and didn't trade — is a winning day. You preserved capital. You avoided bad trades. You showed up, did the work, and made the right decision. The P/L for a watching day is $0. The long-term value of consistent watching days is enormous.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>The morning read takes 20-30 minutes.</strong> Not all day. Not all morning. Open the Command Center, run through the checklist, make the call. If it's a trading day, you know your candidates and your setups. If it's a watching day, close the platform and go live your life. That's the ZION structure trading lifestyle — deliberate, bounded, sustainable.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>The chart already knows.</strong> Every item on this morning read is a question you're asking the chart. The chart knows whether today is a trading day. Your job is to listen carefully enough to hear the answer — and have the discipline to honor it when the answer is "not today."</div>
+    </div>
+  </div>
+
+  <div style="background:var(--panel2);border:1px solid var(--accent);border-radius:10px;padding:20px 24px;margin:28px 0">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px">◆ The ZION Daily Sequence — Complete</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--panel);border:1px solid var(--border2);color:var(--text)">Night before → Journal + Watchlist</span>
+      <span style="color:var(--dim);font-size:12px;padding:4px 0">→</span>
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--panel);border:1px solid var(--border2);color:var(--text)">Morning → Body first</span>
+      <span style="color:var(--dim);font-size:12px;padding:4px 0">→</span>
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--panel);border:1px solid var(--border2);color:var(--text)">9:00 → Morning read</span>
+      <span style="color:var(--dim);font-size:12px;padding:4px 0">→</span>
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--panel);border:1px solid var(--border2);color:var(--text)">9:25 → Operator check</span>
+      <span style="color:var(--dim);font-size:12px;padding:4px 0">→</span>
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--panel);border:1px solid var(--border2);color:var(--text)">9:30 → Watch only</span>
+      <span style="color:var(--dim);font-size:12px;padding:4px 0">→</span>
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:#00f5d418;border:1px solid #00f5d433;color:var(--teal)">10:00+ → Pro Setup Window</span>
+      <span style="color:var(--dim);font-size:12px;padding:4px 0">→</span>
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--panel);border:1px solid var(--border2);color:var(--text)">Entry if structure + checklist</span>
+      <span style="color:var(--dim);font-size:12px;padding:4px 0">→</span>
+      <span style="font-family:var(--font-data);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--panel);border:1px solid var(--border2);color:var(--text)">EOD → Journal</span>
+    </div>
+  </div>
+</section>
+
+<!-- Completion -->
+<div class="completion" id="completion">
+  <div class="completion-icon">◆</div>
+  <h2 class="completion-title">Module 3.6 Complete</h2>
+  <p class="completion-text">
+    The chart is the gatekeeper. Discipline wins over feelings every single time. The position is a thesis, not money. You're climbing the right mountain — slowly and deliberately. Your pre-session ritual sets the operator state intentionally. And the morning read tells you whether today is a trading day or a watching day before the market ever opens.<br><br>
+    This is ZION Mind. Not a set of rules — a way of being in the market. Calm. Structured. Detached from the outcome. Attached to the process.<br><br>
+    <strong style="color:var(--accent)">The chart already knows. Your job is to listen.</strong>
+  </p>
+  <div style="background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:20px 24px;margin:20px 0;max-width:380px;margin-left:auto;margin-right:auto;text-align:center">
+    <div style="font-family:var(--font-disp);font-style:italic;font-size:17px;color:var(--hdr);line-height:1.75;margin-bottom:10px">Trade the structure.<br>Ignore the noise.<br>Honor the process.</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--accent);letter-spacing:.15em">ZION CANON ◆ Stitch it on a pillow</div>
+  </div>
+  <p style="display:none">
+  </p>
+  <div class="completion-actions">
+    <a class="btn-primary" href="ZION_Dashboard.html">Open Dashboard</a>
+    <a class="btn-primary" href="ZION_Pretrade.html">Pre-Trade Checklist</a>
+    <a class="btn-secondary" href="ZION_Module3_5_Operator_Advanced.html">← Module 3.5</a>
+    <a class="btn-secondary" href="ZION_Academy.html">Academy Home</a>
+  </div>
+</div>
+</div>
+
+<script>
+// ── Section navigation ─────────────────────────────
+const SECTIONS = ['hero','gatekeeper','feelings','money','direction','ritual','morning'];
+let completed = JSON.parse(localStorage.getItem('zion-m36-progress')||'{}');
+
+const showSection = id => {
+  SECTIONS.forEach(s=>{
+    const el=document.getElementById('section-'+s);
+    if(el) el.classList.toggle('visible',s===id);
+  });
+  document.querySelectorAll('.nav-link').forEach((el,i)=>{
+    el.classList.toggle('active',SECTIONS[i]===id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  completed[id]=true;
+  localStorage.setItem('zion-m36-progress',JSON.stringify(completed));
+  updateProgress();
+};
+
+const updateProgress = () => {
+  const done=Object.keys(completed).length;
+  const pct=Math.round((done/SECTIONS.length)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=pct+'% complete';
+};
+updateProgress();
+
+// ── Quiz ──────────────────────────────────────────
+const FEEDBACK = {
+  'quiz-gatekeeper':{
+    correct:"Exactly. The chart says hold. The structure is intact, the signal is PRIME ▲, the thesis is alive. Taking profit because a number feels good is letting P/L override the chart. Your target was 60% — let the chart tell you when the thesis is done, not your feelings.",
+    wrong:"The chart — not the P/L — is the gatekeeper. Structure intact + PRIME ▲ = thesis alive. The 45% gain is a number. The Kijun holding is a signal. Always choose the signal."
+  },
+  'quiz-feelings':{
+    correct:"That's the disciplined response. Three correct stops are not a problem — they're the system working. WAIT means wait. The week's P/L has no bearing on the next trade decision. Review, journal, return when the chart gives a signal.",
+    wrong:"Three losses followed by forcing a trade is the definition of emotional trading. The WAIT signal is the system telling you there's no edge available right now. Honoring WAIT IS the trade."
+  },
+  'quiz-direction':{
+    correct:"Your buddy's results on their mountain tell you nothing about your mountain. A week of WAIT signals means ZION protected you from bad trades — that's the system working perfectly. Stay on your mountain. The right mountain, climbed slowly, beats the wrong mountain every time.",
+    wrong:"Switching strategies during a slow period is how traders compound losses and reset learning curves. Your buddy is on a different mountain. WAIT signals mean the system is protecting you. That's not a failure — that's the edge."
+  },
+};
+
+const answerQuiz = (quizId,chosen,correct) => {
+  const opts=document.querySelectorAll(`#${quizId} .quiz-opt`);
+  const fb=document.getElementById(`${quizId}-feedback`);
+  opts.forEach((opt,i)=>{
+    const letter=String.fromCharCode(97+i);
+    opt.classList.add('disabled');
+    if(letter===correct) opt.classList.add('correct');
+    else if(letter===chosen) opt.classList.add('wrong');
+  });
+  const ok=chosen===correct;
+  fb.textContent=(ok?'✓ ':'✗ ')+FEEDBACK[quizId][ok?'correct':'wrong'];
+  fb.className=`quiz-feedback show ${ok?'good':'bad'}`;
+  if(quizId==='quiz-direction'){
+    setTimeout(()=>document.getElementById('completion')?.scrollIntoView({behavior:'smooth'}),800);
+  }
+};
+
+// ── Morning checklist ──────────────────────────────
+const toggleMC = item => {
+  item.classList.toggle('done');
+  updateMC();
+};
+
+const updateMC = () => {
+  const items  = document.querySelectorAll('.mc-item');
+  const done   = [...items].filter(i=>i.classList.contains('done')).length;
+  const total  = items.length;
+  const verdict= document.getElementById('mcVerdict');
+  document.getElementById('mcScore').textContent = `${done}/${total}`;
+
+  if(done===total){
+    verdict.style.cssText='color:var(--teal);background:#00f5d410;border-top:1px solid #00f5d430;padding:12px 18px;font-family:var(--font-data);font-size:11px;font-weight:700;text-align:center';
+    verdict.textContent='◆ TRADING DAY — All conditions reviewed. Structure confirmed. Operator ready. Proceed with discipline.';
+  } else if(done>=7){
+    verdict.style.cssText='color:var(--wait);background:#fb923c10;border-top:1px solid #fb923c30;padding:12px 18px;font-family:var(--font-data);font-size:11px;font-weight:700;text-align:center';
+    verdict.textContent=`⚠ ALMOST THERE — ${total-done} items remaining. Complete the read before deciding.`;
+  } else if(done===0){
+    verdict.style.cssText='color:var(--dim);background:transparent;border-top:1px solid var(--border);padding:12px 18px;font-family:var(--font-data);font-size:11px;text-align:center';
+    verdict.textContent='Complete the morning read above to determine: Trading Day or Watching Day.';
+  } else {
+    verdict.style.cssText='color:var(--dim);background:transparent;border-top:1px solid var(--border);padding:12px 18px;font-family:var(--font-data);font-size:11px;text-align:center';
+    verdict.textContent=`${done}/${total} complete — keep going…`;
+  }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,632 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Academy — Zen Ichimoku Options Navigation</title>
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --bull:#4ade80; --teal:#00f5d4; --bear:#f87171;
+  --crimson:#ff4d6d; --wait:#fb923c; --blue:#60a5fa;
+  --gold:#fbbf24; --purple:#a78bfa;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:14px; line-height:1.7; overflow-x:hidden; }
+
+/* ── Nav ── */
+.nav { position:sticky; top:0; z-index:100; background:rgba(5,13,26,.96); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 28px; height:52px; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); text-decoration:none; }
+.nav-logo span { color:var(--teal); }
+.nav-right { display:flex; gap:8px; }
+.nav-link { font-size:11px; color:var(--dim); text-decoration:none; padding:4px 10px; border:1px solid transparent; border-radius:4px; transition:all .15s; }
+.nav-link:hover { color:var(--blue); border-color:var(--border2); }
+
+/* ── Hero ── */
+.hero { min-height:92vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:80px 24px 60px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 35%, #00f5d412 0%, transparent 65%); pointer-events:none; }
+.hero::after { content:'ZION'; position:absolute; font-family:var(--font-disp); font-size:clamp(120px,20vw,280px); font-weight:700; color:var(--teal); opacity:.03; letter-spacing:.1em; pointer-events:none; user-select:none; }
+.eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.3em; color:var(--teal); text-transform:uppercase; margin-bottom:24px; position:relative; z-index:1; }
+.hero-title { font-family:var(--font-disp); font-size:clamp(42px,7vw,88px); font-weight:700; color:var(--hdr); line-height:1.05; margin-bottom:10px; position:relative; z-index:1; }
+.hero-title em { font-style:italic; color:var(--teal); }
+.hero-acronym { font-family:var(--font-data); font-size:13px; color:var(--dim); letter-spacing:.12em; margin-bottom:28px; position:relative; z-index:1; }
+.hero-acronym span { color:var(--text); }
+.hero-sub { font-size:17px; color:var(--text); max-width:580px; line-height:1.8; margin:0 auto 48px; position:relative; z-index:1; }
+.hero-ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
+.cta-primary { background:var(--teal); color:#050d1a; font-weight:700; font-size:13px; padding:13px 32px; border-radius:6px; text-decoration:none; transition:background .2s,transform .15s; letter-spacing:.04em; }
+.cta-primary:hover { background:#00e0c0; transform:translateY(-1px); }
+.cta-secondary { background:transparent; color:var(--blue); font-size:13px; padding:13px 32px; border-radius:6px; border:1px solid var(--blue); text-decoration:none; transition:all .2s; }
+.cta-secondary:hover { background:#0f2545; }
+
+/* ── Path section ── */
+.path-section { padding:80px 24px; max-width:1000px; margin:0 auto; }
+.section-label { font-family:var(--font-data); font-size:9px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.path-title { font-family:var(--font-disp); font-size:clamp(26px,4vw,42px); font-weight:700; color:var(--hdr); margin-bottom:14px; }
+.path-sub { font-size:15px; color:var(--text); max-width:640px; line-height:1.8; margin-bottom:52px; }
+
+/* ── Curriculum track ── */
+.track { display:flex; flex-direction:column; gap:0; position:relative; }
+.track::before { content:''; position:absolute; left:28px; top:40px; bottom:40px; width:1px; background:linear-gradient(to bottom, var(--teal), var(--border)); z-index:0; }
+
+.track-item { display:grid; grid-template-columns:56px 1fr; gap:20px; position:relative; z-index:1; margin-bottom:8px; }
+.track-node { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-data); font-size:13px; font-weight:700; flex-shrink:0; border:2px solid; transition:all .2s; }
+.node-primer  { background:#0d1e35; border-color:var(--gold);   color:var(--gold); }
+.node-m1      { background:#0d1e35; border-color:var(--blue);   color:var(--blue); }
+.node-m2      { background:#0d1e35; border-color:var(--teal);   color:var(--teal); }
+.node-m3      { background:#0d1e35; border-color:var(--crimson);color:var(--crimson); }
+.node-done    { background:var(--teal); border-color:var(--teal); color:#050d1a; }
+
+.track-card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin-bottom:8px; transition:border-color .2s,background .2s; text-decoration:none; display:block; }
+.track-card:hover { border-color:var(--border2); background:var(--panel2); }
+.track-card.primer:hover { border-color:var(--gold); }
+.track-card.m1:hover     { border-color:var(--blue); }
+.track-card.m2:hover     { border-color:var(--teal); }
+.track-card.m3:hover     { border-color:var(--crimson); }
+
+.tc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.tc-tag { font-family:var(--font-data); font-size:9px; letter-spacing:.12em; text-transform:uppercase; padding:3px 8px; border-radius:3px; }
+.tag-optional { background:#fbbf2418; color:var(--gold); border:1px solid #fbbf2433; }
+.tag-m1       { background:#60a5fa18; color:var(--blue); border:1px solid #60a5fa33; }
+.tag-m2       { background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; }
+.tag-m3       { background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; }
+.tc-progress  { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.tc-title { font-family:var(--font-disp); font-size:22px; font-weight:700; color:var(--hdr); margin-bottom:6px; }
+.tc-desc  { font-size:13px; color:var(--text); line-height:1.6; margin-bottom:12px; }
+.tc-topics { display:flex; gap:6px; flex-wrap:wrap; }
+.tc-topic { font-family:var(--font-data); font-size:10px; padding:3px 8px; border-radius:3px; background:var(--panel2); border:1px solid var(--border2); color:var(--dim); }
+.tc-arrow { font-family:var(--font-data); font-size:13px; color:var(--dim); flex-shrink:0; transition:transform .2s,color .2s; }
+.track-card:hover .tc-arrow { transform:translateX(4px); }
+.track-card.primer:hover .tc-arrow { color:var(--gold); }
+.track-card.m1:hover .tc-arrow     { color:var(--blue); }
+.track-card.m2:hover .tc-arrow     { color:var(--teal); }
+.track-card.m3:hover .tc-arrow     { color:var(--crimson); }
+
+/* ── Stats row ── */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin:60px 0; }
+.stat-cell { background:var(--panel); padding:24px 20px; text-align:center; }
+.stat-num { font-family:var(--font-data); font-size:28px; font-weight:700; margin-bottom:4px; }
+.stat-lbl { font-size:11px; color:var(--dim); line-height:1.5; }
+
+/* ── Philosophy ── */
+.philosophy { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:40px 44px; margin:0 0 80px; position:relative; overflow:hidden; }
+.philosophy::before { content:'"'; font-family:var(--font-disp); font-size:120px; color:var(--teal); opacity:.08; position:absolute; top:-20px; left:20px; line-height:1; }
+.phil-text { font-family:var(--font-disp); font-style:italic; font-size:clamp(18px,2.5vw,24px); color:var(--hdr); line-height:1.65; max-width:700px; position:relative; z-index:1; }
+.phil-attr { font-family:var(--font-data); font-size:10px; color:var(--teal); letter-spacing:.15em; margin-top:20px; }
+
+/* ── Who this is for ── */
+.audience-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:32px 0 60px; }
+@media(max-width:700px){ .audience-grid { grid-template-columns:1fr; } }
+.audience-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:20px; }
+.ac-icon { font-size:28px; margin-bottom:10px; }
+.ac-title { font-weight:600; color:var(--hdr); margin-bottom:8px; font-size:14px; }
+.ac-desc { font-size:12px; color:var(--text); line-height:1.65; }
+.ac-start { font-family:var(--font-data); font-size:10px; color:var(--teal); margin-top:12px; }
+
+/* ── Footer ── */
+.footer { border-top:1px solid var(--border); padding:28px 28px; display:flex; align-items:center; justify-content:space-between; max-width:1000px; margin:0 auto; }
+.footer-logo { font-family:var(--font-data); font-size:11px; letter-spacing:.15em; color:var(--dim); }
+.footer-logo span { color:var(--teal); }
+.footer-note { font-size:11px; color:var(--dim); }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="ZION_Academy.html"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></a>
+  <div class="nav-right">
+    <a class="nav-link" href="ZION_Command.html">Command Center</a>
+    <a class="nav-link" href="ZION_Dashboard.html">Dashboard</a>
+    <a class="nav-link" href="ZION_Trades.html">Trades</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="eyebrow">Welcome to ZION Academy</div>
+  <h1 class="hero-title">Trade the structure.<br><em>Not the noise.</em></h1>
+  <div style="font-family:var(--font-data);font-size:11px;color:var(--dim);letter-spacing:.15em;margin-bottom:16px;position:relative;z-index:1">
+    The control room is different. &nbsp;◆&nbsp; The job is the same.
+  </div>
+  <div class="hero-acronym">
+    <span>Z</span>en &nbsp;·&nbsp; <span>I</span>chimoku &nbsp;·&nbsp; <span>O</span>ptions &nbsp;·&nbsp; <span>N</span>avigation
+  </div>
+  <p class="hero-sub">A complete trading education built around one philosophy — read the structure, manage the operator, navigate with discipline. Whether you're new to trading or looking to add a proven system to your existing knowledge, you're in the right place.</p>
+
+  <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;position:relative;z-index:1">
+    <div style="background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:20px 28px;max-width:260px;text-align:center;border-top:3px solid var(--teal)">
+      <div style="font-family:var(--font-disp);font-style:italic;font-size:16px;color:var(--hdr);line-height:1.7;margin-bottom:10px">Trade the structure.<br>Ignore the noise.<br>Honor the process.</div>
+      <div style="font-family:var(--font-data);font-size:9px;color:var(--teal);letter-spacing:.15em">ZION CANON</div>
+    </div>
+    <div style="background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:20px 28px;max-width:300px;text-align:center;border-top:3px solid var(--gold)">
+      <div style="font-family:var(--font-disp);font-style:italic;font-size:15px;color:var(--hdr);line-height:1.75;margin-bottom:10px">When the mind is calm,<br>the chart reveals its truth.<br>When the chart is clear,<br>the mind becomes calm.</div>
+      <div style="font-family:var(--font-data);font-size:9px;color:var(--gold);letter-spacing:.15em">心静则明</div>
+    </div>
+  </div>
+  <div class="hero-ctas">
+    <a class="cta-primary" href="ZION_Primer.html">Start Here — Free Primer</a>
+    <a class="cta-secondary" href="#curriculum">View Full Curriculum</a>
+  </div>
+</section>
+
+<!-- ══ WHO THIS IS FOR ══ -->
+<div class="path-section">
+  <div class="section-label">Who This Is For</div>
+  <h2 class="path-title">Built for every level.</h2>
+  <p class="path-sub">You don't need to know what Ichimoku is to start. You do need to be willing to learn it properly — not just copy signals, but understand why they work.</p>
+
+  <div class="audience-grid">
+    <div class="audience-card">
+      <div class="ac-icon">🌱</div>
+      <div class="ac-title">Brand New to Trading</div>
+      <div class="ac-desc">Never bought a stock, let alone an option? Start with the Primer. It covers everything you need to know before the real curriculum begins — terminology, candlesticks, chart basics, and a gentle Ichimoku introduction.</div>
+      <div class="ac-start">→ Start with the Primer</div>
+    </div>
+    <div class="audience-card">
+      <div class="ac-icon">📈</div>
+      <div class="ac-title">Trading But Not Winning Consistently</div>
+      <div class="ac-desc">You've been in the market, maybe made some money, definitely lost some. You have a system — sort of. ZION will give you structure, discipline, and a complete read methodology that tells you when to trade and when to sit on your hands.</div>
+      <div class="ac-start">→ Start with Module 1</div>
+    </div>
+    <div class="audience-card">
+      <div class="ac-icon">🎯</div>
+      <div class="ac-title">Experienced but Missing an Edge</div>
+      <div class="ac-desc">You understand technicals. You've tried indicators. You know what a Kijun is. What you're missing is a unified system that integrates everything into one signal stack — and the operator discipline to follow it. Jump straight to Module 2.</div>
+      <div class="ac-start">→ Start with Module 2</div>
+    </div>
+  </div>
+
+  <!-- ══ SELF ASSESSMENT ══ -->
+  <div style="margin:48px 0 0">
+    <div class="section-label">Find Your Starting Point</div>
+    <h2 class="path-title" style="margin-bottom:10px">Which trader are you?</h2>
+    <p class="path-sub" style="margin-bottom:28px">Answer three quick questions and we'll tell you exactly where to start.</p>
+
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden" id="assessWrap">
+
+      <!-- Step 1 -->
+      <div id="step1">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);background:#070f1e;display:flex;align-items:center;gap:12px">
+          <span style="font-family:var(--font-data);font-size:10px;color:var(--teal);letter-spacing:.15em">STEP 1 OF 3</span>
+          <span style="font-size:13px;color:var(--hdr);font-weight:600">How much time can you dedicate to trading each day?</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:20px 24px">
+          <div class="assess-opt-card" onclick="nextStep(1,'scalp')">
+            <div style="font-size:22px;margin-bottom:8px">⚡</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">All day</div>
+            <div style="font-size:12px;color:var(--dim)">I'm glued to the screen</div>
+          </div>
+          <div class="assess-opt-card" onclick="nextStep(1,'day')">
+            <div style="font-size:22px;margin-bottom:8px">🕐</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Market hours</div>
+            <div style="font-size:12px;color:var(--dim)">A few hours while market is open</div>
+          </div>
+          <div class="assess-opt-card" onclick="nextStep(1,'structure')">
+            <div style="font-size:22px;margin-bottom:8px">☕</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">1-2 hours</div>
+            <div style="font-size:12px;color:var(--dim)">Morning read, check back later</div>
+          </div>
+          <div class="assess-opt-card" onclick="nextStep(1,'position')">
+            <div style="font-size:22px;margin-bottom:8px">📅</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Occasional</div>
+            <div style="font-size:12px;color:var(--dim)">Weekly check-ins are fine</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="step2" style="display:none">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);background:#070f1e;display:flex;align-items:center;gap:12px">
+          <span style="font-family:var(--font-data);font-size:10px;color:var(--teal);letter-spacing:.15em">STEP 2 OF 3</span>
+          <span style="font-size:13px;color:var(--hdr);font-weight:600">How do you feel about overnight risk?</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:20px 24px">
+          <div class="assess-opt-card" onclick="nextStep(2,'no_overnight')">
+            <div style="font-size:22px;margin-bottom:8px">😰</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Makes me nervous</div>
+            <div style="font-size:12px;color:var(--dim)">I want to be flat by close</div>
+          </div>
+          <div class="assess-opt-card" onclick="nextStep(2,'ok_overnight')">
+            <div style="font-size:22px;margin-bottom:8px">😎</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">I can handle it</div>
+            <div style="font-size:12px;color:var(--dim)">I'm comfortable holding overnight</div>
+          </div>
+          <div class="assess-opt-card" onclick="nextStep(2,'prefer_overnight')">
+            <div style="font-size:22px;margin-bottom:8px">🌙</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Prefer it</div>
+            <div style="font-size:12px;color:var(--dim)">Longer holds are fine with me</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="step3" style="display:none">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);background:#070f1e;display:flex;align-items:center;gap:12px">
+          <span style="font-family:var(--font-data);font-size:10px;color:var(--teal);letter-spacing:.15em">STEP 3 OF 3</span>
+          <span style="font-size:13px;color:var(--hdr);font-weight:600">What's your primary goal?</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:20px 24px">
+          <div class="assess-opt-card" onclick="showResult('income')">
+            <div style="font-size:22px;margin-bottom:8px">💰</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Active income</div>
+            <div style="font-size:12px;color:var(--dim)">I want to trade for regular returns</div>
+          </div>
+          <div class="assess-opt-card" onclick="showResult('growth')">
+            <div style="font-size:22px;margin-bottom:8px">📈</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Account growth</div>
+            <div style="font-size:12px;color:var(--dim)">Build wealth over months/years</div>
+          </div>
+          <div class="assess-opt-card" onclick="showResult('learn')">
+            <div style="font-size:22px;margin-bottom:8px">🎓</div>
+            <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Learn first</div>
+            <div style="font-size:12px;color:var(--dim)">Understand before I risk real money</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div id="assessResult" style="display:none;padding:28px 24px">
+        <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--teal);text-transform:uppercase;margin-bottom:12px">Your ZION Starting Point</div>
+        <div style="font-family:var(--font-disp);font-size:24px;font-weight:700;color:var(--hdr);margin-bottom:10px" id="resultTitle"></div>
+        <div style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:600px" id="resultDesc"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a id="resultCta" href="#" style="background:var(--teal);color:#050d1a;font-weight:700;font-size:13px;padding:10px 24px;border-radius:6px;text-decoration:none">Start Here →</a>
+          <button onclick="resetAssess()" style="background:transparent;border:1px solid var(--border2);color:var(--dim);font-size:12px;padding:10px 18px;border-radius:6px;cursor:pointer;font-family:var(--font-ui)">Start Over</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STATS ══ -->
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--teal)">3</div>
+      <div class="stat-lbl">Core Modules plus a free Primer for beginners</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--gold)">5</div>
+      <div class="stat-lbl">Signal conditions in the full ZION structure read</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--blue)">1</div>
+      <div class="stat-lbl">Unified system — not a collection of random indicators</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--crimson)">0</div>
+      <div class="stat-lbl">Shortcuts. Discipline is the system. There is no hack.</div>
+    </div>
+  </div>
+
+  <!-- ══ PHILOSOPHY ══ -->
+  <div class="philosophy">
+    <p class="phil-text">Most traders lose not because they have bad systems — but because they don't follow the ones they have. ZION is built on a simple premise: read the structure honestly, manage the operator ruthlessly, and let the edge compound over time. Navigate. Don't predict.</p>
+    <div class="phil-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <!-- ══ 90 DAYS ══ -->
+  <div style="background:linear-gradient(135deg,#00f5d410,#060e1e);border:1px solid #00f5d430;border-radius:12px;padding:28px 32px;margin:0 0 48px;text-align:center">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--teal);text-transform:uppercase;margin-bottom:12px">◆ The Commitment</div>
+    <div style="font-family:var(--font-disp);font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--hdr);margin-bottom:16px">Give yourself 90 days.</div>
+    <div style="font-size:14px;color:var(--text);line-height:1.85;max-width:600px;margin:0 auto 20px">
+      90 days of opening the Command Center every morning. 90 days of running the pre-trade checklist before every entry. 90 days of waiting for PRIME ▲ instead of forcing setups. 90 days of journaling every trade, win or loss. 90 days of following the system instead of your feelings.<br><br>
+      <strong style="color:var(--teal)">This time is different</strong> — because this time you have the system, the tools, the education, and the discipline framework. You're not starting from zero. You're starting from ZION.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:500px;margin:0 auto">
+      <div style="background:var(--panel);border-radius:6px;padding:12px;border:1px solid var(--border)">
+        <div style="font-family:var(--font-data);font-size:20px;font-weight:700;color:var(--teal)">90</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:4px">Days of discipline</div>
+      </div>
+      <div style="background:var(--panel);border-radius:6px;padding:12px;border:1px solid var(--border)">
+        <div style="font-family:var(--font-data);font-size:20px;font-weight:700;color:var(--gold)">1</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:4px">System followed consistently</div>
+      </div>
+      <div style="background:var(--panel);border-radius:6px;padding:12px;border:1px solid var(--border)">
+        <div style="font-family:var(--font-data);font-size:20px;font-weight:700;color:var(--purple)">∞</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:4px">Compound effect</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CURRICULUM ══ -->
+  <div id="curriculum">
+    <div class="section-label">Full Curriculum</div>
+    <h2 class="path-title">The complete learning path.</h2>
+    <p class="path-sub">Four stops. One system. Work through them in order or jump to where you need to be. Each module builds on the last — but stands alone if you need a refresher.</p>
+  </div>
+
+  <div class="track">
+
+    <!-- PRIMER -->
+    <div class="track-item">
+      <div class="track-node node-primer">P</div>
+      <a class="track-card primer" href="ZION_Primer.html">
+        <div class="tc-top">
+          <span class="tc-tag tag-optional">Optional · Start Here</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-primer">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">The Primer — Trading Foundations</div>
+        <div class="tc-desc">Not sure what a candlestick is? Never heard of VWAP? Start here. The Primer is the "before you begin" resource — terminology, chart basics, candlestick patterns, and your first introduction to Ichimoku. Skip it if you already know this. Come back to it whenever you need a reference.</div>
+        <div class="tc-topics">
+          <span class="tc-topic">Glossary</span>
+          <span class="tc-topic">Candlestick Patterns</span>
+          <span class="tc-topic">Chart Basics</span>
+          <span class="tc-topic">Ichimoku Intro</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- MODULE 1 -->
+    <div class="track-item">
+      <div class="track-node node-m1">1</div>
+      <a class="track-card m1" href="ZION_Module1_Foundation.html">
+        <div class="tc-top">
+          <span class="tc-tag tag-m1">Module 01 · Foundation</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-m1">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">The Foundation — The Four Tools</div>
+        <div class="tc-desc">Before the cloud, read the chart. VWAP tells you who's in control. Bollinger Bands tell you about volatility. RSI tells you about momentum. Fair Value Gaps tell you where price left business unfinished. These four tools underpin every ZION trade read.</div>
+        <div class="tc-topics">
+          <span class="tc-topic">VWAP</span>
+          <span class="tc-topic">Bollinger Bands</span>
+          <span class="tc-topic">RSI & Divergence</span>
+          <span class="tc-topic">Fair Value Gaps</span>
+          <span class="tc-topic">Context Stacking</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- MODULE 2 -->
+    <div class="track-item">
+      <div class="track-node node-m2">2</div>
+      <a class="track-card m2" href="ZION_Module2_Ichimoku.html">
+        <div class="tc-top">
+          <span class="tc-tag tag-m2">Module 02 · Ichimoku</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-m2">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">Ichimoku Deep Dive — One Chart. The Whole Story.</div>
+        <div class="tc-desc">The heart of the ZION system. Build the Ichimoku chart piece by piece — Tenkan, Kijun, Cloud, Chikou, VWAP slope — and learn exactly what each component means for your options trade. By the end, the ZION signal stack makes complete sense.</div>
+        <div class="tc-topics">
+          <span class="tc-topic">Tenkan & Kijun</span>
+          <span class="tc-topic">The Cloud (Kumo)</span>
+          <span class="tc-topic">Chikou Span</span>
+          <span class="tc-topic">VWAP Slope</span>
+          <span class="tc-topic">ZION Signal Stack</span>
+          <span class="tc-topic">Options Application</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- MODULE 3 -->
+    <div class="track-item">
+      <div class="track-node node-m3">3</div>
+      <a class="track-card m3" href="ZION_Module3_Operator.html">
+        <div class="tc-top">
+          <span class="tc-tag tag-m3">Module 03 · The Operator</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-m3">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">The Operator — The System is Ready. Are You?</div>
+        <div class="tc-desc">The module nobody wants to take — and the one that matters most. Discipline, the revenge trade, position sizing, sitting on your hands, and the pre-trade ritual. The indicators don't lose money. The operator does. This module is about managing that operator.</div>
+        <div class="tc-topics">
+          <span class="tc-topic">The Real Edge</span>
+          <span class="tc-topic">Revenge Trade</span>
+          <span class="tc-topic">Position Sizing</span>
+          <span class="tc-topic">Sit On Your Hands</span>
+          <span class="tc-topic">Pre-Trade Ritual</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- MODULE 3.5 -->
+    <div class="track-item">
+      <div class="track-node" style="background:#0d1e35;border-color:var(--purple);color:var(--purple);font-size:11px;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-data);font-weight:700;flex-shrink:0;border:2px solid">3.5</div>
+      <a class="track-card m3" href="ZION_Module3_5_Operator_Advanced.html">
+        <div class="tc-top">
+          <span class="tc-tag" style="background:#a78bfa18;color:var(--purple);border:1px solid #a78bfa33;font-family:var(--font-data);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px">Module 03.5 · Advanced · Prerequisites: Module 3</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-m35">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">The Operator: Advanced — Who You're Becoming</div>
+        <div class="tc-desc">For the student who finished Module 3 and felt something shift. Ikigai. Trading in the Zone. Kaizen. The Wrong Train. Wabi-Sabi. And a personal trading philosophy builder that produces a statement worth pinning to your screen and reading before every session.</div>
+        <div class="tc-topics">
+          <span class="tc-topic">Ikigai</span>
+          <span class="tc-topic">Trading in the Zone</span>
+          <span class="tc-topic">Kaizen</span>
+          <span class="tc-topic">The Wrong Train</span>
+          <span class="tc-topic">Wabi-Sabi</span>
+          <span class="tc-topic">Philosophy Builder</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- MODULE 3.6 -->
+    <div class="track-item">
+      <div class="track-node" style="background:#0d1e35;border-color:#0ea5e9;color:#0ea5e9;font-size:11px;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-data);font-weight:700;flex-shrink:0;border:2px solid">3.6</div>
+      <a class="track-card m3" href="ZION_Module3_6_Mindset.html">
+        <div class="tc-top">
+          <span class="tc-tag" style="background:#0ea5e918;color:#0ea5e9;border:1px solid #0ea5e933;font-family:var(--font-data);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px">Module 03.6 · ZION Mind · Prerequisites: 3.5</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-m36">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">ZION Mind — The Chart is the Gatekeeper</div>
+        <div class="tc-desc">The chart tells you when to enter, hold, and exit. Your P/L doesn't. This module builds the mental infrastructure to let the chart speak without your emotions interrupting — including the Psychology of Money, the pre-session ritual, and the complete ZION morning read workflow.</div>
+        <div class="tc-topics">
+          <span class="tc-topic">Chart as Gatekeeper</span>
+          <span class="tc-topic">Discipline Over Feelings</span>
+          <span class="tc-topic">Psychology of Money</span>
+          <span class="tc-topic">Direction Not Speed</span>
+          <span class="tc-topic">Pre-Session Ritual</span>
+          <span class="tc-topic">Morning Read</span>
+        </div>
+      </a>
+    </div>
+
+  </div><!-- /track -->
+
+  <!-- ══ TOOLS ══ -->
+  <div style="margin-top:60px">
+    <div class="section-label">ZION Tools</div>
+    <h2 class="path-title">The system lives here.</h2>
+    <p class="path-sub">The course teaches you the system. These tools run it — live, every trading day.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px">
+      <a href="ZION_Dashboard.html" style="text-decoration:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;display:block;transition:border-color .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:20px;margin-bottom:8px">📊</div>
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Live Dashboard</div>
+        <div style="font-size:12px;color:var(--dim)">HUD · Sectors · Screener · Flow Scanner</div>
+      </a>
+      <a href="ZION_Trades.html" style="text-decoration:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;display:block;transition:border-color .2s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:20px;margin-bottom:8px">📋</div>
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Trade Tracker</div>
+        <div style="font-size:12px;color:var(--dim)">Positions · P&L · Journal · Discord Cards</div>
+      </a>
+      <a href="ZION_WeeklyPrep.html" style="text-decoration:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;display:block;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:20px;margin-bottom:8px">📅</div><div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Weekly Prep</div><div style="font-size:12px;color:var(--dim)">Sunday ritual · Context · Positions · Game plan</div></a>
+    <a href="ZION_Pretrade.html" style="text-decoration:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;display:block;transition:border-color .2s" onmouseover="this.style.borderColor='var(--crimson)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:20px;margin-bottom:8px">✅</div>
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:4px">Pre-Trade Checklist</div>
+        <div style="font-size:12px;color:var(--dim)">GO / NO-GO · Rotation · Operator State</div>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /path-section -->
+
+<footer style="border-top:1px solid var(--border);padding:24px 28px;max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-family:var(--font-data);font-size:11px;letter-spacing:.15em;color:var(--dim)">ZION <span style="color:var(--teal)">◆</span> Zen Ichimoku Options Navigation</div>
+  <div style="font-size:11px;color:var(--dim)">Not financial advice · Trade your own plan</div>
+</footer>
+
+<script>
+/* ── Self Assessment Cards ── */
+const assessStyle = document.createElement('style');
+assessStyle.textContent = `
+  .assess-opt-card {
+    background: var(--panel2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+  }
+  .assess-opt-card:hover {
+    border-color: var(--teal);
+    background: #0d2535;
+    transform: translateY(-2px);
+  }
+`;
+document.head.appendChild(assessStyle);
+
+// ── Self Assessment Logic ──────────────────────────────
+let assessAnswers = {};
+
+const RESULTS = {
+  learn: {
+    title: 'Start with the Primer',
+    desc: 'Before risking real money, build the foundation. The ZION Primer covers everything — glossary, candlesticks, chart basics, and your first introduction to Ichimoku. No pressure, no positions, just learning. When the concepts click, Module 1 will feel like the natural next step.',
+    cta: 'Open the Primer',
+    href: 'ZION_Primer.html'
+  },
+  income: {
+    title: 'Structure Trading is Your Path',
+    desc: 'ZION is built for exactly this — consistent, disciplined options trading with 1-2 hours of screen time per day. The system identifies high-probability setups using Ichimoku structure, sector rotation, and VWAP context. Start with Module 1 to build the foundation, then Module 2 where the real system lives.',
+    cta: 'Begin Module 1',
+    href: 'ZION_Module1_Foundation.html'
+  },
+  growth: {
+    title: 'Structure Trading Fits Your Timeline',
+    desc: 'Longer holds, bigger moves, less theta pressure. ZION's 65m and Daily structure reads are designed for trades that play out over days to weeks — exactly the right timeframe for meaningful options moves without daily babysitting. Start with Module 1, pay close attention to position sizing in Module 3.',
+    cta: 'Begin Module 1',
+    href: 'ZION_Module1_Foundation.html'
+  },
+};
+
+const nextStep = (step, answer) => {
+  assessAnswers[step] = answer;
+  document.getElementById(`step${step}`).style.display = 'none';
+  if(step < 3) {
+    document.getElementById(`step${step+1}`).style.display = 'block';
+  }
+};
+
+const showResult = (goal) => {
+  assessAnswers[3] = goal;
+  document.getElementById('step3').style.display = 'none';
+  const r = RESULTS[goal];
+  document.getElementById('resultTitle').textContent = r.title;
+  document.getElementById('resultDesc').textContent  = r.desc;
+  document.getElementById('resultCta').textContent   = r.cta + ' →';
+  document.getElementById('resultCta').href          = r.href;
+  document.getElementById('assessResult').style.display = 'block';
+};
+
+const resetAssess = () => {
+  assessAnswers = {};
+  document.getElementById('assessResult').style.display = 'none';
+  ['step2','step3'].forEach(s => document.getElementById(s).style.display='none');
+  document.getElementById('step1').style.display = 'block';
+};
+
+// ── Load progress from localStorage ───────────────────
+const loadProgress = () => {
+  const primer = JSON.parse(localStorage.getItem('zion-primer-progress')||'{}');
+  const m1     = JSON.parse(localStorage.getItem('zion-m1-progress')||'{}');
+  const m2     = JSON.parse(localStorage.getItem('zion-m2-progress')||'{}');
+  const m3     = JSON.parse(localStorage.getItem('zion-m3-progress')||'{}');
+
+  const primerSections = ['glossary','candlesticks','chart','ichimoku-intro'];
+  const m1Sections     = ['hero','vwap','bb','rsi','fvg','together'];
+  const m2Sections     = ['hero','philosophy','tk','cloud','chikou','signal'];
+  const m3Sections     = ['hero','edge','revenge','sizing','hands','ritual'];
+
+  const pct = (prog, sections) => {
+    const done = sections.filter(s=>prog[s]).length;
+    return done===0 ? '—' : done===sections.length ? '✓ Complete' : `${Math.round(done/sections.length*100)}% done`;
+  };
+
+  document.getElementById('prog-primer').textContent = pct(primer, primerSections);
+  document.getElementById('prog-m1').textContent     = pct(m1, m1Sections);
+  document.getElementById('prog-m2').textContent     = pct(m2, m2Sections);
+  document.getElementById('prog-m3').textContent     = pct(m3, m3Sections);
+
+  // Color the nodes if complete
+  if(m1Sections.every(s=>m1[s]))     document.querySelector('.node-m1').className='track-node node-done';
+  if(m2Sections.every(s=>m2[s]))     document.querySelector('.node-m2').className='track-node node-done';
+  if(m3Sections.every(s=>m3[s]))     document.querySelector('.node-m3').className='track-node node-done';
+  if(primerSections.every(s=>primer[s])) document.querySelector('.node-primer').className='track-node node-done';
+};
+loadProgress();
+</script>
+</body>
+</html>

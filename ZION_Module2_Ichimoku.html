@@ -1,0 +1,776 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Academy · Module 2: Ichimoku Deep Dive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --bull:#4ade80; --teal:#00f5d4; --bear:#f87171;
+  --crimson:#ff4d6d; --wait:#fb923c; --blue:#60a5fa;
+  --gold:#fbbf24; --purple:#a78bfa;
+  --tenkan:#3c78ff; --kijun:#ff4d6d;
+  --spana:#00f5d4; --spanb:#ff4d6d;
+  --chikou:#fbbf24; --vwap:#fb923c;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:14px; line-height:1.7; overflow-x:hidden; }
+
+/* ── Nav ── */
+.nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(5,13,26,.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); }
+.nav-logo span { color:var(--teal); }
+.nav-links { display:flex; gap:4px; }
+.nav-link { font-size:11px; color:var(--dim); padding:4px 10px; border-radius:4px; transition:color .15s,background .15s; cursor:pointer; text-decoration:none; }
+.nav-link:hover,.nav-link.active { color:var(--teal); background:#00f5d410; }
+.nav-right { display:flex; align-items:center; gap:12px; }
+.progress-label { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.progress-bar { width:120px; height:3px; background:var(--border2); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--teal); border-radius:2px; transition:width .4s ease; width:0%; }
+
+/* ── Hero ── */
+.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 24px 80px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 40%, #00f5d415 0%, transparent 65%); pointer-events:none; }
+.module-eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.25em; color:var(--teal); text-transform:uppercase; margin-bottom:20px; }
+.hero-title { font-family:var(--font-disp); font-size:clamp(38px,6vw,76px); font-weight:700; color:var(--hdr); line-height:1.1; margin-bottom:16px; }
+.hero-title em { font-style:italic; color:var(--teal); }
+.hero-sub { font-size:17px; color:var(--text); max-width:580px; line-height:1.75; margin:0 auto 40px; }
+.hero-cta { display:inline-flex; align-items:center; gap:8px; background:var(--teal); color:#050d1a; font-weight:700; font-size:13px; padding:12px 28px; border-radius:6px; border:none; cursor:pointer; transition:background .2s,transform .15s; letter-spacing:.04em; }
+.hero-cta:hover { background:#00e0c0; transform:translateY(-1px); }
+
+/* ── Sections ── */
+.module-section { display:none; }
+.module-section.visible { display:block; }
+#section-hero { display:block; }
+.section { padding:100px 24px; max-width:900px; margin:0 auto; }
+.section-eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+.section-eyebrow::after { content:''; flex:1; height:1px; background:var(--border); }
+.section-title { font-family:var(--font-disp); font-size:clamp(28px,4vw,48px); font-weight:700; color:var(--hdr); line-height:1.2; margin-bottom:20px; }
+.section-intro { font-size:16px; color:var(--text); line-height:1.85; margin-bottom:48px; max-width:720px; }
+
+/* ── INTERACTIVE CHART BUILDER ── */
+.chart-builder { background:var(--panel2); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin:40px 0; }
+.cb-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:#070f1e; }
+.cb-title { font-family:var(--font-data); font-size:10px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; }
+.cb-controls { display:flex; gap:8px; flex-wrap:wrap; }
+.cb-btn { font-family:var(--font-data); font-size:10px; font-weight:700; padding:5px 12px; border-radius:4px; border:1px solid var(--border2); background:transparent; cursor:pointer; transition:all .2s; letter-spacing:.05em; white-space:nowrap; }
+.cb-btn:disabled { opacity:.35; cursor:default; }
+.cb-btn.tenkan  { color:var(--tenkan); border-color:#3c78ff44; }
+.cb-btn.tenkan.on  { background:#3c78ff20; border-color:var(--tenkan); }
+.cb-btn.kijun   { color:var(--kijun);  border-color:#ff4d6d44; }
+.cb-btn.kijun.on   { background:#ff4d6d20; border-color:var(--kijun); }
+.cb-btn.cloud   { color:var(--teal);   border-color:#00f5d444; }
+.cb-btn.cloud.on   { background:#00f5d420; border-color:var(--teal); }
+.cb-btn.chikou  { color:var(--gold);   border-color:#fbbf2444; }
+.cb-btn.chikou.on  { background:#fbbf2420; border-color:var(--gold); }
+.cb-btn.vwap    { color:var(--vwap);   border-color:#fb923c44; }
+.cb-btn.vwap.on    { background:#fb923c20; border-color:var(--vwap); }
+.cb-canvas { padding:12px 16px 16px; }
+.cb-canvas svg { width:100%; display:block; }
+.cb-legend { display:flex; gap:16px; flex-wrap:wrap; padding:10px 20px 14px; border-top:1px solid var(--border); }
+.legend-item { display:flex; align-items:center; gap:6px; font-family:var(--font-data); font-size:10px; color:var(--dim); transition:color .2s; }
+.legend-item.active { color:var(--text); }
+.legend-dot { width:20px; height:3px; border-radius:2px; flex-shrink:0; }
+.cb-description { padding:12px 20px; background:var(--panel); border-top:1px solid var(--border); font-size:12px; color:var(--dim); font-family:var(--font-data); min-height:44px; transition:color .3s; line-height:1.6; }
+
+/* ── Key points ── */
+.key-points { display:flex; flex-direction:column; gap:10px; margin:24px 0; }
+.key-point { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; background:var(--panel); border-radius:6px; border-left:3px solid transparent; transition:border-color .2s; }
+.key-point:hover { border-left-color:var(--teal); }
+.kp-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:8px; }
+.kp-text { font-size:13px; color:var(--text); line-height:1.65; }
+.kp-text strong { color:var(--hdr); }
+
+/* ── Options callout ── */
+.options-callout { background:linear-gradient(135deg,#0f2545,#0a1628); border:1px solid var(--blue); border-radius:8px; padding:20px 24px; margin:28px 0; position:relative; overflow:hidden; }
+.options-callout::before { content:'OPTIONS'; position:absolute; right:20px; top:50%; transform:translateY(-50%); font-family:var(--font-data); font-size:48px; font-weight:700; color:var(--blue); opacity:.06; letter-spacing:.1em; pointer-events:none; }
+.oc-label { font-family:var(--font-data); font-size:9px; letter-spacing:.2em; color:var(--blue); text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.oc-label::before { content:'◆'; }
+.oc-text { font-size:13px; color:var(--text); line-height:1.7; }
+.oc-text strong { color:var(--blue); }
+
+/* ── Insight ── */
+.insight-box { background:linear-gradient(135deg,#00f5d410,#060e1e); border:1px solid #00f5d430; border-radius:8px; padding:20px 24px; margin:28px 0; position:relative; }
+.insight-box::before { content:'"'; font-family:var(--font-disp); font-size:60px; color:var(--teal); opacity:.3; position:absolute; top:-10px; left:16px; line-height:1; }
+.insight-text { font-family:var(--font-disp); font-style:italic; font-size:16px; color:var(--hdr); line-height:1.65; padding-left:8px; }
+.insight-attr { font-family:var(--font-data); font-size:10px; color:var(--teal); letter-spacing:.1em; margin-top:10px; padding-left:8px; }
+
+/* ── Component breakdown ── */
+.component-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:28px 0; }
+@media(max-width:640px){ .component-grid { grid-template-columns:1fr; } }
+.comp-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px 18px; border-left:3px solid transparent; transition:border-color .2s,background .2s; }
+.comp-card:hover { background:var(--panel2); }
+.comp-name { font-family:var(--font-data); font-size:11px; font-weight:700; letter-spacing:.08em; margin-bottom:6px; }
+.comp-formula { font-family:var(--font-data); font-size:10px; color:var(--dim); margin-bottom:8px; }
+.comp-desc { font-size:12px; color:var(--text); line-height:1.6; }
+
+/* ── Signal stack ── */
+.signal-stack { background:var(--panel2); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin:28px 0; }
+.ss-header { padding:14px 20px; background:#070f1e; border-bottom:1px solid var(--border); font-family:var(--font-data); font-size:10px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; }
+.ss-row { display:grid; grid-template-columns:28px 1fr 80px; align-items:center; gap:16px; padding:12px 20px; border-bottom:1px solid var(--border); transition:background .12s; }
+.ss-row:last-child { border-bottom:none; }
+.ss-row:hover { background:var(--panel); }
+.ss-num { font-family:var(--font-data); font-size:11px; font-weight:700; color:var(--dim); }
+.ss-text { font-size:13px; color:var(--text); line-height:1.5; }
+.ss-text strong { color:var(--hdr); }
+.ss-badge { font-family:var(--font-data); font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; text-align:center; white-space:nowrap; }
+.badge-bull { background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; }
+.badge-bear { background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; }
+.badge-gate { background:#60a5fa18; color:var(--blue); border:1px solid #60a5fa33; }
+.badge-wait { background:#fb923c18; color:var(--wait); border:1px solid #fb923c33; }
+
+/* ── Quiz ── */
+.quiz-block { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:24px; margin:40px 0; }
+.quiz-label { font-family:var(--font-data); font-size:9px; letter-spacing:.2em; color:var(--gold); text-transform:uppercase; margin-bottom:14px; }
+.quiz-question { font-size:15px; font-weight:600; color:var(--hdr); margin-bottom:16px; line-height:1.5; }
+.quiz-options { display:flex; flex-direction:column; gap:8px; }
+.quiz-opt { display:flex; align-items:flex-start; gap:12px; padding:12px 16px; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; cursor:pointer; transition:all .15s; font-size:13px; color:var(--text); }
+.quiz-opt:hover { border-color:var(--blue); color:var(--hdr); }
+.quiz-opt.correct { border-color:var(--teal); background:#00f5d412; color:var(--teal); pointer-events:none; }
+.quiz-opt.wrong   { border-color:var(--crimson); background:#ff4d6d12; color:var(--crimson); pointer-events:none; }
+.quiz-opt.disabled { pointer-events:none; opacity:.45; }
+.quiz-opt.correct.disabled { opacity:1; }
+.quiz-letter { font-family:var(--font-data); font-weight:700; font-size:11px; color:var(--dim); flex-shrink:0; margin-top:1px; }
+.quiz-feedback { margin-top:14px; padding:12px 16px; border-radius:6px; font-size:13px; line-height:1.6; display:none; }
+.quiz-feedback.show { display:block; }
+.quiz-feedback.good { background:#00f5d412; border:1px solid #00f5d430; color:var(--teal); }
+.quiz-feedback.bad  { background:#ff4d6d12; border:1px solid #ff4d6d30; color:var(--bear); }
+
+/* ── Divider / Nav ── */
+.divider { border:none; border-top:1px solid var(--border); margin:0; }
+.next-section { display:flex; justify-content:center; padding:60px 24px; }
+.next-btn { display:inline-flex; align-items:center; gap:10px; background:transparent; border:1px solid var(--border2); color:var(--dim); font-family:var(--font-ui); font-size:13px; padding:10px 24px; border-radius:6px; cursor:pointer; transition:all .2s; }
+.next-btn:hover { border-color:var(--teal); color:var(--teal); background:#00f5d408; }
+
+/* ── Completion ── */
+.completion { text-align:center; padding:100px 24px; max-width:600px; margin:0 auto; }
+.completion-icon { font-size:48px; margin-bottom:20px; }
+.completion-title { font-family:var(--font-disp); font-size:36px; color:var(--hdr); margin-bottom:16px; }
+.completion-text { font-size:15px; color:var(--text); line-height:1.85; margin-bottom:40px; }
+.completion-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn-primary { background:var(--teal); color:#050d1a; font-weight:700; font-size:13px; padding:12px 28px; border-radius:6px; border:none; cursor:pointer; text-decoration:none; display:inline-block; transition:background .2s; }
+.btn-secondary { background:transparent; color:var(--blue); font-size:13px; padding:12px 28px; border-radius:6px; border:1px solid var(--blue); cursor:pointer; text-decoration:none; display:inline-block; transition:all .2s; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div class="nav-links">
+    <a class="nav-link" href="ZION_Academy.html" style="text-decoration:none">← Academy</a>
+    <span class="nav-link active" onclick="showSection('hero')">Intro</span>
+    <span class="nav-link" onclick="showSection('philosophy')">Philosophy</span>
+    <span class="nav-link" onclick="showSection('tk')">TK</span>
+    <span class="nav-link" onclick="showSection('cloud')">Cloud</span>
+    <span class="nav-link" onclick="showSection('chikou')">Chikou</span>
+    <span class="nav-link" onclick="showSection('signal')">Signal</span>
+  </div>
+  <div class="nav-right">
+    <span class="progress-label" id="progressLabel">0% complete</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div id="section-hero" class="module-section visible">
+<section class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="module-eyebrow">ZION · Zen Ichimoku Options Navigation · Module 02</div>
+    <h1 class="hero-title">One Chart.<br><em>The whole story.</em></h1>
+    <p class="hero-sub">Ichimoku Kinko Hyo. A Japanese journalist spent 30 years building a system that encodes trend, momentum, support, resistance, and time — all in a single view. You're going to build it piece by piece, understand every component, and know exactly what each one means for your next options trade.</p>
+    <button class="hero-cta" onclick="showSection('philosophy')">→ Start Module 2</button>
+  </div>
+</section>
+<div class="next-section"><button class="next-btn" onclick="showSection('philosophy')">Begin: The Philosophy →</button></div>
+</div>
+
+<!-- ══ PHILOSOPHY ══ -->
+<div id="section-philosophy" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 01</div>
+  <h2 class="section-title">Why Ichimoku — <em style="font-family:var(--font-disp);font-style:italic">Structure over Prediction</em></h2>
+  <p class="section-intro">In the late 1930s, a Japanese journalist named Goichi Hosoda spent decades — with a team of students running manual calculations — developing a system that could tell a trader everything they needed to know at a single glance. He called it Ichimoku Kinko Hyo: "one glance equilibrium chart." He was right.</p>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Most indicators tell you what happened.</strong> A moving average tells you the average price over a period. RSI tells you momentum over a period. They're all looking backward. Ichimoku does something different — it projects forward. The cloud shows you where support and resistance will be 26 bars from now.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>It's a complete system, not an indicator.</strong> Most traders layer indicator on top of indicator hoping they'll agree. Ichimoku was designed as a unified whole — five components that were meant to work together. When all five agree, you have high-confidence structure. When they conflict, you wait.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>It's a navigation system, not a crystal ball.</strong> Ichimoku doesn't predict where price will go. It tells you the current state of the battlefield — who's in control, where the key levels are, and whether the conditions support a trade. You navigate based on conditions. The conditions change. You adapt.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>The standard settings are 9, 26, 52.</strong> These aren't arbitrary. Hosoda designed them around the Japanese six-day trading week. 9 = 1.5 weeks, 26 = one month, 52 = two months. On a modern 5-day week, some traders use 9, 26, 52 as-is. ZION uses them as designed — the mathematics hold regardless of trading days.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">Hosoda didn't publish his system until 1969 — after 30 years of refinement. He wasn't in a hurry. He wanted to get it right. That's the energy we bring to ZION. Patience isn't weakness. It's the edge.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="options-callout">
+    <div class="oc-label">Options Application</div>
+    <div class="oc-text">Options have a built-in enemy: <strong>time decay (theta)</strong>. Every day you hold an option, it loses value — even if price doesn't move against you. This is exactly why Ichimoku structure matters for options traders. When the structure is strong and all five components agree, you're not guessing — you're entering a high-probability move that can overcome theta. When structure is mixed, you're paying theta to watch paint dry. That's not a trade. That's a donation.</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-philosophy">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">What makes Ichimoku fundamentally different from most technical indicators?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-philosophy','a','b')"><span class="quiz-letter">A</span><span>It uses more data points, making it more accurate than simpler indicators.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-philosophy','b','b')"><span class="quiz-letter">B</span><span>It's a complete, unified system designed to show trend, momentum, support and resistance simultaneously — including projecting future levels forward in time.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-philosophy','c','b')"><span class="quiz-letter">C</span><span>It was developed by a Japanese trader, making it better suited to Asian markets.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-philosophy-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('tk')">Next: Tenkan &amp; Kijun →</button></div>
+</div>
+
+<!-- ══ TENKAN & KIJUN ══ -->
+<div id="section-tk" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 02</div>
+  <h2 class="section-title">Tenkan &amp; Kijun — <em style="font-family:var(--font-disp);font-style:italic">The Heartbeat</em></h2>
+  <p class="section-intro">Two lines. The Tenkan-sen (Conversion Line) and the Kijun-sen (Base Line). Their relationship tells you more about the current state of a trade than almost any other single signal. This is the heartbeat of the system — and the first thing you look at on every chart.</p>
+
+  <!-- Interactive chart builder -->
+  <div class="chart-builder" id="builder-tk">
+    <div class="cb-header">
+      <span class="cb-title">Build the chart — click to add components</span>
+      <div class="cb-controls">
+        <button class="cb-btn tenkan" id="btn-tk-tenkan" onclick="toggleLayer('tk','tenkan')">+ Tenkan (9)</button>
+        <button class="cb-btn kijun"  id="btn-tk-kijun"  onclick="toggleLayer('tk','kijun')" disabled>+ Kijun (26)</button>
+      </div>
+    </div>
+    <div class="cb-canvas">
+      <svg id="chart-tk" viewBox="0 0 700 200" style="height:200px">
+        <!-- Grid -->
+        <line x1="0" y1="45" x2="700" y2="45" stroke="#111f38" stroke-width="1"/>
+        <line x1="0" y1="90" x2="700" y2="90" stroke="#111f38" stroke-width="1"/>
+        <line x1="0" y1="135" x2="700" y2="135" stroke="#111f38" stroke-width="1"/>
+        <!-- Price candles (simplified) -->
+        <g id="tk-candles">
+          <!-- Bearish section -->
+          <rect x="20"  y="118" width="10" height="28" rx="1" fill="#ff4d6d" opacity=".7"/>
+          <rect x="36"  y="122" width="10" height="22" rx="1" fill="#ff4d6d" opacity=".7"/>
+          <rect x="52"  y="126" width="10" height="20" rx="1" fill="#ff4d6d" opacity=".7"/>
+          <rect x="68"  y="120" width="10" height="24" rx="1" fill="#ff4d6d" opacity=".7"/>
+          <rect x="84"  y="115" width="10" height="18" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="100" y="108" width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="116" y="100" width="10" height="16" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="132" y="94"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="148" y="88"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="164" y="80"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="180" y="72"  width="10" height="16" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="196" y="66"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="212" y="60"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="228" y="54"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="244" y="50"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="260" y="48"  width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="276" y="46"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="292" y="44"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="308" y="48"  width="10" height="12" rx="1" fill="#ff4d6d" opacity=".7"/>
+          <rect x="324" y="52"  width="10" height="14" rx="1" fill="#ff4d6d" opacity=".7"/>
+          <rect x="340" y="56"  width="10" height="12" rx="1" fill="#ff4d6d" opacity=".7"/>
+          <rect x="356" y="60"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="372" y="56"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="388" y="52"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="404" y="48"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="420" y="44"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="436" y="40"  width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="452" y="38"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="468" y="34"  width="10" height="14" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="484" y="30"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="500" y="28"  width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="516" y="26"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="532" y="24"  width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="548" y="22"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="564" y="20"  width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="580" y="18"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="596" y="16"  width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="612" y="14"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="628" y="12"  width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="644" y="10"  width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="660" y="8"   width="10" height="10" rx="1" fill="#4ade80" opacity=".7"/>
+          <rect x="676" y="6"   width="10" height="12" rx="1" fill="#4ade80" opacity=".7"/>
+        </g>
+        <!-- Tenkan line (hidden initially) -->
+        <!-- Tenkan starts BELOW Kijun (bearish), crosses ABOVE at x=220, y=108 -->
+        <path id="tk-tenkan-line" d="M 20 155 L 80 148 L 140 138 L 180 128 L 220 108 L 280 82 L 340 60 L 420 42 L 520 26 L 620 14 L 692 8" fill="none" stroke="#3c78ff" stroke-width="2.5" opacity="0" style="transition:opacity .5s"/>
+        <!-- Kijun starts ABOVE Tenkan (slow/lagging), crosses BELOW at x=220, y=108 -->
+        <path id="tk-kijun-line" d="M 20 138 L 80 134 L 140 128 L 180 120 L 220 108 L 280 96 L 340 82 L 420 68 L 520 52 L 620 38 L 692 30" fill="none" stroke="#ff4d6d" stroke-width="2.5" opacity="0" style="transition:opacity .5s"/>
+        <!-- TK cross annotation — placed exactly at crossover point x=220, y=108 -->
+        <g id="tk-cross-annotation" opacity="0" style="transition:opacity .5s">
+          <!-- Circle on cross point -->
+          <circle cx="220" cy="108" r="7" fill="#fbbf2420" stroke="#fbbf24" stroke-width="2"/>
+          <!-- Leader line going DOWN then RIGHT into clear airspace -->
+          <line x1="220" y1="115" x2="220" y2="158" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="220" y1="158" x2="310" y2="158" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="314" y="155" font-family="JetBrains Mono" font-size="10" fill="#fbbf24" font-weight="700">TK Cross ↑</text>
+          <text x="314" y="167" font-family="JetBrains Mono" font-size="8" fill="#c8d8f0">Tenkan crosses above Kijun</text>
+          <text x="314" y="178" font-family="JetBrains Mono" font-size="8" fill="#c8d8f0">= bullish signal</text>
+          <!-- Before cross label — lower left, below action -->
+          <text x="22" y="155" font-family="JetBrains Mono" font-size="8" fill="#ff4d6d" opacity="0.9">Kijun above Tenkan</text>
+          <text x="22" y="166" font-family="JetBrains Mono" font-size="8" fill="#4a6080">bearish structure</text>
+          <!-- After cross label — top right, clear of candles -->
+          <text x="310" y="18" font-family="JetBrains Mono" font-size="8" fill="#3c78ff" opacity="0.9">Tenkan above Kijun</text>
+          <text x="310" y="29" font-family="JetBrains Mono" font-size="8" fill="#4a6080">bullish structure</text>
+        </g>
+        <!-- Price labels -->
+        <text x="8" y="44"  font-family="JetBrains Mono" font-size="9" fill="#4a6080">High</text>
+        <text x="8" y="90"  font-family="JetBrains Mono" font-size="9" fill="#4a6080">Mid</text>
+        <text x="8" y="135" font-family="JetBrains Mono" font-size="9" fill="#4a6080">Low</text>
+      </svg>
+    </div>
+    <div class="cb-legend">
+      <div class="legend-item" id="leg-tk-tenkan"><div class="legend-dot" style="background:#3c78ff"></div>Tenkan (9)</div>
+      <div class="legend-item" id="leg-tk-kijun"><div class="legend-dot" style="background:#ff4d6d"></div>Kijun (26)</div>
+    </div>
+    <div class="cb-description" id="cb-tk-desc">Click <strong style="color:#3c78ff">+ Tenkan</strong> to add the first component.</div>
+  </div>
+
+  <div class="component-grid">
+    <div class="comp-card" style="border-left-color:var(--tenkan)">
+      <div class="comp-name" style="color:var(--tenkan)">TENKAN-SEN · Conversion Line</div>
+      <div class="comp-formula">(9-period high + 9-period low) ÷ 2</div>
+      <div class="comp-desc">The fast line. Measures the midpoint of the last 9 bars. Reacts quickly to price change. Think of it as a short-term momentum tracker — it tells you what price is doing right now.</div>
+    </div>
+    <div class="comp-card" style="border-left-color:var(--kijun)">
+      <div class="comp-name" style="color:var(--kijun)">KIJUN-SEN · Base Line</div>
+      <div class="comp-formula">(26-period high + 26-period low) ÷ 2</div>
+      <div class="comp-desc">The slow line. The 26-bar midpoint. This is the anchor — the line the market keeps returning to. It acts as dynamic support in uptrends, dynamic resistance in downtrends. Respect the Kijun.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--tenkan)"></div>
+      <div class="kp-text"><strong>Tenkan above Kijun = bullish TK structure.</strong> The short-term midpoint is above the medium-term midpoint. Momentum is pointing up. This is the first gate your trade must pass through.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--kijun)"></div>
+      <div class="kp-text"><strong>The TK cross is a signal — context determines its weight.</strong> When Tenkan crosses above Kijun, that's a bullish TK cross. When it happens above the cloud, it's a strong signal. Inside the cloud, weak. Below the cloud, treat it as noise until confirmed.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Kijun is your stop loss level.</strong> In a healthy uptrend, price pulls back to the Kijun and holds. When price breaks convincingly below the Kijun, the trade is compromised. Many ZION traders use a daily close below the Kijun as their exit trigger.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Flat Kijun = danger zone.</strong> When the Kijun is flat and horizontal, it means price has been rangebound for 26 bars. The market is digesting. A flat Kijun in the direction of your trade is weak structure. Wait for it to slope in your direction.</div>
+    </div>
+  </div>
+
+  <div class="options-callout">
+    <div class="oc-label">Options Application — TK Structure</div>
+    <div class="oc-text">Before buying a call, ask: <strong>is Tenkan above Kijun on the 65m chart?</strong> If yes, short-term momentum aligns with medium-term momentum — the trade has structural tailwind. If Tenkan is below Kijun, you're fighting the base line. You might still win, but you're paying theta while the structure works against you. The Kijun is also your mental stop — if price closes a 65m bar below the Kijun, your thesis is compromised. Respect it.</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-tk">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">You're looking at a potential call entry. The 65m chart shows Tenkan at $185, Kijun at $192, price at $188. What's the TK read and what does it mean?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-tk','a','c')"><span class="quiz-letter">A</span><span>Tenkan below Kijun — bullish. The gap means the move is just starting.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-tk','b','c')"><span class="quiz-letter">B</span><span>Tenkan below Kijun — neutral. TK doesn't matter unless price is above both lines.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-tk','c','c')"><span class="quiz-letter">C</span><span>Tenkan below Kijun — bearish TK structure. This is a red flag for a call entry. Price needs to reclaim the Kijun ($192) and Tenkan needs to cross above before the structure supports a long.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-tk-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('cloud')">Next: The Cloud →</button></div>
+</div>
+
+<!-- ══ CLOUD ══ -->
+<div id="section-cloud" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 03</div>
+  <h2 class="section-title">The Cloud — <em style="font-family:var(--font-disp);font-style:italic">The Battlefield</em></h2>
+  <p class="section-intro">The Kumo. The cloud. The single most visually distinctive element of Ichimoku — and the most powerful. Two lines projected 26 bars into the future, filling the space between them with color that tells you, at a glance, whether the bulls or bears own the battlefield ahead.</p>
+
+  <div class="chart-builder" id="builder-cloud">
+    <div class="cb-header">
+      <span class="cb-title">Build the chart — add cloud components</span>
+      <div class="cb-controls">
+        <button class="cb-btn tenkan on" disabled>Tenkan ✓</button>
+        <button class="cb-btn kijun on"  disabled>Kijun ✓</button>
+        <button class="cb-btn cloud" id="btn-cloud-cloud" onclick="toggleLayer('cloud','cloud')">+ Cloud (Kumo)</button>
+      </div>
+    </div>
+    <div class="cb-canvas">
+      <svg id="chart-cloud" viewBox="0 0 700 200" style="height:200px">
+        <line x1="0" y1="50"  x2="700" y2="50"  stroke="#111f38" stroke-width="1"/>
+        <line x1="0" y1="100" x2="700" y2="100" stroke="#111f38" stroke-width="1"/>
+        <line x1="0" y1="150" x2="700" y2="150" stroke="#111f38" stroke-width="1"/>
+        <!-- Bear cloud (left) -->
+        <path id="cloud-bear-fill" d="M 0 90 Q 80 95 160 100 L 160 140 Q 80 135 0 130 Z" fill="#ff4d6d" opacity="0" style="transition:opacity .6s"/>
+        <!-- Bull cloud (right, projected forward) -->
+        <path id="cloud-bull-fill" d="M 280 60 Q 400 50 520 40 Q 600 35 700 30 L 700 65 Q 600 70 520 75 Q 400 85 280 95 Z" fill="#00f5d4" opacity="0" style="transition:opacity .6s"/>
+        <!-- Span A line -->
+        <path id="cloud-spana" d="M 0 110 Q 80 105 160 100 Q 240 90 320 75 Q 400 62 520 48 Q 600 40 700 35" fill="none" stroke="#00f5d4" stroke-width="1.5" opacity="0" style="transition:opacity .5s"/>
+        <!-- Span B line -->
+        <path id="cloud-spanb" d="M 0 130 Q 80 128 160 125 Q 240 118 320 105 Q 400 90 520 72 Q 600 62 700 55" fill="none" stroke="#ff4d6d" stroke-width="1.5" opacity="0" style="transition:opacity .5s"/>
+        <!-- Tenkan (always visible) -->
+        <path d="M 0 145 Q 80 130 160 105 Q 240 82 320 68 Q 400 56 520 42 Q 600 34 700 28" fill="none" stroke="#3c78ff" stroke-width="2" opacity=".7"/>
+        <!-- Kijun (always visible) -->
+        <path d="M 0 155 Q 80 145 160 128 Q 240 108 320 88 Q 400 74 520 58 Q 600 48 700 40" fill="none" stroke="#ff4d6d" stroke-width="2" opacity=".7"/>
+        <!-- Price line -->
+        <path d="M 0 158 Q 80 148 160 120 Q 220 100 280 82 Q 340 66 420 52 Q 500 42 580 32 Q 640 26 700 22" fill="none" stroke="#e8f0ff" stroke-width="2.5" opacity=".8"/>
+        <!-- Annotations -->
+        <text id="cloud-label-bear" x="40" y="118" font-family="JetBrains Mono" font-size="9" fill="#ff4d6d" opacity="0" style="transition:opacity .5s">Bear Cloud</text>
+        <text id="cloud-label-bull" x="350" y="46" font-family="JetBrains Mono" font-size="9" fill="#00f5d4" opacity="0" style="transition:opacity .5s">Bull Cloud (projected)</text>
+        <text id="cloud-label-above" x="540" y="20" font-family="JetBrains Mono" font-size="9" fill="#e8f0ff" opacity="0" style="transition:opacity .5s">Price above cloud ✓</text>
+        <!-- Price labels -->
+        <text x="8" y="49"  font-family="JetBrains Mono" font-size="9" fill="#4a6080">High</text>
+        <text x="8" y="99"  font-family="JetBrains Mono" font-size="9" fill="#4a6080">Mid</text>
+        <text x="8" y="149" font-family="JetBrains Mono" font-size="9" fill="#4a6080">Low</text>
+      </svg>
+    </div>
+    <div class="cb-legend">
+      <div class="legend-item active"><div class="legend-dot" style="background:#3c78ff"></div>Tenkan</div>
+      <div class="legend-item active"><div class="legend-dot" style="background:#ff4d6d"></div>Kijun</div>
+      <div class="legend-item" id="leg-cloud-spana"><div class="legend-dot" style="background:#00f5d4"></div>Span A</div>
+      <div class="legend-item" id="leg-cloud-spanb"><div class="legend-dot" style="background:#ff4d6d;opacity:.5"></div>Span B</div>
+      <div class="legend-item" id="leg-cloud-fill"><div class="legend-dot" style="background:linear-gradient(90deg,#ff4d6d44,#00f5d444)"></div>Cloud Fill</div>
+    </div>
+    <div class="cb-description" id="cb-cloud-desc">Click <strong style="color:#00f5d4">+ Cloud</strong> to add the Kumo — the most powerful element in Ichimoku.</div>
+  </div>
+
+  <div class="component-grid">
+    <div class="comp-card" style="border-left-color:var(--teal)">
+      <div class="comp-name" style="color:var(--teal)">SENKOU SPAN A · Leading Span A</div>
+      <div class="comp-formula">(Tenkan + Kijun) ÷ 2, plotted 26 bars ahead</div>
+      <div class="comp-desc">The faster cloud boundary. Reacts more quickly to price changes. In a bull cloud, Span A is on top. In a bear cloud, it's on the bottom. When it's rising, the leading edge of the cloud is thinning — the cloud is weakening.</div>
+    </div>
+    <div class="comp-card" style="border-left-color:var(--crimson)">
+      <div class="comp-name" style="color:var(--crimson)">SENKOU SPAN B · Leading Span B</div>
+      <div class="comp-formula">(52-period high + 52-period low) ÷ 2, plotted 26 bars ahead</div>
+      <div class="comp-desc">The slower cloud boundary. Based on 52 bars — the longest lookback in the system. Moves slowly and carries significant weight as support/resistance. A thick cloud between Span A and Span B means strong structure.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Price above a green cloud = strong bull.</strong> The cloud is green (Span A above Span B), price is above both spans, and the cloud ahead is green. Every condition is lined up. This is what "above the cloud" means — not just above one line, above the entire structure.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Cloud thickness = strength of support/resistance.</strong> A thick cloud is a major zone. Price entering a thick cloud is in a battle — neither side has clear control. A thin cloud is weak support — price can punch through it. Watch the cloud thickness ahead. Thin cloud ahead = easier path. Thick cloud ahead = potential stall.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>Cloud color change = trend change signal.</strong> When the projected cloud switches from red to green (or green to red) in the future, that's called a Kumo Twist. It's a forward-looking signal that the balance of power is about to shift. Watch what's coming 26 bars out.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>Inside the cloud = no man's land.</strong> Price inside the cloud means neither bulls nor bears are in control. This is the worst place to enter an options trade. You're paying for directionality when the market hasn't picked a direction. Wait for a clean break above or below.</div>
+    </div>
+  </div>
+
+  <div class="options-callout">
+    <div class="oc-label">Options Application — Cloud Position</div>
+    <div class="oc-text">For a call entry, you want: <strong>price above the cloud AND the cloud ahead is green</strong>. This means (1) current structure is bullish and (2) future structure is bullish. The cloud is showing you the road ahead is clear. If price is inside the cloud, the road is under construction — don't drive 90mph through a construction zone with an options position that's burning theta every day. If price is below the cloud and the cloud ahead is red, that's a double layer of resistance. You need a really good reason to be long there.</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-cloud">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">The stock you're watching has price sitting inside a thick red cloud. Tenkan just crossed above Kijun. Is this a buy signal?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-cloud','a','c')"><span class="quiz-letter">A</span><span>Yes — a TK cross is always a buy signal regardless of cloud position.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-cloud','b','c')"><span class="quiz-letter">B</span><span>Maybe — depends on the RSI reading at the time of the cross.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-cloud','c','c')"><span class="quiz-letter">C</span><span>No — a TK cross inside a thick bear cloud is a weak signal. Price needs to break above the cloud for the signal to carry weight. Inside the cloud means no man's land.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-cloud-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('chikou')">Next: Chikou →</button></div>
+</div>
+
+<!-- ══ CHIKOU ══ -->
+<div id="section-chikou" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 04</div>
+  <h2 class="section-title">Chikou — <em style="font-family:var(--font-disp);font-style:italic">The Forgotten Confirmation</em></h2>
+  <p class="section-intro">The Chikou Span. The most misunderstood and most underused component of Ichimoku. It's just the current closing price plotted 26 bars in the past. Simple concept. Profound implication. It answers one question: is today's price stronger or weaker than it was 26 bars ago?</p>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Chikou above price from 26 bars ago = bullish confirmation.</strong> If today's closing price is higher than where price was trading 26 sessions ago, the current move has outpaced the historical baseline. Momentum is genuinely up — not just on paper. This is the market literally comparing itself to its own recent past.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>Chikou below price from 26 bars ago = bearish confirmation.</strong> Today's price can't clear what it was doing a month ago. That's weakness — structural weakness, not just a bad day. A bearish Chikou on a day when TK looks bullish is a serious warning flag.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>Chikou is your final confirmation gate.</strong> In the ZION system, we want TK bullish, price above cloud, AND Chikou above. When all three are aligned, the structure is genuinely strong across multiple dimensions — short-term, medium-term, and compared to recent history. That's when structure supports an options position.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>Most traders ignore Chikou. That's an edge.</strong> Because Chikou is plotted in the past (visually displaced backward on the chart), new traders find it confusing and skip it. You won't. When you're in a trade and Chikou starts approaching the candles from 26 bars ago, watch carefully — a Chikou that gets pinned below historical price action is a legitimate exit signal.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">Chikou is the system's built-in reality check. TK and the cloud can look bullish while price slowly grinds lower. Chikou can't lie — it's just comparing today's close to where price literally was 26 bars ago. If that number is lower, something is wrong with your bullish thesis.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="options-callout">
+    <div class="oc-label">Options Application — Chikou Confirmation</div>
+    <div class="oc-text">Before entering a call: <strong>look at where the Chikou line sits relative to the candles behind it.</strong> If Chikou is floating cleanly above historical price action, the stock has made genuine progress over the last month. That momentum supports a call. If Chikou is tangled in or below historical candles, the stock is struggling to clear its own recent history — that's exactly the environment where theta kills you while you wait for a move that may not come.</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-chikou">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">TK is bullish. Price is above a green cloud. But the Chikou Span is sitting right on top of a dense cluster of candles from 26 bars ago. What's the correct read?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-chikou','a','b')"><span class="quiz-letter">A</span><span>Strong buy — TK and cloud are both bullish, Chikou position doesn't matter much.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-chikou','b','b')"><span class="quiz-letter">B</span><span>Proceed with caution. Two of three gates are green but Chikou is facing resistance from historical price action. Wait to see if Chikou clears the cluster before entering or enter with smaller size.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-chikou','c','b')"><span class="quiz-letter">C</span><span>Don't trade — Chikou resistance always overrides TK and cloud signals.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-chikou-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('signal')">Next: The ZION Signal →</button></div>
+</div>
+
+<!-- ══ THE ZION SIGNAL ══ -->
+<div id="section-signal" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 05 · The Full System</div>
+  <h2 class="section-title">The ZION Signal — <em style="font-family:var(--font-disp);font-style:italic">All Five, Together</em></h2>
+  <p class="section-intro">You've built the system piece by piece. Now here's how it all comes together into a single trade decision framework. The ZION signal has gates — each one must be passed before you commit capital. Think of it like a pre-flight checklist. You don't skip items because you're in a hurry.</p>
+
+  <div class="signal-stack">
+    <div class="ss-header">ZION Signal Stack — 65m Timeframe</div>
+    <div class="ss-row">
+      <div class="ss-num" style="color:var(--tenkan)">①</div>
+      <div class="ss-text"><strong>TK Bullish</strong> — Tenkan above Kijun on the 65m chart. Short-term momentum leads medium-term. The heartbeat is healthy.</div>
+      <div class="ss-badge badge-bull">REQUIRED</div>
+    </div>
+    <div class="ss-row">
+      <div class="ss-num" style="color:var(--teal)">②</div>
+      <div class="ss-text"><strong>Price Above Cloud</strong> — Close above both Span A and Span B on 65m. You're not fighting the cloud — you're above the battlefield.</div>
+      <div class="ss-badge badge-bull">REQUIRED</div>
+    </div>
+    <div class="ss-row">
+      <div class="ss-num" style="color:var(--gold)">③</div>
+      <div class="ss-text"><strong>Chikou Above</strong> — Chikou Span above historical candles from 26 bars ago. Today's price has outpaced the recent past. The move is genuine.</div>
+      <div class="ss-badge badge-bull">REQUIRED</div>
+    </div>
+    <div class="ss-row">
+      <div class="ss-num" style="color:var(--vwap)">④</div>
+      <div class="ss-text"><strong>VWAP Slope Positive</strong> — The 65m VWAP is rising. Institutional money is accumulating above the volume-weighted average. The smart money is on your side.</div>
+      <div class="ss-badge badge-bull">REQUIRED</div>
+    </div>
+    <div class="ss-row">
+      <div class="ss-num" style="color:var(--blue)">⑤</div>
+      <div class="ss-text"><strong>Daily Gate</strong> — TK bullish and price above cloud on the Daily chart. This is your macro alignment check. You don't want to be long on the 65m against a bearish daily structure.</div>
+      <div class="ss-badge badge-gate">GATE</div>
+    </div>
+    <div class="ss-row" style="background:#00f5d408">
+      <div class="ss-num" style="color:var(--teal)">◆</div>
+      <div class="ss-text"><strong>READY ▲</strong> — All five conditions met. Structure supports a long options position. This is when the ZION HUD fires the alert.</div>
+      <div class="ss-badge badge-bull">PRIME</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>This is a high-conviction filter, not a trade trigger.</strong> READY ▲ means the structure supports a long. It does not mean "buy immediately." You still need a catalyst, a sector check, and a pre-trade ritual. Structure is the foundation — your trade thesis goes on top of it.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--wait)"></div>
+      <div class="kp-text"><strong>WAIT is not a failure.</strong> Most of the time, most tickers are in WAIT. That's correct. The market is not always offering high-probability setups. The traders who get in trouble are the ones who manufacture trades when the system says wait. Patience is the edge.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Strength score matters.</strong> The ZION HUD shows a strength score from -4 to +4 based on how many conditions align. A score of +4 is rare and powerful. A score of +2 is watchable. A score of 0 is noise. Use the score to size your conviction, not just direction.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>The system works bearishly too.</strong> All five gates inverted — TK bearish, price below cloud, Chikou below, VWAP slope negative, daily bearish — gives you READY ▼. That's the structure for a put or a short. The same discipline applies in both directions.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">You built this system over 30 years of looking at charts, taking trades, and understanding what matters and what's noise. The ZION HUD reads all five conditions in real time across every ticker in your watchlist. That's not an indicator. That's a co-pilot.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="options-callout">
+    <div class="oc-label">Options Application — The Full ZION Trade</div>
+    <div class="oc-text">When the ZION signal fires READY ▲: <strong>TK aligned, above cloud, Chikou clear, VWAP rising, daily gate open.</strong> This is your structure-confirmed entry environment. Now layer in Module 1's tools — is price above VWAP? Are Bollinger Bands expanding? Is RSI healthy without divergence? Is there a recent FVG below acting as support? When Module 1 and Module 2 stack together, you have the full ZION read. That's when you open the pre-trade checklist, confirm your operator state, and make a deliberate, thesis-driven options entry. Not a gamble. A navigation decision.</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-signal">
+    <div class="quiz-label">◆ Final Check · Module 2</div>
+    <div class="quiz-question">The ZION HUD shows READY ▲ on NVDA. Strength score is +3. Your sector panel shows XLK leading. The pre-trade checklist is clear. What is the correct next step?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-signal','a','b')"><span class="quiz-letter">A</span><span>Buy the nearest expiration call immediately — the signal is strong, don't overthink it.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-signal','b','b')"><span class="quiz-letter">B</span><span>Structure, sector, and operator state are all aligned. Select an expiration that allows time for repair, size the position appropriately, define your exit levels (Kijun as stop, thesis target as profit), and enter with conviction.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-signal','c','b')"><span class="quiz-letter">C</span><span>Wait for a strength score of +4 before entering — +3 is not strong enough.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-signal-feedback"></div>
+  </div>
+</section>
+
+<div class="completion" id="completion">
+  <div class="completion-icon">◆</div>
+  <h2 class="completion-title">Module 2 Complete</h2>
+  <p class="completion-text">You now understand every component of the Ichimoku system and how each one filters your options entries. Tenkan and Kijun are the heartbeat. The cloud is the battlefield. Chikou is the reality check. VWAP slope is the institutional compass. The daily gate is the macro filter.<br><br>Together they form the ZION signal — the most complete structure read you can have before committing capital. Module 3 covers the only thing that can still get you — yourself.</p>
+  <div class="completion-actions">
+    <a class="btn-primary" href="ZION_Module1_Foundation.html">← Module 1</a>
+    <a class="btn-primary" href="ZION_Dashboard.html">Dashboard</a>
+    <a class="btn-secondary" href="#">Module 3: The Operator →</a>
+  </div>
+</div>
+</div>
+
+<script>
+// ── Section navigation ─────────────────────────────
+const SECTIONS = ['hero','philosophy','tk','cloud','chikou','signal'];
+let completed = JSON.parse(localStorage.getItem('zion-m2-progress')||'{}');
+
+const showSection = id => {
+  SECTIONS.forEach(s => {
+    const el = document.getElementById('section-'+s);
+    if(el) el.classList.toggle('visible', s===id);
+  });
+  document.querySelectorAll('.nav-link').forEach((el,i) => {
+    el.classList.toggle('active', SECTIONS[i]===id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  completed[id]=true;
+  localStorage.setItem('zion-m2-progress',JSON.stringify(completed));
+  updateProgress();
+};
+
+const updateProgress = () => {
+  const done = Object.keys(completed).length;
+  const pct  = Math.round((done/SECTIONS.length)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = pct+'% complete';
+};
+updateProgress();
+
+// ── Chart builder — TK section ─────────────────────
+let tkState = { tenkan:false, kijun:false };
+
+const TK_DESCS = {
+  none:   'Click <strong style="color:#3c78ff">+ Tenkan</strong> to add the first component.',
+  tenkan: 'The <strong style="color:#3c78ff">Tenkan-sen</strong> (blue) tracks the 9-bar midpoint — the fast, reactive line. Now add the Kijun to see the relationship.',
+  both:   '<strong style="color:#3c78ff">Tenkan</strong> crossed above <strong style="color:#ff4d6d">Kijun</strong> — that\'s a bullish TK cross ↑. Notice the annotation where the cross occurs. This is the first gate in the ZION signal stack.',
+};
+
+const toggleLayer = (chart, layer) => {
+  if(chart === 'tk') {
+    if(layer === 'tenkan' && !tkState.tenkan) {
+      tkState.tenkan = true;
+      document.getElementById('tk-tenkan-line').style.opacity = '1';
+      document.getElementById('leg-tk-tenkan').classList.add('active');
+      document.getElementById('btn-tk-tenkan').classList.add('on');
+      document.getElementById('btn-tk-tenkan').textContent = 'Tenkan ✓';
+      document.getElementById('btn-tk-jijun') && null;
+      document.getElementById('btn-tk-kijun').disabled = false;
+      document.getElementById('cb-tk-desc').innerHTML = TK_DESCS.tenkan;
+    } else if(layer === 'kijun' && !tkState.kijun) {
+      tkState.kijun = true;
+      document.getElementById('tk-kijun-line').style.opacity = '1';
+      document.getElementById('tk-cross-annotation').style.opacity = '1';
+      document.getElementById('leg-tk-kijun').classList.add('active');
+      document.getElementById('btn-tk-kijun').classList.add('on');
+      document.getElementById('btn-tk-kijun').textContent = 'Kijun ✓';
+      document.getElementById('cb-tk-desc').innerHTML = TK_DESCS.both;
+    }
+  } else if(chart === 'cloud' && layer === 'cloud') {
+    document.getElementById('cloud-bear-fill').style.opacity = '0.18';
+    document.getElementById('cloud-bull-fill').style.opacity = '0.18';
+    document.getElementById('cloud-spana').style.opacity = '1';
+    document.getElementById('cloud-spanb').style.opacity = '1';
+    document.getElementById('cloud-label-bear').style.opacity = '1';
+    document.getElementById('cloud-label-bull').style.opacity = '1';
+    document.getElementById('cloud-label-above').style.opacity = '1';
+    document.getElementById('leg-cloud-spana').classList.add('active');
+    document.getElementById('leg-cloud-spanb').classList.add('active');
+    document.getElementById('leg-cloud-fill').classList.add('active');
+    document.getElementById('btn-cloud-cloud').classList.add('on');
+    document.getElementById('btn-cloud-cloud').textContent = 'Cloud ✓';
+    document.getElementById('cb-cloud-desc').innerHTML = 'The <strong style="color:#00f5d4">Kumo</strong> is revealed. Left: red bear cloud (price was below structure). Right: green bull cloud projected 26 bars forward — the road ahead is clear. Price (white line) is above the cloud: bullish structure confirmed.';
+  }
+};
+
+// ── Quiz logic ─────────────────────────────────────
+const FEEDBACK = {
+  'quiz-philosophy': {
+    correct: "Exactly. Ichimoku is unique because it was designed as a complete, integrated system — not an add-on indicator. And crucially, the cloud projects support/resistance forward in time. No other standard indicator does that.",
+    wrong:   "The real distinction is that Ichimoku is a unified system designed to work as a whole, and it projects future levels. Data volume and geography aren't the key differentiators."
+  },
+  'quiz-tk': {
+    correct: "Perfect read. Tenkan (185) below Kijun (192) is bearish TK structure. Price (188) is between them — in the TK no-man's land. Before buying a call here, you'd want to see Tenkan cross above Kijun and ideally price clear the Kijun at 192.",
+    wrong:   "When Tenkan is below Kijun, that's bearish TK structure — short-term momentum is below medium-term baseline. For a call entry, you want the opposite. The gap doesn't tell you the move is starting, it tells you the structure is weak."
+  },
+  'quiz-cloud': {
+    correct: "Correct. A TK cross inside the cloud is a weak signal — Ichimoku specifically weights signals by their location relative to the cloud. Inside the cloud means conflicted structure. The signal only carries weight above the cloud.",
+    wrong:   "Location matters enormously in Ichimoku. A TK cross above the cloud is a strong signal. Inside the cloud, it's weak. Below the cloud, it's a warning. Never treat all TK crosses equally."
+  },
+  'quiz-chikou': {
+    correct: "Well read. Two gates are green, one is yellow. Chikou facing a cluster of resistance from historical candles means the move may stall while price tries to clear that overhead. Smaller size or waiting for Chikou to clear is the disciplined play.",
+    wrong:   "Chikou is a confirmation gate, not a veto — but it matters. When TK and cloud are bullish but Chikou faces resistance, the correct read is caution, not abandonment. Size down or wait for Chikou to clear."
+  },
+  'quiz-signal': {
+    correct: "That's the complete ZION approach. Structure ✓ Sector ✓ Operator ✓. Now you select expiration deliberately (not 0DTE unless that's your strategy), size for the reality that you could be wrong, set your Kijun as the structural stop, and enter with a clear thesis. That's trading. That's ZION.",
+    wrong:   "The signal is there — the work now is in the execution. Nearest expiration means theta is your enemy. +3 is a strong signal, not a weak one. The correct move is deliberate entry with defined risk, not urgency or hesitation."
+  },
+};
+
+const answerQuiz = (quizId, chosen, correct) => {
+  const opts = document.querySelectorAll(`#${quizId} .quiz-opt`);
+  const feedback = document.getElementById(`${quizId}-feedback`);
+  opts.forEach((opt,i) => {
+    const letter = String.fromCharCode(97+i);
+    opt.classList.add('disabled');
+    if(letter===correct) opt.classList.add('correct');
+    else if(letter===chosen) opt.classList.add('wrong');
+  });
+  const isCorrect = chosen===correct;
+  const fb = FEEDBACK[quizId];
+  feedback.textContent = (isCorrect?'✓ ':'✗ ') + (isCorrect?fb.correct:fb.wrong);
+  feedback.className = `quiz-feedback show ${isCorrect?'good':'bad'}`;
+  if(quizId==='quiz-signal') {
+    setTimeout(()=>{
+      document.getElementById('completion').scrollIntoView({behavior:'smooth'});
+    }, 800);
+  }
+};
+</script>
+</body>
+</html>

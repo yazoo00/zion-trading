@@ -1,0 +1,24 @@
+# ZION Trading — Netlify Configuration
+# ZionTrading.io
+
+[build]
+  publish = "."
+
+# Serve index.html as the root
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+  force = true
+
+# Handle direct file access
+[[redirects]]
+  from = "/:file"
+  to = "/:file"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    Cache-Control = "public, max-age=3600"

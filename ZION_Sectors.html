@@ -1,0 +1,493 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Sectors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #050d1a;
+    --panel:    #0a1628;
+    --panel2:   #0d1e35;
+    --border:   #111f38;
+    --border2:  #1a2f4a;
+    --text:     #c8d8f0;
+    --text-dim: #4a6080;
+    --text-hdr: #e8f0ff;
+    --bull:     #4ade80;
+    --bear:     #f87171;
+    --wait:     #fb923c;
+    --blue:     #60a5fa;
+    --font-data:'JetBrains Mono', monospace;
+    --font-ui:  'Inter', sans-serif;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* ── Page shell ── */
+  .shell {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: var(--font-data);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .2em;
+    color: var(--text-hdr);
+  }
+  .logo span { color: var(--blue); }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--bull);
+    animation: pulse 2s infinite;
+  }
+  .live-dot.loading { background: var(--wait); animation: pulse .6s infinite; }
+  .live-dot.error   { background: var(--bear); animation: none; }
+  .live-dot.paused  { background: var(--text-dim); animation: none; }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 #4ade8044; }
+    70%  { box-shadow: 0 0 0 5px #4ade8000; }
+    100% { box-shadow: 0 0 0 0 #4ade8000; }
+  }
+  .status {
+    font-family: var(--font-data);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .status.err { color: var(--bear); }
+  .btn {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--blue); }
+  .btn.active { color: var(--blue); border-color: var(--blue); background: #0f2545; }
+
+  /* API key input */
+  .key-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 7px 12px;
+  }
+  .key-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: .08em;
+    white-space: nowrap;
+  }
+  .key-input {
+    flex: 1;
+    font-family: var(--font-data);
+    font-size: 11px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    outline: none;
+  }
+  .key-input::placeholder { color: var(--text-dim); }
+
+  /* ── Breadth summary bar ── */
+  .breadth-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 6px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .breadth-bull { background: var(--bull); transition: width .5s ease; }
+  .breadth-bear { background: var(--bear); transition: width .5s ease; }
+  .breadth-flat { background: var(--text-dim); transition: width .5s ease; }
+
+  .breadth-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .breadth-label {
+    font-size: 9px;
+    letter-spacing: .1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .breadth-counts {
+    font-family: var(--font-data);
+    font-size: 11px;
+    display: flex;
+    gap: 10px;
+    white-space: nowrap;
+  }
+
+  /* ── Sector table ── */
+  .sector-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .tbl-head {
+    display: grid;
+    grid-template-columns: 56px 1fr 90px 72px 80px;
+    border-bottom: 1px solid var(--border);
+    background: #070f1e;
+  }
+  .tbl-head div {
+    font-size: 9px;
+    letter-spacing: .1em;
+    color: #5577aa;
+    text-transform: uppercase;
+    padding: 6px 10px;
+  }
+  .tbl-head div:not(:first-child) { text-align: right; }
+
+  .sector-row {
+    display: grid;
+    grid-template-columns: 56px 1fr 90px 72px 80px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background .15s;
+    position: relative;
+  }
+  .sector-row:last-child { border-bottom: none; }
+  .sector-row:hover { background: var(--panel2); }
+
+  /* heat stripe — far left, behind content */
+  .heat-stripe {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    transition: background .4s;
+  }
+
+  .cell {
+    padding: 7px 10px;
+    font-family: var(--font-data);
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cell-symbol {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--blue);
+    padding-left: 14px; /* room for stripe */
+  }
+  .cell-name {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--text);
+  }
+  .cell-num { text-align: right; }
+  .cell-latest { font-weight: 500; color: var(--text-hdr); }
+
+  .bull-c { color: var(--bull) !important; }
+  .bear-c { color: var(--bear) !important; }
+
+  /* pct bar inside the % change cell */
+  .pct-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .pct-mini-bar {
+    width: 28px;
+    height: 3px;
+    background: var(--border2);
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .pct-mini-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  .footer {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: var(--font-data);
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="logo">ZION <span>//</span> SECTORS</div>
+    <div class="topbar-right">
+      <div class="live-dot" id="liveDot"></div>
+      <span class="status" id="statusEl">—</span>
+      <button class="btn" id="pauseBtn">Pause</button>
+    </div>
+  </div>
+
+  <!-- API key -->
+  <div class="key-row">
+    <span class="key-label">TWELVE DATA KEY</span>
+    <input class="key-input" id="apiKey" type="password"
+      placeholder="Paste your Twelve Data API key here…">
+  </div>
+
+  <!-- Breadth summary -->
+  <div class="breadth-row">
+    <span class="breadth-label">Breadth</span>
+    <div style="flex:1">
+      <div class="breadth-bar">
+        <div class="breadth-bull" id="bBull" style="width:0%"></div>
+        <div class="breadth-flat" id="bFlat" style="width:0%"></div>
+        <div class="breadth-bear" id="bBear" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="breadth-counts" id="breadthCounts">— up &nbsp; — flat &nbsp; — down</div>
+  </div>
+
+  <!-- Sector table -->
+  <div class="sector-card">
+    <div class="tbl-head">
+      <div>Symbol</div>
+      <div style="text-align:left">Sector</div>
+      <div>Latest</div>
+      <div>Change</div>
+      <div>% Change</div>
+    </div>
+    <div id="tableBody"></div>
+  </div>
+
+  <div class="footer">Data: Twelve Data · S&P 500 Sector SPDRs · not financial advice</div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  PASTE YOUR TWELVE DATA API KEY HERE
+//  (or use the input field above)
+// ══════════════════════════════════════════
+let API_KEY = '';
+
+// ── Sector definitions ────────────────────
+const SECTORS = [
+  { symbol: 'XLI',  name: 'Industrial' },
+  { symbol: 'XLB',  name: 'Materials' },
+  { symbol: 'XLK',  name: 'Technology' },
+  { symbol: 'XLY',  name: 'Cons Disc' },
+  { symbol: 'XLV',  name: 'Healthcare' },
+  { symbol: 'XLF',  name: 'Financials' },
+  { symbol: 'XLU',  name: 'Utilities' },
+  { symbol: 'XLC',  name: 'Comm Svcs' },
+  { symbol: 'XLRE', name: 'Real Estate' },
+  { symbol: 'XLP',  name: 'Cons Staples' },
+  { symbol: 'XLE',  name: 'Energy' },
+];
+
+// ── Utilities ─────────────────────────────
+const $ = id => document.getElementById(id);
+const fmt = (n, d=2) => typeof n === 'number'
+  ? n.toLocaleString('en-US', {minimumFractionDigits:d, maximumFractionDigits:d})
+  : '—';
+
+const setStatus = (msg, isErr=false) => {
+  $('statusEl').textContent = msg;
+  $('statusEl').className = 'status' + (isErr ? ' err' : '');
+};
+
+// ── Fetch quotes for all sectors ──────────
+// Twelve Data batch endpoint: up to 120 symbols per call
+const fetchSectors = async () => {
+  const key = API_KEY.trim();
+  if (!key) throw new Error('No API key — paste your Twelve Data key above');
+
+  const symbols = SECTORS.map(s => s.symbol).join(',');
+  const url = `https://api.twelvedata.com/quote?symbol=${symbols}&apikey=${key}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+
+  // Single symbol returns object directly; multiple returns {SYMBOL: {...}}
+  // Handle both cases
+  if (json.status === 'error') throw new Error(json.message || 'API error');
+
+  return SECTORS.map(s => {
+    const q = json[s.symbol] || json; // fallback for single
+    if (!q || q.status === 'error') return { ...s, price: null, change: null, pct: null };
+    return {
+      ...s,
+      price:  parseFloat(q.close),
+      change: parseFloat(q.change),
+      pct:    parseFloat(q.percent_change),
+    };
+  });
+};
+
+// ── Render ────────────────────────────────
+const renderTable = (data) => {
+  const body = $('tableBody');
+  body.innerHTML = '';
+
+  // Sort by % change descending (best sector first)
+  const sorted = [...data].sort((a,b) => (b.pct||0) - (a.pct||0));
+
+  // Find max abs pct for mini-bar scaling
+  const maxPct = Math.max(...sorted.map(d => Math.abs(d.pct||0)), 0.01);
+
+  // Breadth
+  const up   = sorted.filter(d => d.pct > 0.05).length;
+  const down = sorted.filter(d => d.pct < -0.05).length;
+  const flat = sorted.length - up - down;
+  const total = sorted.length;
+
+  $('bBull').style.width = `${(up/total)*100}%`;
+  $('bFlat').style.width = `${(flat/total)*100}%`;
+  $('bBear').style.width = `${(down/total)*100}%`;
+  $('breadthCounts').innerHTML =
+    `<span class="bull-c">${up} up</span>&nbsp;&nbsp;` +
+    `<span style="color:var(--text-dim)">${flat} flat</span>&nbsp;&nbsp;` +
+    `<span class="bear-c">${down} down</span>`;
+
+  sorted.forEach(d => {
+    const isBull = d.pct > 0;
+    const isBear = d.pct < 0;
+    const colorClass = isBull ? 'bull-c' : isBear ? 'bear-c' : '';
+    const stripeColor = isBull ? 'var(--bull)' : isBear ? 'var(--bear)' : 'var(--text-dim)';
+    const sign = isBull ? '+' : '';
+    const barPct = Math.min((Math.abs(d.pct||0) / maxPct) * 100, 100);
+
+    const row = document.createElement('div');
+    row.className = 'sector-row';
+
+    row.innerHTML = `
+      <div class="heat-stripe" style="background:${stripeColor}"></div>
+      <div class="cell cell-symbol">${d.symbol}</div>
+      <div class="cell cell-name">${d.name}</div>
+      <div class="cell cell-num cell-latest">${d.price !== null ? fmt(d.price) : '—'}</div>
+      <div class="cell cell-num ${colorClass}">${d.change !== null ? sign+fmt(d.change) : '—'}</div>
+      <div class="cell cell-num">
+        <div class="pct-wrap">
+          <div class="pct-mini-bar">
+            <div class="pct-mini-fill" style="width:${barPct}%;background:${stripeColor}"></div>
+          </div>
+          <span class="${colorClass}">${d.pct !== null ? sign+fmt(d.pct)+'%' : '—'}</span>
+        </div>
+      </div>`;
+
+    body.appendChild(row);
+  });
+};
+
+// ── Fetch cycle ───────────────────────────
+let isFetching = false;
+
+const refresh = async () => {
+  if (isFetching) return;
+  const key = API_KEY.trim();
+  if (!key) {
+    setStatus('Paste your API key above', true);
+    $('liveDot').className = 'live-dot error';
+    return;
+  }
+
+  isFetching = true;
+  $('liveDot').className = 'live-dot loading';
+  setStatus('Fetching sectors…');
+
+  try {
+    const data = await fetchSectors();
+    renderTable(data);
+    const now = new Date().toLocaleTimeString('en-US',
+      {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    setStatus(`Updated ${now}`);
+    $('liveDot').className = isLive ? 'live-dot' : 'live-dot paused';
+  } catch(err) {
+    setStatus(err.message, true);
+    $('liveDot').className = 'live-dot error';
+    console.error('ZION Sectors error:', err);
+  } finally {
+    isFetching = false;
+  }
+};
+
+// ── Live loop ─────────────────────────────
+let liveTimer = null;
+let isLive = true;
+const INTERVAL = 60000; // 60s — 11 sectors = 11 calls, 60s = ~660/hr, well within free tier
+
+const startLoop = () => {
+  if (liveTimer) clearInterval(liveTimer);
+  liveTimer = setInterval(refresh, INTERVAL);
+};
+const stopLoop = () => { clearInterval(liveTimer); liveTimer = null; };
+
+// ── API key wiring ────────────────────────
+$('apiKey').addEventListener('change', e => {
+  API_KEY = e.target.value.trim();
+  refresh();
+});
+$('apiKey').addEventListener('blur', e => {
+  API_KEY = e.target.value.trim();
+});
+
+// ── Pause ─────────────────────────────────
+$('pauseBtn').addEventListener('click', () => {
+  isLive = !isLive;
+  $('pauseBtn').textContent = isLive ? 'Pause' : 'Resume';
+  $('pauseBtn').classList.toggle('active', !isLive);
+  $('liveDot').className = 'live-dot' + (isLive ? '' : ' paused');
+  isLive ? startLoop() : stopLoop();
+});
+
+// ── Boot ──────────────────────────────────
+refresh();
+startLoop();
+</script>
+</body>
+</html>

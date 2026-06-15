@@ -1,0 +1,738 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Academy · Module 1: The Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #050d1a;
+  --panel:    #0a1628;
+  --panel2:   #0d1e35;
+  --border:   #111f38;
+  --border2:  #1a2f4a;
+  --text:     #c8d8f0;
+  --dim:      #4a6080;
+  --hdr:      #e8f0ff;
+  --bull:     #4ade80;
+  --teal:     #00f5d4;
+  --bear:     #f87171;
+  --crimson:  #ff4d6d;
+  --wait:     #fb923c;
+  --blue:     #60a5fa;
+  --gold:     #fbbf24;
+  --purple:   #a78bfa;
+  --font-data: 'JetBrains Mono', monospace;
+  --font-ui:   'Inter', sans-serif;
+  --font-disp: 'Playfair Display', serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; line-height: 1.7; overflow-x: hidden; }
+
+/* ── Nav ── */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(5,13,26,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 52px; }
+.nav-logo { font-family: var(--font-data); font-weight: 700; font-size: 12px; letter-spacing: .2em; color: var(--hdr); }
+.nav-logo span { color: var(--teal); }
+.nav-links { display: flex; gap: 4px; }
+.nav-link { font-size: 11px; color: var(--dim); text-decoration: none; padding: 4px 10px; border-radius: 4px; transition: color .15s, background .15s; cursor: pointer; }
+.nav-link:hover, .nav-link.active { color: var(--teal); background: #00f5d410; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.progress-label { font-family: var(--font-data); font-size: 10px; color: var(--dim); }
+.progress-bar { width: 120px; height: 3px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--teal); border-radius: 2px; transition: width .4s ease; width: 0%; }
+
+/* ── Hero ── */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
+.hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 50% 30%, #00f5d418 0%, transparent 65%); pointer-events:none; }
+
+.module-eyebrow { font-family: var(--font-data); font-size: 10px; letter-spacing: .25em; color: var(--teal); text-transform: uppercase; margin-bottom: 20px; }
+.hero-title { font-family: var(--font-disp); font-size: clamp(40px, 7vw, 80px); font-weight: 700; color: var(--hdr); line-height: 1.1; margin-bottom: 12px; }
+.hero-title em { font-style: italic; color: var(--teal); }
+.hero-sub { font-size: 17px; color: var(--text); max-width: 560px; line-height: 1.7; margin: 0 auto 40px; }
+.hero-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: #050d1a; font-weight: 700; font-size: 13px; padding: 12px 28px; border-radius: 6px; text-decoration: none; cursor: pointer; border: none; transition: background .2s, transform .15s; letter-spacing: .04em; }
+.hero-cta:hover { background: #00e0c0; transform: translateY(-1px); }
+.hero-cta span { font-size: 16px; }
+
+/* Animated chart lines in hero bg */
+.hero-chart { position: absolute; bottom: 0; left: 0; right: 0; height: 200px; opacity: .12; pointer-events: none; }
+
+/* ── Sections ── */
+.section { padding: 100px 24px; max-width: 860px; margin: 0 auto; }
+.section-eyebrow { font-family: var(--font-data); font-size: 10px; letter-spacing: .2em; color: var(--dim); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.section-eyebrow::after { content:''; flex:1; height:1px; background: var(--border); }
+.section-title { font-family: var(--font-disp); font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: var(--hdr); line-height: 1.2; margin-bottom: 20px; }
+.section-intro { font-size: 16px; color: var(--text); line-height: 1.8; margin-bottom: 48px; max-width: 700px; }
+
+/* ── Concept cards ── */
+.concept-grid { display: grid; gap: 2px; margin-bottom: 48px; }
+.concept-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color .2s; }
+.concept-card:hover { border-color: var(--border2); }
+.concept-card.expanded { border-color: var(--teal); }
+.concept-header { display: flex; align-items: center; gap: 16px; padding: 20px 24px; }
+.concept-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.concept-title-wrap { flex: 1; }
+.concept-name { font-weight: 600; font-size: 15px; color: var(--hdr); margin-bottom: 2px; }
+.concept-tagline { font-size: 12px; color: var(--dim); }
+.concept-toggle { font-family: var(--font-data); font-size: 18px; color: var(--dim); transition: transform .3s, color .2s; }
+.concept-card.expanded .concept-toggle { transform: rotate(45deg); color: var(--teal); }
+.concept-body { display: none; padding: 0 24px 28px; border-top: 1px solid var(--border); }
+.concept-card.expanded .concept-body { display: block; }
+
+/* ── Visual canvas ── */
+.visual-canvas { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 24px 0; position: relative; overflow: hidden; }
+.canvas-label { font-family: var(--font-data); font-size: 9px; letter-spacing: .15em; color: var(--dim); text-transform: uppercase; margin-bottom: 16px; }
+svg.chart { width: 100%; height: 160px; }
+
+/* ── Key points ── */
+.key-points { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+.key-point { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; background: var(--panel); border-radius: 6px; border-left: 3px solid transparent; transition: border-color .2s; }
+.key-point:hover { border-left-color: var(--teal); }
+.kp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+.kp-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+.kp-text strong { color: var(--hdr); }
+
+/* ── Quote blocks ── */
+.insight-box { background: linear-gradient(135deg, #00f5d410, #060e1e); border: 1px solid #00f5d430; border-radius: 8px; padding: 20px 24px; margin: 24px 0; position: relative; }
+.insight-box::before { content: '"'; font-family: var(--font-disp); font-size: 60px; color: var(--teal); opacity: .3; position: absolute; top: -10px; left: 16px; line-height: 1; }
+.insight-text { font-family: var(--font-disp); font-style: italic; font-size: 16px; color: var(--hdr); line-height: 1.6; padding-left: 8px; }
+.insight-attr { font-family: var(--font-data); font-size: 10px; color: var(--teal); letter-spacing: .1em; margin-top: 10px; padding-left: 8px; }
+
+/* ── Quiz ── */
+.quiz-block { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 40px 0; }
+.quiz-label { font-family: var(--font-data); font-size: 9px; letter-spacing: .2em; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+.quiz-question { font-size: 15px; font-weight: 600; color: var(--hdr); margin-bottom: 16px; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--panel2); border: 1px solid var(--border2); border-radius: 6px; cursor: pointer; transition: all .15s; font-size: 13px; color: var(--text); }
+.quiz-opt:hover { border-color: var(--blue); color: var(--hdr); }
+.quiz-opt.correct { border-color: var(--teal); background: #00f5d412; color: var(--teal); }
+.quiz-opt.wrong { border-color: var(--crimson); background: #ff4d6d12; color: var(--crimson); }
+.quiz-opt.disabled { pointer-events: none; opacity: .5; }
+.quiz-opt.correct.disabled { opacity: 1; }
+.quiz-letter { font-family: var(--font-data); font-weight: 700; font-size: 11px; color: var(--dim); flex-shrink: 0; margin-top: 1px; }
+.quiz-opt.correct .quiz-letter { color: var(--teal); }
+.quiz-feedback { margin-top: 14px; padding: 12px 16px; border-radius: 6px; font-size: 13px; line-height: 1.6; display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.good { background: #00f5d412; border: 1px solid #00f5d430; color: var(--teal); }
+.quiz-feedback.bad  { background: #ff4d6d12; border: 1px solid #ff4d6d30; color: var(--bear); }
+
+/* ── Section divider ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* ── Next button ── */
+.next-section { display: flex; justify-content: center; padding: 60px 24px; }
+.next-btn { display: inline-flex; align-items: center; gap: 10px; background: transparent; border: 1px solid var(--border2); color: var(--dim); font-family: var(--font-ui); font-size: 13px; padding: 10px 24px; border-radius: 6px; cursor: pointer; transition: all .2s; }
+.next-btn:hover { border-color: var(--teal); color: var(--teal); background: #00f5d408; }
+
+/* ── Completion ── */
+.completion { text-align: center; padding: 100px 24px; max-width: 600px; margin: 0 auto; }
+.completion-icon { font-size: 48px; margin-bottom: 20px; }
+.completion-title { font-family: var(--font-disp); font-size: 36px; color: var(--hdr); margin-bottom: 16px; }
+.completion-text { font-size: 15px; color: var(--text); line-height: 1.8; margin-bottom: 40px; }
+.completion-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-primary { background: var(--teal); color: #050d1a; font-weight: 700; font-size: 13px; padding: 12px 28px; border-radius: 6px; border: none; cursor: pointer; transition: background .2s; text-decoration: none; display: inline-block; }
+.btn-secondary { background: transparent; color: var(--blue); font-size: 13px; padding: 12px 28px; border-radius: 6px; border: 1px solid var(--blue); cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block; }
+
+/* ── Colors ── */
+.c-teal { color: var(--teal); }
+.c-gold { color: var(--gold); }
+.c-blue { color: var(--blue); }
+.c-crimson { color: var(--crimson); }
+.c-bull { color: var(--bull); }
+.c-bear { color: var(--bear); }
+.c-wait { color: var(--wait); }
+
+/* ── Tooltip badges ── */
+.badge { display: inline-block; font-family: var(--font-data); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin: 0 2px; vertical-align: middle; }
+.badge-teal   { background: #00f5d420; color: var(--teal); border: 1px solid #00f5d440; }
+.badge-gold   { background: #fbbf2420; color: var(--gold); border: 1px solid #fbbf2440; }
+.badge-blue   { background: #60a5fa20; color: var(--blue); border: 1px solid #60a5fa40; }
+.badge-bear   { background: #ff4d6d20; color: var(--crimson); border: 1px solid #ff4d6d40; }
+
+/* ── Hidden sections ── */
+.module-section { display: none; }
+.module-section.visible { display: block; }
+#section-hero { display: block; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div class="nav-links">
+    <a class="nav-link" href="ZION_Academy.html" style="text-decoration:none">← Academy</a>
+    <span class="nav-link active" onclick="showSection('hero')">Intro</span>
+    <span class="nav-link" onclick="showSection('vwap')">VWAP</span>
+    <span class="nav-link" onclick="showSection('bb')">Bollinger</span>
+    <span class="nav-link" onclick="showSection('rsi')">RSI</span>
+    <span class="nav-link" onclick="showSection('fvg')">FVGs</span>
+    <span class="nav-link" onclick="showSection('together')">Together</span>
+  </div>
+  <div class="nav-right">
+    <span class="progress-label" id="progressLabel">0% complete</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div id="section-hero" class="module-section visible">
+<section class="hero">
+  <svg class="hero-chart" viewBox="0 0 1200 200" preserveAspectRatio="none">
+    <polyline points="0,160 60,140 120,150 180,110 240,120 300,90 360,100 420,70 480,80 540,55 600,65 660,45 720,60 780,40 840,50 900,30 960,45 1020,25 1080,35 1140,20 1200,30" fill="none" stroke="#00f5d4" stroke-width="2" opacity="0.6"/>
+    <polyline points="0,180 60,170 120,175 180,155 240,165 300,140 360,150 420,125 480,135 540,110 600,120 660,100 720,115 780,95 840,105 900,80 960,95 1020,70 1080,85 1140,60 1200,75" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity="0.4"/>
+  </svg>
+  <div style="position:relative;z-index:1">
+    <div class="module-eyebrow">ZION · Zen Ichimoku Options Navigation · Module 01</div>
+    <h1 class="hero-title">Before the Cloud,<br><em>read the chart.</em></h1>
+    <p class="hero-sub">VWAP. Bollinger Bands. RSI. Fair Value Gaps. Four tools that every serious trader needs to understand — not just use. This module builds the foundation that makes everything else click.</p>
+    <button class="hero-cta" onclick="showSection('vwap')"><span>→</span> Start Learning</button>
+  </div>
+</section>
+
+<div class="next-section">
+  <button class="next-btn" onclick="showSection('vwap')">Begin with VWAP →</button>
+</div>
+</div>
+
+<!-- ══ VWAP ══ -->
+<div id="section-vwap" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Concept 01</div>
+  <h2 class="section-title">VWAP — <em style="font-family:var(--font-disp);font-style:italic">The Institutional Compass</em></h2>
+  <p class="section-intro">Volume Weighted Average Price. It sounds complicated. It isn't. VWAP is simply the average price of every share traded today, weighted by how many shares traded at each price. Institutions use it as their benchmark. When you understand VWAP, you start seeing the market the way the big money sees it.</p>
+
+  <div class="visual-canvas">
+    <div class="canvas-label">VWAP in action — price relationship</div>
+    <svg class="chart" viewBox="0 0 600 160">
+      <!-- Grid lines -->
+      <line x1="0" y1="40" x2="600" y2="40" stroke="#111f38" stroke-width="1"/>
+      <line x1="0" y1="80" x2="600" y2="80" stroke="#111f38" stroke-width="1"/>
+      <line x1="0" y1="120" x2="600" y2="120" stroke="#111f38" stroke-width="1"/>
+      <!-- VWAP line -->
+      <path d="M 0 90 Q 150 85 300 78 Q 450 72 600 68" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="0"/>
+      <!-- Price line (above VWAP = bullish) -->
+      <path d="M 0 100 Q 100 95 200 75 Q 350 55 450 48 Q 530 44 600 42" fill="none" stroke="#00f5d4" stroke-width="2"/>
+      <!-- Price crosses below VWAP -->
+      <path d="M 0 100 Q 80 105 160 115 Q 240 125 320 118 Q 400 110 480 130 Q 540 140 600 145" fill="none" stroke="#ff4d6d" stroke-width="2" stroke-dasharray="5,3" opacity="0.7"/>
+      <!-- Labels -->
+      <text x="490" y="62" font-family="JetBrains Mono" font-size="10" fill="#00f5d4">Price above VWAP</text>
+      <text x="490" y="64" dy="14" font-family="JetBrains Mono" font-size="9" fill="#4a6080">→ institutional support</text>
+      <text x="8" y="62" font-family="JetBrains Mono" font-size="10" fill="#fbbf24">VWAP</text>
+      <text x="280" y="135" font-family="JetBrains Mono" font-size="10" fill="#ff4d6d">Price below VWAP</text>
+      <text x="280" y="148" font-family="JetBrains Mono" font-size="9" fill="#4a6080">→ distribution / weakness</text>
+    </svg>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Price above VWAP = buyers in control.</strong> Institutions that bought at or below VWAP are sitting on profit. They're not in a hurry to sell. This is the environment where long trades have institutional wind at their back.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>Price below VWAP = sellers in control.</strong> Anyone who bought today is underwater. The path of least resistance is down. Fighting this is a low-probability trade.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>VWAP slope matters more than level.</strong> A rising VWAP means each hour's trading is pulling the average higher — sustained demand. A flat or falling VWAP is a warning flag even if price looks OK.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>VWAP resets every day.</strong> It's a daily anchor, not a trend indicator. Yesterday's VWAP tells you nothing about today. For multi-day context, use the 65m or Daily VWAP alongside the intraday.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The 0DTE crowd moves fast and doesn't need VWAP the way we do — they're in and out before the institutional picture even develops. But if you're holding a position for hours or days, knowing where the big money is benchmarked is non-negotiable. Trade with the institutions, not in spite of them.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-vwap">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">A stock opens strong, rallies 2%, then slowly drifts back below VWAP by 11am. What does this tell you?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-vwap','a','b')">
+        <span class="quiz-letter">A</span>
+        <span>It's a buying opportunity — the stock is on sale.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-vwap','b','b')">
+        <span class="quiz-letter">B</span>
+        <span>Early buyers are now underwater. Sellers are in control. Proceed with extreme caution on longs.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-vwap','c','b')">
+        <span class="quiz-letter">C</span>
+        <span>VWAP doesn't matter intraday — only at the close.</span>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="quiz-vwap-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section">
+  <button class="next-btn" onclick="showSection('bb')">Next: Bollinger Bands →</button>
+</div>
+</div>
+
+<!-- ══ BOLLINGER BANDS ══ -->
+<div id="section-bb" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Concept 02</div>
+  <h2 class="section-title">Bollinger Bands — <em style="font-family:var(--font-disp);font-style:italic">The Volatility Envelope</em></h2>
+  <p class="section-intro">Three lines. A middle moving average, an upper band two standard deviations above it, and a lower band two standard deviations below. When the bands are tight, the market is coiling. When they're wide, it's already moved. Most traders use Bollinger Bands wrong — they fade the bands. You'll use them differently.</p>
+
+  <div class="visual-canvas">
+    <div class="canvas-label">Bollinger Band structure — squeeze and expansion</div>
+    <svg class="chart" viewBox="0 0 600 160">
+      <line x1="0" y1="40" x2="600" y2="40" stroke="#111f38" stroke-width="1"/>
+      <line x1="0" y1="80" x2="600" y2="80" stroke="#111f38" stroke-width="1"/>
+      <line x1="0" y1="120" x2="600" y2="120" stroke="#111f38" stroke-width="1"/>
+      <!-- Upper band -->
+      <path d="M 0 30 Q 100 32 200 55 Q 250 65 280 70 Q 320 65 400 35 Q 500 15 600 10" fill="none" stroke="#00f5d4" stroke-width="1.5" opacity="0.7"/>
+      <!-- Lower band -->
+      <path d="M 0 110 Q 100 108 200 95 Q 250 90 280 88 Q 320 90 400 105 Q 500 120 600 130" fill="none" stroke="#ff4d6d" stroke-width="1.5" opacity="0.7"/>
+      <!-- Middle (basis) -->
+      <path d="M 0 70 Q 100 70 200 75 Q 250 77 280 79 Q 320 77 400 70 Q 500 67 600 70" fill="none" stroke="#60a5fa" stroke-width="2" stroke-dasharray="6,3"/>
+      <!-- Fill between bands -->
+      <path d="M 0 30 Q 100 32 200 55 Q 250 65 280 70 Q 320 65 400 35 Q 500 15 600 10 L 600 130 Q 500 120 400 105 Q 320 90 280 88 Q 250 90 200 95 Q 100 108 0 110 Z" fill="#3a3a5a" opacity="0.12"/>
+      <!-- Price line -->
+      <path d="M 0 72 Q 80 68 160 72 Q 220 75 260 76 Q 300 72 380 50 Q 460 28 540 12 Q 570 8 600 6" fill="none" stroke="#fbbf24" stroke-width="2"/>
+      <!-- Squeeze annotation -->
+      <rect x="230" y="60" width="80" height="40" rx="3" fill="#0d1e35" stroke="#1a2f4a"/>
+      <text x="270" y="76" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#fbbf24">SQUEEZE</text>
+      <text x="270" y="88" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#4a6080">coiling</text>
+      <!-- Expansion -->
+      <text x="520" y="25" font-family="JetBrains Mono" font-size="9" fill="#00f5d4">Expansion</text>
+      <text x="520" y="38" font-family="JetBrains Mono" font-size="8" fill="#4a6080">breakout</text>
+    </svg>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>The squeeze is the setup, not the signal.</strong> When the bands contract (the range between upper and lower tightens), volatility is compressed. Energy is building. The next big move is coming — you just don't know which direction yet. Wait for the breakout.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Price riding the upper band is strength.</strong> Counterintuitively, price consistently touching or riding the upper band is a sign of momentum, not overextension. It means buyers are aggressive enough to keep pushing.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>The basis line (middle band) is your first support/resistance.</strong> In a trending move, price often pulls back to the 20-period moving average (the basis) and bounces. That's your entry on a retest in a clean trend.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>BB position tells you WHERE you are, not WHAT to do.</strong> "Near upper band" is context. It tells you the move has been strong. Combined with VWAP and Ichimoku, it helps you decide whether to chase or wait for a reset.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The most dangerous trade is buying because price "touched the lower band." In a downtrend, price can hug the lower band for weeks. Bollinger Bands tell you about volatility. They don't tell you about direction. For direction, look left — at structure.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-bb">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">The Bollinger Bands on your chart have been contracting for 3 days and are now the tightest they've been in a month. What's the correct interpretation?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-bb','a','b')">
+        <span class="quiz-letter">A</span>
+        <span>The stock is going to stay quiet. Time to look elsewhere.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-bb','b','b')">
+        <span class="quiz-letter">B</span>
+        <span>Volatility is compressed. A significant move is building — stay alert for a breakout in either direction.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-bb','c','b')">
+        <span class="quiz-letter">C</span>
+        <span>This is a buy signal — tight bands always precede an upward move.</span>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="quiz-bb-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section">
+  <button class="next-btn" onclick="showSection('rsi')">Next: RSI →</button>
+</div>
+</div>
+
+<!-- ══ RSI ══ -->
+<div id="section-rsi" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Concept 03</div>
+  <h2 class="section-title">RSI — <em style="font-family:var(--font-disp);font-style:italic">Momentum, Not Magic</em></h2>
+  <p class="section-intro">Relative Strength Index. A 0–100 oscillator that measures how fast and how far price has moved. Above 70 is "overbought." Below 30 is "oversold." Every new trader learns this rule. Every experienced trader learns why it's incomplete — and what RSI actually tells you when you use it correctly.</p>
+
+  <div class="visual-canvas">
+    <div class="canvas-label">RSI — the right and wrong way to read it</div>
+    <svg class="chart" viewBox="0 0 600 160">
+      <!-- RSI zones -->
+      <rect x="0" y="0" width="600" height="35" fill="#ff4d6d08"/>
+      <rect x="0" y="105" width="600" height="55" fill="#00f5d408"/>
+      <line x1="0" y1="35" x2="600" y2="35" stroke="#ff4d6d" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+      <line x1="0" y1="80" x2="600" y2="80" stroke="#4a6080" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="0" y1="105" x2="600" y2="105" stroke="#00f5d4" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+      <!-- Labels -->
+      <text x="8" y="22" font-family="JetBrains Mono" font-size="9" fill="#ff4d6d" opacity="0.8">70 — Overbought</text>
+      <text x="8" y="76" font-family="JetBrains Mono" font-size="9" fill="#4a6080">50 — Midline</text>
+      <text x="8" y="120" font-family="JetBrains Mono" font-size="9" fill="#00f5d4" opacity="0.8">30 — Oversold</text>
+      <!-- RSI line - showing divergence scenario -->
+      <path d="M 0 65 Q 60 50 120 25 Q 160 12 200 22 Q 240 32 280 30 Q 320 28 360 35 Q 400 42 440 38 Q 480 34 520 40 Q 560 46 600 50" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+      <!-- Divergence markers -->
+      <circle cx="120" cy="25" r="4" fill="#ff4d6d" opacity="0.8"/>
+      <circle cx="520" cy="40" r="4" fill="#ff4d6d" opacity="0.8"/>
+      <line x1="120" y1="25" x2="520" y2="40" stroke="#ff4d6d" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+      <text x="280" y="18" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#ff4d6d">RSI making lower highs</text>
+      <text x="280" y="30" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#4a6080">while price makes higher highs = Bear Div</text>
+    </svg>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--wait)"></div>
+      <div class="kp-text"><strong>Overbought doesn't mean sell.</strong> In a strong uptrend, RSI can stay above 70 for weeks. "Overbought" means momentum is high — it doesn't mean the move is over. Strong stocks stay overbought. Weak stocks can't even get there.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>RSI divergence is where it gets interesting.</strong> When price makes a new high but RSI makes a lower high — that's bearish divergence. Momentum is weakening even though price looks strong. This is a warning, not a guarantee, but it deserves your attention.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>The 50 line is the real story.</strong> RSI above 50 means more up days than down days in recent history. RSI below 50 means the reverse. Simple, clean, useful. The 70/30 zones are context — the 50 line is the battle line.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Timeframe matters enormously.</strong> RSI on a 5-minute chart is noise. RSI on a 65-minute chart is signal. In the ZION system, we specifically watch the 65m RSI for divergence because it's high enough to filter out the chop, low enough to give actionable warning.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>RSI trend zones — the most underused insight.</strong> In a genuine uptrend, RSI oscillates between 40 and 90, with the 40–50 zone acting as support on pullbacks. In a downtrend, it oscillates between 10 and 60, with 50–60 acting as resistance on bounces. If your stock is in an uptrend and RSI pulls back to 45 and holds — that's a buy signal, not a warning. The trend ID zone tells you where RSI should bounce if the trend is real.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>Centerline crossovers matter.</strong> RSI crossing above 50 means recent gains are outpacing recent losses — an uptrend is forming. RSI crossing below 50 means the reverse. In ZION, an RSI crossing above 50 on the 65m while TK is bullish is a double confirmation of momentum. Below 50 with bearish TK is a double warning.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>Failure swings — the advanced divergence signal.</strong> A bullish failure swing: RSI drops below 30, bounces back above 30, pulls back but holds above 30, then breaks its previous high. That sequence — without price necessarily making a new low — is a strong reversal signal. The bearish mirror: RSI exceeds 70, drops below 70, rallies but fails to reach 70 again, then breaks its previous low. These are early warnings before the price chart confirms.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">RSI is a speedometer, not a GPS. It tells you how fast you're going. It doesn't tell you where you're headed or whether you should stop. Use it to confirm what the structure is already telling you — not to override it.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <!-- RSI Quick Reference -->
+  <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:28px 0">
+    <div style="padding:10px 16px;background:#070f1e;border-bottom:1px solid var(--border);font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase">RSI Quick Reference — ZION Edition</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:var(--border)">
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--bear);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Overbought · Above 70</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Momentum is high — not a sell signal. In strong uptrends, RSI can stay above 70 for weeks. Only bearish if accompanied by divergence.</div>
+      </div>
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--teal);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Oversold · Below 30</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Momentum is low — not an automatic buy. In downtrends, RSI can stay below 30. Only bullish if structure supports a reversal.</div>
+      </div>
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--teal);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Uptrend Zone · 40–90</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">RSI bouncing between 40–90 confirms genuine uptrend. Pullback to 40–50 = potential buy zone if structure agrees.</div>
+      </div>
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--crimson);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Downtrend Zone · 10–60</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">RSI bouncing between 10–60 confirms downtrend. Rally to 50–60 = potential short zone or exit point for longs.</div>
+      </div>
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Bearish Divergence</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Price makes higher high, RSI makes lower high. Momentum weakening. Warning — not a sell signal alone. Confirm with structure.</div>
+      </div>
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Bullish Divergence</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Price makes lower low, RSI makes higher low. Sellers weakening. Potential reversal — confirm with candlestick trigger and VWAP.</div>
+      </div>
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Centerline Cross · 50</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">RSI crossing above 50 = uptrend forming. Below 50 = downtrend forming. In ZION, confirms TK direction on 65m.</div>
+      </div>
+      <div style="background:var(--panel);padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:9px;color:var(--wait);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Failure Swing</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">RSI fails to reach prior extreme on second attempt then breaks its own prior swing level. Early reversal warning before price confirms.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-block" id="quiz-rsi">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">A stock makes a new 52-week high. RSI on the 65m chart is at 62 — lower than it was at the previous high of 74. Price is still above VWAP and the Bollinger Bands are still expanding. What do you do?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-rsi','a','c')">
+        <span class="quiz-letter">A</span>
+        <span>Buy aggressively — new highs mean momentum is strong.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-rsi','b','c')">
+        <span class="quiz-letter">B</span>
+        <span>Sell immediately — RSI divergence is a confirmed sell signal.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-rsi','c','c')">
+        <span class="quiz-letter">C</span>
+        <span>Note the bearish RSI divergence as a warning. Stay in the trade if VWAP is holding and BB expansion continues, but tighten your stop and watch for confirmation of weakness.</span>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="quiz-rsi-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section">
+  <button class="next-btn" onclick="showSection('fvg')">Next: Fair Value Gaps →</button>
+</div>
+</div>
+
+<!-- ══ FVG ══ -->
+<div id="section-fvg" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Concept 04</div>
+  <h2 class="section-title">Fair Value Gaps — <em style="font-family:var(--font-disp);font-style:italic">Where Price Left Business Unfinished</em></h2>
+  <p class="section-intro">When price moves fast — really fast — it skips over price levels without giving buyers and sellers a chance to transact. That gap is called a Fair Value Gap (FVG). Markets have a tendency to come back and fill these gaps, as if they need to resolve unfinished business. FVGs are magnets.</p>
+
+  <div class="visual-canvas">
+    <div class="canvas-label">Fair Value Gap — 3-candle pattern</div>
+    <svg class="chart" viewBox="0 0 600 160">
+      <line x1="0" y1="40" x2="600" y2="40" stroke="#111f38" stroke-width="1"/>
+      <line x1="0" y1="80" x2="600" y2="80" stroke="#111f38" stroke-width="1"/>
+      <line x1="0" y1="120" x2="600" y2="120" stroke="#111f38" stroke-width="1"/>
+      <!-- Candle 1 -->
+      <rect x="80" y="80" width="18" height="40" rx="1" fill="#4ade80" opacity="0.8"/>
+      <line x1="89" y1="70" x2="89" y2="80" stroke="#4ade80" stroke-width="1.5"/>
+      <line x1="89" y1="120" x2="89" y2="128" stroke="#4ade80" stroke-width="1.5"/>
+      <!-- Candle 2 (the fast candle) -->
+      <rect x="120" y="30" width="18" height="50" rx="1" fill="#4ade80" opacity="0.9"/>
+      <line x1="129" y1="20" x2="129" y2="30" stroke="#4ade80" stroke-width="1.5"/>
+      <line x1="129" y1="80" x2="129" y2="88" stroke="#4ade80" stroke-width="1.5"/>
+      <!-- Candle 3 -->
+      <rect x="160" y="18" width="18" height="35" rx="1" fill="#4ade80" opacity="0.8"/>
+      <line x1="169" y1="10" x2="169" y2="18" stroke="#4ade80" stroke-width="1.5"/>
+      <line x1="169" y1="53" x2="169" y2="60" stroke="#4ade80" stroke-width="1.5"/>
+      <!-- FVG zone between candle 1 high and candle 3 low -->
+      <rect x="80" y="60" width="100" height="18" rx="2" fill="#00f5d4" opacity="0.15" stroke="#00f5d4" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="185" y="70" font-family="JetBrains Mono" font-size="9" fill="#00f5d4">← FVG (Bullish)</text>
+      <text x="185" y="82" font-family="JetBrains Mono" font-size="8" fill="#4a6080">price may return to fill</text>
+      <!-- Price returning to fill -->
+      <path d="M 190 20 Q 250 18 300 22 Q 360 30 400 55 Q 440 70 460 68 Q 480 66 500 72" fill="none" stroke="#fbbf24" stroke-width="2"/>
+      <text x="350" y="45" font-family="JetBrains Mono" font-size="9" fill="#fbbf24">price returns</text>
+      <text x="350" y="58" font-family="JetBrains Mono" font-size="8" fill="#4a6080">to fill the gap</text>
+      <!-- Fill marker -->
+      <circle cx="460" cy="68" r="4" fill="#00f5d4" opacity="0.8"/>
+      <text x="468" y="72" font-family="JetBrains Mono" font-size="9" fill="#00f5d4">filled ✓</text>
+    </svg>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>A bullish FVG is a potential support zone.</strong> When price came up fast and left a gap, and then pulls back into that gap — that's often where buyers re-enter. The gap acted as a launch pad. Now it may act as a landing pad.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>A bearish FVG is a potential resistance zone.</strong> Same logic, inverse direction. Price dropped fast, leaving a gap above. If price rallies back into that gap, sellers who missed the original move often re-enter there.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Not all FVGs get filled.</strong> In a strong trend, price may never look back. An FVG that holds as support confirms the trend is genuine. Use FVGs as context — a place to watch for reaction, not a guaranteed fill target.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>FVGs work on all timeframes.</strong> A daily FVG is significant. A 5-minute FVG is noise. In the ZION system, we use the 65m chart for FVG context — large enough to be meaningful, small enough to be actionable.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">Your Discord friends asking about FVGs are asking the right question. They're a legitimate edge — not because they always fill, but because price often reacts at them. When a FVG aligns with Kijun support and VWAP, you have a real thesis, not just a hope.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-fvg">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">Price surged 4% on Monday, leaving a clear bullish FVG on the 65m chart. On Wednesday, price pulls back into the FVG zone. What's the correct approach?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-fvg','a','b')">
+        <span class="quiz-letter">A</span>
+        <span>Buy immediately — FVGs always act as support.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-fvg','b','b')">
+        <span class="quiz-letter">B</span>
+        <span>Watch for price reaction at the FVG. Look for confirming signals — VWAP holding, RSI not diverging, bullish candle structure — before entering.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-fvg','c','b')">
+        <span class="quiz-letter">C</span>
+        <span>Ignore it — FVGs only matter on daily charts.</span>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="quiz-fvg-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section">
+  <button class="next-btn" onclick="showSection('together')">Next: Putting It Together →</button>
+</div>
+</div>
+
+<!-- ══ TOGETHER ══ -->
+<div id="section-together" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Concept 05</div>
+  <h2 class="section-title">The Full Picture — <em style="font-family:var(--font-disp);font-style:italic">Context Stacking</em></h2>
+  <p class="section-intro">No single tool is enough. VWAP tells you who's in control. Bollinger Bands tell you about volatility. RSI tells you about momentum. FVGs tell you where price left business unfinished. The art is reading them together — not in isolation.</p>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>The stack matters.</strong> <span class="badge badge-teal">VWAP ↑</span> + <span class="badge badge-gold">BB upper</span> + <span class="badge badge-blue">RSI 65+</span> = momentum confirmed on multiple levels. One bullish signal is a whisper. Three aligned signals are a conviction trade.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Conflict means wait.</strong> RSI overbought + price below VWAP = mixed message. Don't force a read. The best trades are the ones where every tool in your kit is saying the same thing. When they disagree, the market is disagreeing with itself. Let it resolve.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>This is the foundation — not the system.</strong> Everything in this module is what your ZION HUD is reading in real time. When the HUD shows VWAP slope, BB position, and RSI side-by-side, it's giving you this entire analysis in a single glance. Module 2 shows you why we add Ichimoku on top.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>Structure trading is a different game.</strong> There are people making serious money scalping 0DTE every day — that's real, and it requires real skill. This system is built for a different operator. You're reading a story that takes days to develop and getting paid when the chapter ends. Different path, different clock, different stress level. Pick the one that fits your life.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Confluence zones are where Module 1 meets Module 2.</strong> A support level (S/R) plus VWAP holding plus RSI in the uptrend zone plus a bullish engulfing candle — that's four independent signals pointing at the same price. That's a confluence zone. When you add Ichimoku structure (Module 2) on top — Kijun at that same level, cloud below, Chikou above — you've got the full ZION read. Every tool confirms. Nothing contradicts. That's the trade.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>The entry trigger is the last thing you look for.</strong> Structure first. Context second. Trigger last. A candlestick pattern at a confluence zone with full indicator alignment is a trigger worth acting on. The same candlestick pattern in the middle of nowhere with mixed signals is noise. Always build from the big picture down — never from the trigger up.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The best trade setup is boring. Everything agrees. There's nothing to argue about. You see it, you enter, you manage it, you exit. The exciting setups — where you're convincing yourself the signals aren't that bad — those are the ones that humble you.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-together">
+    <div class="quiz-label">◆ Final Check · Module 1</div>
+    <div class="quiz-question">You're analyzing a trade. Price is above VWAP ✓. BB bands just started expanding after a squeeze ✓. RSI is at 58 and rising ✓. There's a bullish FVG below current price that held on a retest ✓. What does this setup tell you?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-together','a','a')">
+        <span class="quiz-letter">A</span>
+        <span>Multiple timeframe and indicator confluence — all signals aligned bullish. This is the kind of stack worth considering a position in.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-together','b','a')">
+        <span class="quiz-letter">B</span>
+        <span>RSI at 58 is too low — wait for 70 before entering.</span>
+      </div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-together','c','a')">
+        <span class="quiz-letter">C</span>
+        <span>The BB expansion means it's too late — the move already happened.</span>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="quiz-together-feedback"></div>
+  </div>
+</section>
+
+<!-- Completion -->
+<div class="completion" id="completion">
+  <div class="completion-icon">◆</div>
+  <h2 class="completion-title">Module 1 Complete</h2>
+  <p class="completion-text">You now understand the four building blocks that every ZION trade is filtered through. VWAP gives you institutional context. Bollinger Bands give you volatility context. RSI gives you momentum context. FVGs give you structural context.<br><br>Module 2 is where we layer Ichimoku on top of all of this — and the whole system starts to click.</p>
+  <div class="completion-actions">
+    <a class="btn-primary" href="ZION_Dashboard.html">← Back to Dashboard</a>
+    <a class="btn-secondary" href="#">Module 2: Ichimoku →</a>
+  </div>
+</div>
+</div>
+
+<script>
+// ── Section navigation ─────────────────────────────────
+const SECTIONS = ['hero','vwap','bb','rsi','fvg','together'];
+const LABELS   = ['Intro','VWAP','Bollinger','RSI','FVGs','Together'];
+
+let completedSections = JSON.parse(localStorage.getItem('zion-m1-progress') || '{"hero":false,"vwap":false,"bb":false,"rsi":false,"fvg":false,"together":false}');
+
+const showSection = (id) => {
+  SECTIONS.forEach(s => {
+    const el = document.getElementById('section-' + s);
+    if(el) el.classList.toggle('visible', s === id);
+  });
+  document.querySelectorAll('.nav-link').forEach((el, i) => {
+    el.classList.toggle('active', SECTIONS[i] === id);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  completedSections[id] = true;
+  localStorage.setItem('zion-m1-progress', JSON.stringify(completedSections));
+  updateProgress();
+};
+
+const updateProgress = () => {
+  const done = Object.values(completedSections).filter(Boolean).length;
+  const pct  = Math.round((done / SECTIONS.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = pct + '% complete';
+};
+
+updateProgress();
+
+// ── Quiz logic ────────────────────────────────────────
+const FEEDBACK = {
+  'quiz-vwap': {
+    correct: "Exactly right. Price falling below VWAP means anyone who bought today is now underwater. The path of least resistance shifted to the downside. A good structure trader waits for VWAP recapture before entering long.",
+    wrong:   "Not quite. Price below VWAP means institutional sellers are in control. 'On sale' thinking is how traders get run over by distribution."
+  },
+  'quiz-bb': {
+    correct: "Correct. A Bollinger Band squeeze signals compressed volatility — the market is coiling. You don't know direction yet, but you know a move is coming. Watch the breakout, don't anticipate it.",
+    wrong:   "The squeeze is actually the most important setup BB can show you. It means the market is storing energy. The question is which way it releases — that requires additional context."
+  },
+  'quiz-rsi': {
+    correct: "Perfect read. Bearish RSI divergence is a warning, not a sell signal on its own. Structure (Ichimoku) still bullish means the trend is intact. You acknowledge the warning, manage your risk, but don't panic out of a good position.",
+    wrong:   "RSI divergence is a warning light, not a stop sign. Context matters — if structure is still bullish, the divergence means watch carefully, not exit immediately."
+  },
+  'quiz-fvg': {
+    correct: "Right approach. FVGs are zones of potential reaction, not guaranteed reversals. You watch, you look for confirmation, you enter only when multiple signals agree. Jumping in blind into an FVG is just a different kind of gambling.",
+    wrong:   "FVGs are powerful but not automatic. Price entering a FVG is the beginning of the read, not the end. Look for VWAP support, healthy RSI, and a confirming candle before committing capital."
+  },
+  'quiz-together': {
+    correct: "That's a PRIME setup. VWAP above, BB expanding, RSI building, FVG held. All four tools saying the same thing. This is the kind of alignment that justifies a structured position. Now add Ichimoku — Module 2 shows you how to confirm with cloud structure.",
+    wrong:   "Look at the full picture. All four signals are aligned bullishly. That's not noise — that's confluence. RSI at 58 rising is healthy momentum, not a problem. BB expansion is confirmation, not late entry."
+  }
+};
+
+const answerQuiz = (quizId, chosen, correct) => {
+  const opts = document.querySelectorAll(`#${quizId} .quiz-opt`);
+  const feedback = document.getElementById(`${quizId}-feedback`);
+  const fb = FEEDBACK[quizId];
+
+  opts.forEach((opt, i) => {
+    const letter = String.fromCharCode(97 + i); // a, b, c
+    opt.classList.add('disabled');
+    if(letter === correct) opt.classList.add('correct');
+    else if(letter === chosen) opt.classList.add('wrong');
+  });
+
+  const isCorrect = chosen === correct;
+  feedback.textContent = isCorrect ? '✓ ' + fb.correct : '✗ ' + fb.wrong;
+  feedback.className = `quiz-feedback show ${isCorrect ? 'good' : 'bad'}`;
+
+  // Show completion if on last section
+  if(quizId === 'quiz-together') {
+    setTimeout(() => {
+      document.getElementById('completion').scrollIntoView({ behavior: 'smooth' });
+    }, 800);
+  }
+};
+</script>
+</body>
+</html>

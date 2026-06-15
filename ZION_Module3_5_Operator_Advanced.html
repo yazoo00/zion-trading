@@ -1,0 +1,759 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Academy · Module 3.5: The Operator Advanced</title>
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --bull:#4ade80; --teal:#00f5d4; --bear:#f87171;
+  --crimson:#ff4d6d; --wait:#fb923c; --blue:#60a5fa;
+  --gold:#fbbf24; --purple:#a78bfa;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:14px; line-height:1.7; overflow-x:hidden; }
+
+/* ── Nav ── */
+.nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(5,13,26,.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); }
+.nav-logo span { color:var(--purple); }
+.nav-links { display:flex; gap:4px; }
+.nav-link { font-size:11px; color:var(--dim); padding:4px 10px; border-radius:4px; transition:color .15s,background .15s; cursor:pointer; text-decoration:none; }
+.nav-link:hover,.nav-link.active { color:var(--purple); background:#a78bfa10; }
+.nav-right { display:flex; align-items:center; gap:12px; }
+.progress-label { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.progress-bar { width:120px; height:3px; background:var(--border2); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--purple); border-radius:2px; transition:width .4s ease; width:0%; }
+
+/* ── Sections ── */
+.module-section { display:none; }
+.module-section.visible { display:block; }
+#section-hero { display:block; }
+
+/* ── Hero ── */
+.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 24px 80px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 40%, #a78bfa0d 0%, transparent 65%); pointer-events:none; }
+.module-eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.25em; color:var(--purple); text-transform:uppercase; margin-bottom:20px; }
+.hero-title { font-family:var(--font-disp); font-size:clamp(38px,6vw,76px); font-weight:700; color:var(--hdr); line-height:1.1; margin-bottom:16px; }
+.hero-title em { font-style:italic; color:var(--purple); }
+.hero-sub { font-size:17px; color:var(--text); max-width:600px; line-height:1.75; margin:0 auto 40px; }
+.hero-cta { display:inline-flex; align-items:center; gap:8px; background:var(--purple); color:#fff; font-weight:700; font-size:13px; padding:12px 28px; border-radius:6px; border:none; cursor:pointer; transition:background .2s,transform .15s; letter-spacing:.04em; }
+.hero-cta:hover { background:#9070e8; transform:translateY(-1px); }
+.hero-prereq { margin-top:20px; font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.hero-prereq a { color:var(--crimson); text-decoration:none; }
+.hero-prereq a:hover { text-decoration:underline; }
+
+/* ── Sections ── */
+.section { padding:100px 24px; max-width:860px; margin:0 auto; }
+.section-eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+.section-eyebrow::after { content:''; flex:1; height:1px; background:var(--border); }
+.section-title { font-family:var(--font-disp); font-size:clamp(28px,4vw,48px); font-weight:700; color:var(--hdr); line-height:1.2; margin-bottom:20px; }
+.section-intro { font-size:16px; color:var(--text); line-height:1.85; margin-bottom:48px; max-width:720px; }
+
+/* ── Key points ── */
+.key-points { display:flex; flex-direction:column; gap:10px; margin:24px 0; }
+.key-point { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; background:var(--panel); border-radius:6px; border-left:3px solid transparent; transition:border-color .2s; }
+.key-point:hover { border-left-color:var(--purple); }
+.kp-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:8px; }
+.kp-text { font-size:13px; color:var(--text); line-height:1.65; }
+.kp-text strong { color:var(--hdr); }
+
+/* ── Japanese concept cards ── */
+.jp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; margin:28px 0; }
+.jp-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:18px 20px; transition:border-color .2s,background .2s; }
+.jp-card:hover { border-color:var(--purple); background:var(--panel2); }
+.jp-name { font-family:var(--font-disp); font-size:18px; font-weight:700; color:var(--purple); margin-bottom:4px; }
+.jp-meaning { font-family:var(--font-data); font-size:10px; color:var(--dim); letter-spacing:.08em; margin-bottom:10px; }
+.jp-desc { font-size:12px; color:var(--text); line-height:1.65; }
+.jp-zion { font-size:11px; color:var(--purple); margin-top:10px; padding-top:10px; border-top:1px solid var(--border); line-height:1.55; }
+.jp-zion::before { content:'In ZION: '; font-weight:700; }
+
+/* ── Insight boxes ── */
+.insight-box { background:linear-gradient(135deg,#a78bfa10,#060e1e); border:1px solid #a78bfa30; border-radius:8px; padding:20px 24px; margin:28px 0; position:relative; }
+.insight-box::before { content:'"'; font-family:var(--font-disp); font-size:60px; color:var(--purple); opacity:.3; position:absolute; top:-10px; left:16px; line-height:1; }
+.insight-text { font-family:var(--font-disp); font-style:italic; font-size:16px; color:var(--hdr); line-height:1.65; padding-left:8px; }
+.insight-attr { font-family:var(--font-data); font-size:10px; color:var(--purple); letter-spacing:.1em; margin-top:10px; padding-left:8px; }
+
+/* ── Train insight ── */
+.train-box { background:var(--panel2); border:1px solid var(--border2); border-radius:10px; padding:28px 32px; margin:28px 0; text-align:center; position:relative; overflow:hidden; }
+.train-box::before { content:'🚂'; font-size:48px; position:absolute; top:20px; left:24px; opacity:.15; }
+.train-text { font-family:var(--font-disp); font-style:italic; font-size:20px; color:var(--hdr); line-height:1.65; margin-bottom:16px; }
+.train-attr { font-family:var(--font-data); font-size:10px; color:var(--dim); letter-spacing:.1em; margin-bottom:20px; }
+.train-zion { font-size:13px; color:var(--text); line-height:1.7; padding:14px 16px; background:var(--panel); border-radius:6px; border-left:3px solid var(--crimson); text-align:left; }
+
+/* ── Zone cards ── */
+.zone-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:28px 0; }
+@media(max-width:600px){ .zone-grid { grid-template-columns:1fr; } }
+.zone-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px 18px; }
+.zc-label { font-family:var(--font-data); font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }
+.zc-title { font-weight:600; color:var(--hdr); font-size:14px; margin-bottom:6px; }
+.zc-desc { font-size:12px; color:var(--text); line-height:1.65; }
+
+/* ── Habit loop ── */
+.habit-loop { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin:28px 0; background:var(--border); border-radius:10px; overflow:hidden; }
+@media(max-width:600px){ .habit-loop { grid-template-columns:1fr 1fr; } }
+.hl-step { background:var(--panel); padding:16px 14px; text-align:center; position:relative; }
+.hl-step::after { content:'→'; position:absolute; right:-8px; top:50%; transform:translateY(-50%); color:var(--dim); font-size:14px; z-index:1; }
+.hl-step:last-child::after { display:none; }
+.hl-num { font-family:var(--font-data); font-size:9px; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+.hl-title { font-weight:700; color:var(--hdr); font-size:13px; margin-bottom:6px; }
+.hl-sub { font-size:10px; color:var(--purple); font-style:italic; margin-bottom:8px; }
+.hl-desc { font-size:11px; color:var(--text); line-height:1.55; }
+
+/* ── Kaizen tracker ── */
+.kaizen-tracker { background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin:28px 0; }
+.kt-header { padding:14px 20px; background:#070f1e; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.kt-title { font-family:var(--font-data); font-size:10px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; }
+.kt-streak { font-family:var(--font-data); font-size:12px; font-weight:700; color:var(--gold); }
+.kt-items { padding:16px; display:flex; flex-direction:column; gap:8px; }
+.kt-item { display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--panel2); border-radius:6px; border:1px solid var(--border); cursor:pointer; transition:all .15s; }
+.kt-item:hover { border-color:var(--purple); }
+.kt-check { width:20px; height:20px; border-radius:4px; border:1px solid var(--border2); background:var(--panel); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all .2s; }
+.kt-item.done .kt-check { background:#a78bfa22; border-color:var(--purple); color:var(--purple); }
+.kt-item.done .kt-check::after { content:'✓'; }
+.kt-item.done .kt-text { color:var(--dim); text-decoration:line-through; }
+.kt-text { font-size:13px; color:var(--text); flex:1; }
+.kt-tag { font-family:var(--font-data); font-size:9px; padding:2px 6px; border-radius:3px; }
+.tag-daily { background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; }
+.tag-trade { background:#fbbf2418; color:var(--gold); border:1px solid #fbbf2433; }
+.tag-mind  { background:#a78bfa18; color:var(--purple); border:1px solid #a78bfa33; }
+.kt-progress-bar { height:4px; background:var(--border2); margin:0 16px 16px; border-radius:2px; overflow:hidden; }
+.kt-progress-fill { height:100%; background:var(--purple); border-radius:2px; transition:width .4s; }
+
+/* ── Philosophy builder ── */
+.phil-builder { background:var(--panel); border:1px solid var(--purple); border-radius:12px; overflow:hidden; margin:28px 0; }
+.pb-header { padding:16px 20px; background:#070f1e; border-bottom:1px solid var(--border); }
+.pb-title { font-family:var(--font-data); font-size:10px; letter-spacing:.15em; color:var(--purple); text-transform:uppercase; margin-bottom:4px; }
+.pb-sub { font-size:12px; color:var(--dim); }
+.pb-body { padding:20px; display:flex; flex-direction:column; gap:16px; }
+.pb-question { font-size:13px; font-weight:600; color:var(--hdr); margin-bottom:8px; }
+.pb-input { width:100%; background:var(--panel2); border:1px solid var(--border2); border-radius:6px; color:var(--text); font-family:var(--font-ui); font-size:13px; padding:10px 14px; outline:none; transition:border-color .15s; resize:none; min-height:60px; line-height:1.6; }
+.pb-input:focus { border-color:var(--purple); }
+.pb-input::placeholder { color:var(--dim); font-size:12px; }
+.pb-generate { width:100%; font-family:var(--font-data); font-size:12px; font-weight:700; padding:12px; background:var(--purple); color:#fff; border:none; border-radius:6px; cursor:pointer; letter-spacing:.08em; transition:background .2s; margin-top:4px; }
+.pb-generate:hover { background:#9070e8; }
+.pb-output { display:none; margin-top:4px; }
+.pb-output.show { display:block; }
+.pb-statement { background:linear-gradient(135deg,#a78bfa12,#060e1e); border:1px solid #a78bfa40; border-radius:8px; padding:24px 28px; font-family:var(--font-disp); font-style:italic; font-size:16px; color:var(--hdr); line-height:1.75; position:relative; margin-bottom:12px; }
+.pb-statement::before { content:'"'; font-size:48px; color:var(--purple); opacity:.3; position:absolute; top:-8px; left:16px; line-height:1; }
+.pb-actions { display:flex; gap:8px; }
+.pb-copy { font-size:11px; padding:7px 16px; border-radius:4px; border:1px solid var(--purple); background:transparent; color:var(--purple); cursor:pointer; font-family:var(--font-ui); transition:all .2s; }
+.pb-copy:hover { background:#a78bfa20; }
+.pb-copy.copied { border-color:var(--teal); color:var(--teal); }
+.pb-reset { font-size:11px; padding:7px 16px; border-radius:4px; border:1px solid var(--border2); background:transparent; color:var(--dim); cursor:pointer; font-family:var(--font-ui); transition:all .2s; }
+.pb-reset:hover { border-color:var(--border2); color:var(--text); }
+
+/* ── Warning box ── */
+.warning-box { background:linear-gradient(135deg,#ff4d6d10,#060e1e); border:1px solid #ff4d6d30; border-radius:8px; padding:20px 24px; margin:28px 0; }
+.warning-text { font-size:13px; color:var(--text); line-height:1.7; padding-left:8px; }
+.warning-text strong { color:var(--crimson); }
+
+/* ── Divider / Nav ── */
+.divider { border:none; border-top:1px solid var(--border); margin:0; }
+.next-section { display:flex; justify-content:center; padding:60px 24px; }
+.next-btn { display:inline-flex; align-items:center; gap:10px; background:transparent; border:1px solid var(--border2); color:var(--dim); font-family:var(--font-ui); font-size:13px; padding:10px 24px; border-radius:6px; cursor:pointer; transition:all .2s; }
+.next-btn:hover { border-color:var(--purple); color:var(--purple); background:#a78bfa08; }
+
+/* ── Completion ── */
+.completion { text-align:center; padding:100px 24px; max-width:640px; margin:0 auto; }
+.completion-icon { font-size:48px; margin-bottom:20px; }
+.completion-title { font-family:var(--font-disp); font-size:36px; color:var(--hdr); margin-bottom:16px; }
+.completion-text { font-size:15px; color:var(--text); line-height:1.85; margin-bottom:40px; }
+.completion-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn-primary { background:var(--purple); color:#fff; font-weight:700; font-size:13px; padding:12px 28px; border-radius:6px; border:none; cursor:pointer; text-decoration:none; display:inline-block; transition:background .2s; }
+.btn-secondary { background:transparent; color:var(--blue); font-size:13px; padding:12px 28px; border-radius:6px; border:1px solid var(--blue); cursor:pointer; text-decoration:none; display:inline-block; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div class="nav-links">
+    <span class="nav-link active" onclick="showSection('hero')">Intro</span>
+    <span class="nav-link" onclick="showSection('ikigai')">Ikigai</span>
+    <span class="nav-link" onclick="showSection('zone')">The Zone</span>
+    <span class="nav-link" onclick="showSection('kaizen')">Kaizen</span>
+    <span class="nav-link" onclick="showSection('train')">Wrong Train</span>
+    <span class="nav-link" onclick="showSection('wabisabi')">Wabi-Sabi</span>
+    <span class="nav-link" onclick="showSection('philosophy')">Your Philosophy</span>
+  </div>
+  <div class="nav-right">
+    <span class="progress-label" id="progressLabel">0% complete</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div id="section-hero" class="module-section visible">
+<section class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="module-eyebrow">ZION · Module 03.5 · The Operator: Advanced</div>
+    <h1 class="hero-title">Module 3 taught you<br><em>what to do.</em></h1>
+    <p class="hero-sub">This one is about who to be. The system is the easy part. You can learn Ichimoku in a weekend. What takes a lifetime — and what separates the traders who last from the ones who don't — is the inner work. This module doesn't teach you more indicators. It teaches you more about yourself.</p>
+    <button class="hero-cta" onclick="showSection('ikigai')">→ Begin Module 3.5</button>
+    <div class="hero-prereq">Prerequisites: <a href="ZION_Module3_Operator.html">Module 3: The Operator</a> · Complete that first.</div>
+  </div>
+</section>
+<div class="next-section"><button class="next-btn" onclick="showSection('ikigai')">Begin: Ikigai →</button></div>
+</div>
+
+<!-- ══ IKIGAI ══ -->
+<div id="section-ikigai" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 01</div>
+  <h2 class="section-title">Ikigai — <em style="font-family:var(--font-disp);font-style:italic">Why You're Really Here</em></h2>
+  <p class="section-intro">Ikigai is a Japanese concept meaning "reason for being." It sits at the intersection of four things: what you love, what you're good at, what the world needs, and what you can be paid for. When all four align — that's ikigai. That's purpose. And purpose, it turns out, is the most powerful trading edge you'll ever develop.</p>
+
+  <div class="insight-box">
+    <p class="insight-text">There's a very specific feeling that happens when you find your thing. Not a thing — THE thing. Your brain sends signals. You get flush. You feel something in your chest that's hard to describe. You feel, for the first time in a while, like you're exactly where you're supposed to be. That feeling is not a distraction. It's data. It's your nervous system saying yes.</p>
+    <div class="insight-attr">— ZION Trading Philosophy · On finding your ikigai</div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>"To make money" is not your why.</strong> That's the result. The why is what drives you to the screen on the days when you've had three losing trades in a row and every instinct says quit. The why is what made you build a system instead of just gambling. The why is what's going to keep you improving long after most traders have given up.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Your background is your edge.</strong> 25 years of reading complex, dynamic, high-stakes systems under pressure. Sequencing. Pattern recognition. Making confident decisions with incomplete information in real time. You didn't come to trading as a civilian. You came as an operator who already knew how to read a complicated environment and act decisively. That's rare. That's an edge.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Ikigai sustains you through drawdowns.</strong> When you're in a losing streak — and you will be, the math guarantees it — the trader whose why is "make money" quits or panics or revenge trades. The trader whose why is "build something meaningful, master a discipline, create financial freedom for my family" — that trader adjusts, reviews, learns, and comes back. Purpose is the antidote to drawdown psychology.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>The course IS the ikigai in action.</strong> You're not just trading. You're building a system, developing a teaching methodology, creating tools that will help other people find their own path. That's what you love, what you're good at, what people need, and what you can charge for. All four quadrants. That's the full thing.</div>
+    </div>
+  </div>
+
+  <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--purple);text-transform:uppercase;margin-bottom:16px">◆ Ikigai Self-Reflection</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:var(--panel);border-radius:6px;padding:14px;border:1px solid #a78bfa33">
+        <div style="font-size:11px;color:var(--purple);font-weight:600;margin-bottom:8px">What I Love About Trading</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">Reading structure. Finding the setup. The moment when everything aligns and you see it before the move happens. The system building. The teaching. The community.</div>
+      </div>
+      <div style="background:var(--panel);border-radius:6px;padding:14px;border:1px solid #00f5d433">
+        <div style="font-size:11px;color:var(--teal);font-weight:600;margin-bottom:8px">What I'm Good At</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">Reading complex dynamic systems under pressure. Pattern recognition. Sequencing. Calm decision-making with incomplete information. Teaching what I know.</div>
+      </div>
+      <div style="background:var(--panel);border-radius:6px;padding:14px;border:1px solid #fbbf2433">
+        <div style="font-size:11px;color:var(--gold);font-weight:600;margin-bottom:8px">What the World Needs</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">A trading system built on structure and discipline rather than gambling and FOMO. A teacher who's honest about the emotional difficulty. Tools that actually work.</div>
+      </div>
+      <div style="background:var(--panel);border-radius:6px;padding:14px;border:1px solid #60a5fa33">
+        <div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:8px">What I Can Be Paid For</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">Trading profits. Course tuition. Tool subscriptions. Consulting. Community membership. Coaching. The whole ecosystem — all built from this one system.</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,#a78bfa12,#060e1e);border-radius:6px;border:1px solid #a78bfa33;font-family:var(--font-disp);font-style:italic;font-size:14px;color:var(--hdr);line-height:1.7;text-align:center">
+      When all four overlap — that's your ikigai. That's ZION. That's why the feeling is real.
+    </div>
+  </div>
+
+  <div class="quiz-block" id="quiz-ikigai" style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;margin:40px 0">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:14px">◆ Reflection Check</div>
+    <div style="font-size:15px;font-weight:600;color:var(--hdr);margin-bottom:16px;line-height:1.5">You've just had a losing week — three trades stopped out, account down 8%. What does ikigai tell you to do?</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-ikigai','a','b')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">A</span><span>Increase position size next week to recover faster — conviction in the system means going bigger.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-ikigai','b','b')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">B</span><span>Review the three trades honestly — did I follow the system or override it? Reconnect with why I'm doing this. Come back next week with the same size and the same discipline.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-ikigai','c','b')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">C</span><span>Take a break from trading — losing weeks mean the system isn't working.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-ikigai-feedback" style="margin-top:14px;padding:12px 16px;border-radius:6px;font-size:13px;line-height:1.6;display:none"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('zone')">Next: Trading in The Zone →</button></div>
+</div>
+
+<!-- ══ THE ZONE ══ -->
+<div id="section-zone" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 02</div>
+  <h2 class="section-title">The Zone — <em style="font-family:var(--font-disp);font-style:italic">Trading in Probabilities</em></h2>
+  <p class="section-intro">Mark Douglas spent his career studying why traders fail. His conclusion: it's not the system. It's the psychology. Specifically, the inability to think in probabilities — to truly accept that every trade is just one outcome in a long series, and that no single outcome defines you, your system, or your future.</p>
+
+  <div class="zone-grid">
+    <div class="zone-card" style="border-left:3px solid var(--crimson)">
+      <div class="zc-label" style="color:var(--crimson)">How Most Traders Think</div>
+      <div class="zc-title">Outcome-Based</div>
+      <div class="zc-desc">Each trade is evaluated on its own result. A win feels like proof the system works. A loss feels like proof it doesn't. Emotional state swings with every trade. The trader is either overconfident or devastated, rarely in between. This is the psychology that leads to revenge trading, over-sizing, and account destruction.</div>
+    </div>
+    <div class="zone-card" style="border-left:3px solid var(--teal)">
+      <div class="zc-label" style="color:var(--teal)">How ZION Traders Think</div>
+      <div class="zc-title">Probability-Based</div>
+      <div class="zc-desc">Each trade is one sample in a large series. The system has an edge over many trades — not on every trade. A loss is expected and budgeted for. A win is welcome but not a signal to get bigger. The emotional state stays flat because the result of any single trade is genuinely irrelevant to the long-term outcome.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>"The market is neutral — all it does is generate information about itself."</strong> This is one of the most liberating ideas in trading psychology. The market is not trying to take your money. It doesn't know you exist. It's just price moving based on the aggregate decisions of millions of participants. Your job is to read that information clearly — without fear, without greed, without ego distorting the signal.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>You can take the risk but not accept it.</strong> This is the subtle distinction that ruins most traders. Taking a risk means entering the trade. Accepting the risk means genuinely being at peace with the possibility that you lose the full position. If you haven't accepted the loss before you enter, you'll make irrational decisions after you enter — holding too long, cutting too early, or revenge trading the exit.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>Most trading errors come from fear.</strong> Fear of being wrong. Fear of losing money. Fear of missing out. Fear of leaving money on the table. Every one of these fears causes you to override your system at exactly the wrong moment. The antidote isn't to eliminate fear — it's to trust your edge enough that fear becomes irrelevant. Trust is built through journaling, reviewing, and following the system consistently.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>"Your mental state determines your bottom line."</strong> Not your indicators. Not your system. Not even your entries. The same setup, in the hands of a calm operator vs a fearful one, produces different outcomes because the calm operator executes the plan and the fearful one modifies it mid-trade. The ZION pre-trade checklist exists to ensure you only trade when your mental state is suitable.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>The emotional part of trading is by far the most difficult thing to master.</strong> And you'll know you've mastered it when you stop being surprised by losses, stop getting euphoric about wins, and feel the same quiet confidence whether the last trade was a winner or a loser. You'll know you're there when the process feels more important than the outcome. We'll let you know when we get there.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">Whatever degree you haven't accepted the risk is the same degree you will avoid it. Trying to avoid the unavoidable will have disastrous effects on your account.</p>
+    <div class="insight-attr">— Mark Douglas · Trading in the Zone</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-zone" style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;margin:40px 0">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:14px">◆ Reflection Check</div>
+    <div style="font-size:15px;font-weight:600;color:var(--hdr);margin-bottom:16px;line-height:1.5">You enter a trade and it immediately goes against you by 20%. You had planned to exit at 40% loss. What does probability-based thinking tell you to do?</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-zone','a','c')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">A</span><span>Exit immediately — a 20% loss early means the trade is wrong.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-zone','b','c')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">B</span><span>Hold and hope — it'll come back.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-zone','c','c')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">C</span><span>Follow the plan. You defined 40% as the stop before you entered because you'd accepted that loss. The 20% move is noise until it isn't. Trust the plan you made with a clear head, not the fear you feel right now.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-zone-feedback" style="margin-top:14px;padding:12px 16px;border-radius:6px;font-size:13px;line-height:1.6;display:none"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('kaizen')">Next: Kaizen →</button></div>
+</div>
+
+<!-- ══ KAIZEN ══ -->
+<div id="section-kaizen" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 03</div>
+  <h2 class="section-title">Kaizen — <em style="font-family:var(--font-disp);font-style:italic">1% Better Every Day</em></h2>
+  <p class="section-intro">Kaizen is the Japanese philosophy of continuous improvement through small, consistent steps. Not giant leaps. Not overnight transformations. Just 1% better today than yesterday, applied relentlessly over time. In trading, as in life, the compound effect of daily discipline is the only sustainable edge.</p>
+
+  <div style="background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-bottom:28px;text-align:center">
+    <div style="font-family:var(--font-data);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">The Math of Kaizen</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+      <div>
+        <div style="font-family:var(--font-data);font-size:32px;font-weight:700;color:var(--teal)">37.78x</div>
+        <div style="font-size:12px;color:var(--text);margin-top:4px">Better in one year if you improve 1% every day</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-data);font-size:32px;font-weight:700;color:var(--crimson)">0.03x</div>
+        <div style="font-size:12px;color:var(--text);margin-top:4px">Of your current self in one year if you decline 1% every day</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--dim);margin-top:16px">The gap between discipline and complacency, compounded daily for a year, is 37.78 versus 0.03. That's not a small difference. That's everything.</div>
+  </div>
+
+  <!-- Habit loop -->
+  <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:12px">The Habit Loop — Applied to Trading</div>
+  <div class="habit-loop">
+    <div class="hl-step">
+      <div class="hl-num">01</div>
+      <div class="hl-title">Cue</div>
+      <div class="hl-sub">Make it obvious</div>
+      <div class="hl-desc">Open the Command Center every morning. The dashboard IS the cue. Make it impossible to miss.</div>
+    </div>
+    <div class="hl-step">
+      <div class="hl-num">02</div>
+      <div class="hl-title">Craving</div>
+      <div class="hl-sub">Make it attractive</div>
+      <div class="hl-desc">The ZION system is beautiful. The Dark Cockpit. The sector colors. The signal stack. You built something worth opening.</div>
+    </div>
+    <div class="hl-step">
+      <div class="hl-num">03</div>
+      <div class="hl-title">Response</div>
+      <div class="hl-sub">Make it easy</div>
+      <div class="hl-desc">Pre-trade checklist is one click. Watchlist loads automatically. Flow scanner is one paste. Friction removed.</div>
+    </div>
+    <div class="hl-step">
+      <div class="hl-num">04</div>
+      <div class="hl-title">Reward</div>
+      <div class="hl-sub">Make it satisfying</div>
+      <div class="hl-desc">Journal the trade. Track the P/L. Watch the system work. The streak is the reward. The discipline is the satisfaction.</div>
+    </div>
+  </div>
+
+  <div class="key-points" style="margin-top:28px">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>Identity-based habits beat outcome-based goals.</strong> "I want to make $10,000 trading" is an outcome. "I am a disciplined structure trader who follows his system" is an identity. The identity drives the behavior. The behavior produces the outcome. Start with who you want to be, not what you want to have.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>The journal is your kaizen engine.</strong> Every trade logged is a data point. Every week reviewed is a pattern identified. Every month analyzed is a lesson compounded. The trader who journals consistently is running a feedback loop that improves their edge over time. The trader who doesn't is just repeating the same mistakes with slightly more frustration.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Habit stacking works.</strong> "After I open the Command Center, I will run the pre-trade checklist. After I complete the checklist, I will check the sector panel. After I identify the leading sector, I will run the sector screener." Chain the behaviors. Remove the decision-making. The ritual becomes automatic.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>Fall in love with boredom.</strong> James Clear's most important insight: "The only way to become excellent is to be endlessly fascinated by doing the same thing over and over." The ZION read is the same every day. Tenkan, Kijun, cloud, Chikou, VWAP slope, daily gate. Every day. Forever. The traders who win are the ones who never get bored of doing it right.</div>
+    </div>
+  </div>
+
+  <!-- Daily Kaizen tracker -->
+  <div class="kaizen-tracker" id="kaizenTracker">
+    <div class="kt-header">
+      <span class="kt-title">Daily Operator Checklist — Kaizen Edition</span>
+      <span class="kt-streak" id="kaizenStreak">0/8 today</span>
+    </div>
+    <div class="kt-items">
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">Morning structure read — Command Center open, sector panel reviewed</div><span class="kt-tag tag-daily">Daily</span></div>
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">Pre-trade checklist completed before any entry</div><span class="kt-tag tag-trade">Trade</span></div>
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">No trades taken outside ZION signal alignment</div><span class="kt-tag tag-trade">Trade</span></div>
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">Journal entry written — win, loss, or no trade</div><span class="kt-tag tag-daily">Daily</span></div>
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">Sat on hands during Midday Chop (11:30am–1:30pm)</div><span class="kt-tag tag-trade">Trade</span></div>
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">Read 10 pages — trading, psychology, or anything that makes me better</div><span class="kt-tag tag-mind">Mind</span></div>
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">Physical movement — walk, exercise, anything that isn't screen time</div><span class="kt-tag tag-mind">Mind</span></div>
+      <div class="kt-item" onclick="toggleKaizen(this)"><div class="kt-check"></div><div class="kt-text">End of day review — did I follow the system or override it?</div><span class="kt-tag tag-daily">Daily</span></div>
+    </div>
+    <div class="kt-progress-bar"><div class="kt-progress-fill" id="kaizenProgress" style="width:0%"></div></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('train')">Next: The Wrong Train →</button></div>
+</div>
+
+<!-- ══ WRONG TRAIN ══ -->
+<div id="section-train" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 04</div>
+  <h2 class="section-title">The Wrong Train — <em style="font-family:var(--font-disp);font-style:italic">Getting Off Early</em></h2>
+  <p class="section-intro">There's a Japanese legend that captures one of the most important — and most violated — principles in trading. It's not about trains. It never was.</p>
+
+  <div class="train-box">
+    <p class="train-text">"If you get on the wrong train, get off at the nearest station. The longer it takes you to get off, the more expensive the return trip will be."</p>
+    <div class="train-attr">Japanese Legend</div>
+    <div class="train-zion">
+      <strong style="color:var(--crimson)">In trading:</strong> The wrong train is the trade that's not working. The nearest station is your predefined stop. The expensive return trip is holding a losing position past your stop, watching it go from -30% to -60% to -90%, desperately hoping for a bounce that may never come. The Kijun is your station. When price closes below it — get off the train. Every bar you stay on costs you more and makes the recovery harder.
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>Sunk cost is the engine that keeps you on the wrong train.</strong> "I've already lost 40% — I can't sell now." Yes you can. The 40% is gone whether you sell or not. The only question is whether you lose 40% or 90%. The money you've already lost has no vote on what happens next. Get off the train.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--wait)"></div>
+      <div class="kp-text"><strong>Hope is not a trading strategy.</strong> "It'll bounce" is a complete sentence that has destroyed more accounts than bad entries ever will. A bad entry with a good stop is a small loss. A bad entry with hope instead of a stop is a potential account-ender. Define your stop before you enter. Honor it when it's hit.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>The ZION Kijun stop is your nearest station.</strong> Not arbitrary. Not emotional. Structural. Price closing a 65m bar below the Kijun means the structure that justified the trade is gone. The thesis is broken. Get off the train at the nearest station — which is the next 65m close below Kijun — not three stations later when you've rationalized staying through four more bad bars.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Exiting a bad trade is a skill, not a failure.</strong> The best traders in the world exit losing trades quickly and without ceremony. They don't agonize. They don't hope. They don't journal about it for three days. They get off the wrong train, walk across the platform, and look for the right one. The loss is the tuition. The discipline is the lesson. Move on.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">Tuition is only expensive if you don't learn from it. Every loss that happened outside the system is data — it tells you exactly where your discipline broke down. Log it. Name it. "I stayed on the wrong train because I didn't want to admit I was wrong." That sentence, written honestly, is worth more than the money you lost.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-train" style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;margin:40px 0">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:14px">◆ Reflection Check</div>
+    <div style="font-size:15px;font-weight:600;color:var(--hdr);margin-bottom:16px;line-height:1.5">Your call position is down 45%. Price just closed below the Kijun on the 65m — your predefined stop. It's currently 11am. The chart "looks like it might bounce." What do you do?</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="quiz-opt" onclick="answerQuiz('quiz-train','a','b')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">A</span><span>Wait for one more bar — maybe it reclaims the Kijun and I can avoid the loss.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-train','b','b')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">B</span><span>Exit. The Kijun closed below is the stop — the thesis is broken. Get off the train now. Log it, learn from it, move on.</span></div>
+      <div class="quiz-opt" onclick="answerQuiz('quiz-train','c','b')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)"><span style="font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px">C</span><span>Hold until expiration — it's only worth a few hundred dollars anyway.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-train-feedback" style="margin-top:14px;padding:12px 16px;border-radius:6px;font-size:13px;line-height:1.6;display:none"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('wabisabi')">Next: Wabi-Sabi →</button></div>
+</div>
+
+<!-- ══ WABI-SABI ══ -->
+<div id="section-wabisabi" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 05</div>
+  <h2 class="section-title">Wabi-Sabi — <em style="font-family:var(--font-disp);font-style:italic">Beauty in Imperfection</em></h2>
+  <p class="section-intro">Wabi-sabi is the Japanese art of finding beauty in imperfection and accepting the transient nature of things. A cracked tea bowl is more interesting than a perfect one — the crack tells a story. A losing trade handled with discipline is more valuable than a winning trade taken recklessly. The imperfection is where the learning lives.</p>
+
+  <div class="jp-grid">
+    <div class="jp-card">
+      <div class="jp-name">Wabi-Sabi</div>
+      <div class="jp-meaning">Beauty in imperfection · Acceptance of transience</div>
+      <div class="jp-desc">Nothing is perfect. Nothing is finished. Nothing lasts. These aren't failures — they're the nature of things. The trader who accepts this stops chasing the perfect trade and starts executing consistently imperfect ones.</div>
+      <div class="jp-zion">A 60% win rate means 40% of your trades lose. That 40% is not broken — it's built in. Accept it before you enter the first trade.</div>
+    </div>
+    <div class="jp-card">
+      <div class="jp-name">Shoshin</div>
+      <div class="jp-meaning">Beginner's mind · Approaching with openness</div>
+      <div class="jp-desc">In the beginner's mind there are many possibilities. In the expert's mind there are few. Approaching each trading session with fresh eyes — without assumptions from yesterday's session — keeps you reading what IS, not what you expect.</div>
+      <div class="jp-zion">Yesterday's PRIME ▲ setup doesn't mean today's is equally valid. Read each day's structure fresh. The chart doesn't owe you yesterday's continuation.</div>
+    </div>
+    <div class="jp-card">
+      <div class="jp-name">Ganbaru</div>
+      <div class="jp-meaning">Doing one's best · Persevering through challenges</div>
+      <div class="jp-desc">Not just trying hard — persisting with full effort through difficulty, without complaint, with dignity. Ganbaru is the mindset during a drawdown. You don't quit. You don't rage. You do the work, follow the system, and trust the compound effect.</div>
+      <div class="jp-zion">The drawdown is the ganbaru test. Every trader faces one. The ones who persist through it with discipline intact come out the other side with a system they genuinely trust.</div>
+    </div>
+    <div class="jp-card">
+      <div class="jp-name">Gaman</div>
+      <div class="jp-meaning">Patience and perseverance when things are hard</div>
+      <div class="jp-desc">Enduring the seemingly unbearable with patience and dignity. In trading terms: sitting on your hands during Midday Chop when every impulse says trade something. Waiting for full confluence when a partial setup is tempting. Holding your stop even when it hurts.</div>
+      <div class="jp-zion">WAIT is gaman in action. The HUD showing WAIT on everything is not a problem. It's the system working. Gaman is the discipline to honor it.</div>
+    </div>
+  </div>
+
+  <!-- Talent won't save you + Meditate -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:28px 0">
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px 20px;border-left:3px solid var(--crimson)">
+      <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.12em;color:var(--crimson);text-transform:uppercase;margin-bottom:10px">Talent Alone Won't Save You</div>
+      <div style="font-size:12px;color:var(--text);line-height:1.7">The market is full of intelligent traders who blow up their accounts. Why? Because they rely on their intelligence instead of doing the monotonous work of following the system. Grit. Resilience. Discipline. These are the skills that separate the ones who last from the ones who don't. Talent is an advantage — but only stacked on top of the actual repetitive work.</div>
+      <div style="font-size:11px;color:var(--crimson);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">In ZION: Being smart enough to build the system means nothing if you override it every time the market stresses you.</div>
+    </div>
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px 20px;border-left:3px solid var(--teal)">
+      <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;margin-bottom:10px">The Operator Needs Maintenance</div>
+      <div style="font-size:12px;color:var(--text);line-height:1.7">You walked away from the cortisol-soaked environment of day trading. Don't rebuild it. Meditation lowers cortisol. Sleep consolidates the pattern recognition your brain did during the session. Exercise clears the mental residue of a frustrating day. These aren't distractions from trading — they're part of the trading practice. The operator IS the instrument.</div>
+      <div style="font-size:11px;color:var(--teal);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">In ZION: The Kaizen tracker includes physical movement and mental clarity for exactly this reason. The chart read is only as good as the mind reading it.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--purple)"></div>
+      <div class="kp-text"><strong>The losing trade is not the enemy.</strong> The losing trade that was taken correctly — with full system alignment, proper sizing, defined stop — is not a failure. It's the system operating as designed. Some trades lose. That's in the math. The enemy is the losing trade taken outside the system, because that one tells you something broke in the operator.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Find the lesson in every imperfect trade.</strong> The crack in the tea bowl. What did the losing trade teach you about your entry timing? Your sizing? Your emotional state? The trade journal isn't a record of wins and losses — it's a collection of lessons. The imperfections, examined honestly, make you better.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Perfection is the enemy of consistency.</strong> Waiting for the perfect setup — five of five conditions, pristine chart, ideal sector, flawless entry timing — means you'll trade rarely and miss the edge that comes from consistently executing good-enough setups with discipline. PRIME ▲ with all gates open is enough. You don't need perfection. You need consistency.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">You are not building a perfect trading record. You are building a disciplined trading practice. The practice, applied consistently over time, produces results that no single perfect trade ever could.</p>
+    <div class="insight-attr">— ZION Trading Philosophy</div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('philosophy')">Final Section: Your Trading Philosophy →</button></div>
+</div>
+
+<!-- ══ PHILOSOPHY BUILDER ══ -->
+<div id="section-philosophy" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 06 · The Signature Element</div>
+  <h2 class="section-title">Your Trading Philosophy — <em style="font-family:var(--font-disp);font-style:italic">In Your Own Words</em></h2>
+  <p class="section-intro">Everything in this module comes down to one thing: knowing who you are as a trader. Your why. Your values. Your non-negotiables. The statement you're about to build is the thing you read before every session. It reminds you what you're doing here and who you've committed to being. Take your time. Be honest. This one's for you.</p>
+
+  <div class="phil-builder">
+    <div class="pb-header">
+      <div class="pb-title">Personal Trading Philosophy Builder</div>
+      <div class="pb-sub">Answer four questions. Get your statement. Print it. Pin it. Mean it.</div>
+    </div>
+    <div class="pb-body">
+      <div>
+        <div class="pb-question">1. Why do you trade? (Not "to make money" — go deeper.)</div>
+        <textarea class="pb-input" id="pb1" placeholder="e.g. To build financial freedom so I can choose how I spend my time. To master a discipline that rewards patience and punishes ego. To build something I'm proud of and teach others…"></textarea>
+      </div>
+      <div>
+        <div class="pb-question">2. What kind of trader do you commit to being?</div>
+        <textarea class="pb-input" id="pb2" placeholder="e.g. Disciplined. Patient. Honest about my mistakes. A structure trader who waits for full confluence and never chases…"></textarea>
+      </div>
+      <div>
+        <div class="pb-question">3. What is your non-negotiable rule — the one thing you will never do?</div>
+        <textarea class="pb-input" id="pb3" placeholder="e.g. I will never trade to recover a loss. I will never size up out of excitement. I will never hold a position past my structural stop…"></textarea>
+      </div>
+      <div>
+        <div class="pb-question">4. What does success look like for you — in one year, done right?</div>
+        <textarea class="pb-input" id="pb4" placeholder="e.g. A consistent win rate, a growing account, a trading course that helps other people, and the discipline to know when to sit on my hands…"></textarea>
+      </div>
+      <button class="pb-generate" onclick="buildPhilosophy()">◆ Build My Trading Philosophy</button>
+
+      <div class="pb-output" id="pbOutput">
+        <div class="pb-statement" id="pbStatement"></div>
+        <div class="pb-actions">
+          <button class="pb-copy" id="pbCopy" onclick="copyPhilosophy()">Copy to Clipboard</button>
+          <button class="pb-reset" onclick="resetPhilosophy()">Start Over</button>
+        </div>
+        <div style="font-size:12px;color:var(--dim);margin-top:12px;font-family:var(--font-data);line-height:1.6">Print this. Put it next to your screen. Read it before every session. This is who you are as a trader — not who you're trying to be. Who you ARE.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Completion -->
+<div class="completion" id="completion">
+  <div class="completion-icon">◆</div>
+  <h2 class="completion-title">Module 3.5 Complete</h2>
+  <p class="completion-text">
+    You found your ikigai — the intersection of what you love, what you're good at, what the world needs, and what you can be paid for. You learned to trade in probabilities, not outcomes. You built your kaizen practice into a daily ritual. You know how to get off the wrong train. You found beauty in the imperfect trade. And you wrote your trading philosophy in your own words.<br><br>
+    That's not a module. That's a transformation.<br><br>
+    <strong style="color:var(--purple)">The emotional part of trading is by far the most difficult thing to master. We'll let you know when we get there — and now you have the map.</strong>
+  </p>
+  <div style="background:linear-gradient(135deg,#a78bfa10,#060e1e);border:1px solid #a78bfa30;border-radius:10px;padding:24px 28px;margin:28px 0;font-family:var(--font-disp);font-style:italic;font-size:17px;color:var(--hdr);line-height:1.75;text-align:left;position:relative">
+    <div style="position:absolute;top:-10px;left:16px;font-size:60px;color:var(--purple);opacity:.3;line-height:1">"</div>
+    <div style="padding-left:8px">Be fucking impossible to ignore. Stand so tall that they can't look past you. Burn so brightly that you catch the whole world on fire.</div>
+    <div style="font-family:var(--font-data);font-size:10px;color:var(--purple);letter-spacing:.1em;margin-top:12px;padding-left:8px;font-style:normal">— On what happens when you find your ikigai and build something real</div>
+  </div>
+  <div style="background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:16px 20px;margin:16px 0;font-family:var(--font-data);font-size:11px;color:var(--text);line-height:1.8">
+    <span style="color:var(--purple)">Future-you walks taller because present-you knelt deeper.</span><br>
+    <span style="color:var(--dim)">The drawdowns you endure with discipline. The signals you wait for. The trades you don't take. Every act of ganbaru compounds into the operator you're becoming.</span>
+  </div>
+  <div class="completion-actions">
+    <a class="btn-primary" href="ZION_Dashboard.html">Open Dashboard</a>
+    <a class="btn-primary" href="ZION_Pretrade.html">Pre-Trade Checklist</a>
+    <a class="btn-secondary" href="ZION_Module3_Operator.html">← Module 3</a>
+    <a class="btn-primary" href="ZION_Module3_6_Mindset.html" style="background:#0ea5e9">Module 3.6: ZION Mind →</a>
+    <a class="btn-secondary" href="ZION_Academy.html">Academy Home</a>
+  </div>
+</div>
+</div>
+
+<script>
+// ── Section navigation ─────────────────────────────
+const SECTIONS = ['hero','ikigai','zone','kaizen','train','wabisabi','philosophy'];
+let completed = JSON.parse(localStorage.getItem('zion-m35-progress')||'{}');
+
+const showSection = id => {
+  SECTIONS.forEach(s=>{
+    const el=document.getElementById('section-'+s);
+    if(el) el.classList.toggle('visible',s===id);
+  });
+  document.querySelectorAll('.nav-link').forEach((el,i)=>{
+    el.classList.toggle('active',SECTIONS[i]===id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  completed[id]=true;
+  localStorage.setItem('zion-m35-progress',JSON.stringify(completed));
+  updateProgress();
+};
+
+const updateProgress = () => {
+  const done=Object.keys(completed).length;
+  const pct=Math.round((done/SECTIONS.length)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=pct+'% complete';
+};
+updateProgress();
+
+// ── Quiz logic ─────────────────────────────────────
+const FEEDBACK = {
+  'quiz-ikigai':{
+    correct:"That's the ikigai response. Purpose doesn't quit when things get hard — it reviews, recalibrates, and returns. Increasing size after a loss is emotional. Quitting is giving up on the why. The correct move is always: review honestly, reconnect with purpose, return with the same discipline.",
+    wrong:"Ikigai is the answer to 'why do I keep going when it's hard?' Increasing size is a revenge trade in disguise. Quitting disconnects you from the purpose that brought you here. Review the trades, reconnect with your why, come back with the same system."
+  },
+  'quiz-zone':{
+    correct:"That's probability-based thinking. You defined the stop with a clear head before emotion entered. The 20% move is within normal variance. The plan was made for exactly this moment — not the moment when fear says exit. Trust the plan you made when you were thinking clearly.",
+    wrong:"Probability thinking means trusting the plan made before emotion arrived. Exiting at 20% because it 'feels wrong' is outcome-based thinking — it lets the current moment override the pre-trade decision. Hold to the plan. Exit at the structural stop. Nothing else."
+  },
+  'quiz-train':{
+    correct:"Get off the train. The Kijun close is the stop — not a suggestion, a structural signal that the thesis is broken. 'Looks like it might bounce' is hope, not analysis. Every bar you stay on the wrong train after your stop is hit costs you more and makes the decision harder. Exit. Log it. Move on.",
+    wrong:"'Looks like it might bounce' is the sound of a trader staying on the wrong train. The Kijun closed below is the station — your predefined exit. The thesis is broken. Waiting for one more bar, or holding to expiration, is sunk cost thinking. Get off at the nearest station."
+  },
+};
+
+const answerQuiz = (quizId,chosen,correct) => {
+  const opts=document.querySelectorAll(`#${quizId} .quiz-opt`);
+  const fb=document.getElementById(`${quizId}-feedback`);
+  opts.forEach((opt,i)=>{
+    const letter=String.fromCharCode(97+i);
+    opt.style.pointerEvents='none'; opt.style.opacity='.45';
+    if(letter===correct){ opt.style.borderColor='var(--teal)'; opt.style.background='#00f5d412'; opt.style.color='var(--teal)'; opt.style.opacity='1'; }
+    else if(letter===chosen){ opt.style.borderColor='var(--crimson)'; opt.style.background='#ff4d6d12'; opt.style.color='var(--crimson)'; opt.style.opacity='1'; }
+  });
+  const ok=chosen===correct;
+  fb.textContent=(ok?'✓ ':'✗ ')+FEEDBACK[quizId][ok?'correct':'wrong'];
+  fb.style.display='block';
+  fb.style.background=ok?'#00f5d412':'#ff4d6d12';
+  fb.style.border=ok?'1px solid #00f5d430':'1px solid #ff4d6d30';
+  fb.style.color=ok?'var(--teal)':'var(--bear)';
+  if(quizId==='quiz-train'){
+    setTimeout(()=>document.getElementById('completion')?.scrollIntoView({behavior:'smooth'}),800);
+  }
+};
+
+// ── Kaizen tracker ─────────────────────────────────
+const toggleKaizen = item => {
+  item.classList.toggle('done');
+  updateKaizen();
+};
+
+const updateKaizen = () => {
+  const items = document.querySelectorAll('.kt-item');
+  const done  = [...items].filter(i=>i.classList.contains('done')).length;
+  const total = items.length;
+  document.getElementById('kaizenStreak').textContent = `${done}/${total} today`;
+  document.getElementById('kaizenProgress').style.width = `${(done/total)*100}%`;
+};
+
+// ── Philosophy builder ─────────────────────────────
+const buildPhilosophy = () => {
+  const why   = document.getElementById('pb1').value.trim();
+  const who   = document.getElementById('pb2').value.trim();
+  const rule  = document.getElementById('pb3').value.trim();
+  const succ  = document.getElementById('pb4').value.trim();
+
+  if(!why||!who||!rule||!succ){
+    alert('Answer all four questions to build your philosophy.');
+    return;
+  }
+
+  const statement = `I trade because ${why}. I commit to being ${who}. My non-negotiable: ${rule}. Done right, in one year, success looks like ${succ}. This is who I am as a trader — not who I'm trying to be.`;
+
+  document.getElementById('pbStatement').textContent = statement;
+  document.getElementById('pbOutput').classList.add('show');
+
+  // Save to localStorage
+  localStorage.setItem('zion-trading-philosophy', statement);
+  document.getElementById('pbOutput').scrollIntoView({behavior:'smooth'});
+};
+
+const copyPhilosophy = () => {
+  const text = document.getElementById('pbStatement').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById('pbCopy');
+    btn.textContent='Copied! ✓'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy to Clipboard'; btn.classList.remove('copied'); },2500);
+  });
+};
+
+const resetPhilosophy = () => {
+  ['pb1','pb2','pb3','pb4'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pbOutput').classList.remove('show');
+};
+
+// Load saved philosophy if exists
+const saved = localStorage.getItem('zion-trading-philosophy');
+if(saved){
+  document.getElementById('pbStatement').textContent = saved;
+  document.getElementById('pbOutput').classList.add('show');
+}
+</script>
+</body>
+</html>

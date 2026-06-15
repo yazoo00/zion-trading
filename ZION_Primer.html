@@ -1,0 +1,1152 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Primer — Trading Foundations</title>
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --bull:#4ade80; --teal:#00f5d4; --bear:#f87171;
+  --crimson:#ff4d6d; --wait:#fb923c; --blue:#60a5fa;
+  --gold:#fbbf24; --purple:#a78bfa;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:14px; line-height:1.7; overflow-x:hidden; }
+
+/* ── Nav ── */
+.nav { position:sticky; top:0; z-index:100; background:rgba(5,13,26,.96); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); text-decoration:none; }
+.nav-logo span { color:var(--teal); }
+.nav-right { display:flex; gap:6px; }
+.nav-link { font-size:11px; color:var(--dim); text-decoration:none; padding:4px 10px; border:1px solid transparent; border-radius:4px; transition:all .15s; }
+.nav-link:hover { color:var(--blue); border-color:var(--border2); }
+.progress-bar { width:100px; height:3px; background:var(--border2); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width .4s; width:0%; }
+
+/* ── Hero ── */
+.hero { padding:80px 24px 60px; text-align:center; max-width:720px; margin:0 auto; }
+.eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.25em; color:var(--gold); text-transform:uppercase; margin-bottom:16px; }
+.hero-title { font-family:var(--font-disp); font-size:clamp(36px,6vw,68px); font-weight:700; color:var(--hdr); line-height:1.1; margin-bottom:16px; }
+.hero-title em { font-style:italic; color:var(--gold); }
+.hero-sub { font-size:16px; color:var(--text); line-height:1.8; margin-bottom:40px; }
+
+/* ── Tab nav ── */
+.tab-nav { display:flex; gap:0; border-bottom:1px solid var(--border); padding:0 24px; max-width:960px; margin:0 auto; overflow-x:auto; }
+.tab-nav::-webkit-scrollbar { height:0; }
+.tab-btn { font-family:var(--font-ui); font-size:13px; font-weight:500; padding:14px 22px; color:var(--dim); border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; white-space:nowrap; position:relative; bottom:-1px; }
+.tab-btn:hover { color:var(--text); }
+.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+/* ── Tab content ── */
+.tab-content { display:none; max-width:960px; margin:0 auto; padding:48px 24px 80px; }
+.tab-content.active { display:block; }
+
+/* ── Section headers ── */
+.sec-label { font-family:var(--font-data); font-size:9px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+.sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.sec-title { font-family:var(--font-disp); font-size:clamp(24px,3.5vw,38px); font-weight:700; color:var(--hdr); margin-bottom:14px; }
+.sec-intro { font-size:15px; color:var(--text); line-height:1.8; margin-bottom:36px; max-width:680px; }
+
+/* ── GLOSSARY ── */
+.gloss-search-wrap { position:relative; margin-bottom:24px; }
+.gloss-search { width:100%; font-family:var(--font-data); font-size:12px; background:var(--panel); border:1px solid var(--border2); border-radius:6px; color:var(--hdr); padding:10px 14px 10px 38px; outline:none; transition:border-color .15s; }
+.gloss-search:focus { border-color:var(--gold); }
+.gloss-search::placeholder { color:var(--dim); }
+.gloss-search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--dim); font-size:14px; }
+.gloss-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:8px; }
+.gloss-item { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start; transition:border-color .15s; }
+.gloss-item:hover { border-color:var(--border2); }
+.gloss-abbr { font-family:var(--font-data); font-size:11px; font-weight:700; color:var(--gold); min-width:44px; flex-shrink:0; padding-top:1px; }
+.gloss-def { font-size:12px; color:var(--text); line-height:1.55; }
+.gloss-def strong { color:var(--hdr); font-size:13px; display:block; margin-bottom:2px; }
+.gloss-category { font-family:var(--font-data); font-size:9px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; margin:24px 0 10px; grid-column:1/-1; display:flex; align-items:center; gap:8px; }
+.gloss-category::after { content:''; flex:1; height:1px; background:var(--border); }
+.gloss-hidden { display:none; }
+
+/* ── CANDLESTICK ── */
+.candle-intro { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:24px; margin-bottom:32px; display:grid; grid-template-columns:140px 1fr; gap:24px; align-items:center; }
+@media(max-width:560px){ .candle-intro { grid-template-columns:1fr; } }
+.candle-svg-wrap { display:flex; justify-content:center; }
+.pattern-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
+.pattern-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px; transition:border-color .2s; }
+.pattern-card:hover { border-color:var(--border2); }
+.pattern-card.bull-card { border-left:3px solid var(--teal); }
+.pattern-card.bear-card { border-left:3px solid var(--crimson); }
+.pc-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.pc-icon { font-size:22px; }
+.pc-name { font-weight:600; color:var(--hdr); font-size:13px; }
+.pc-signal { font-family:var(--font-data); font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; }
+.sig-bull { background:#00f5d418; color:var(--teal); border:1px solid #00f5d433; }
+.sig-bear { background:#ff4d6d18; color:var(--crimson); border:1px solid #ff4d6d33; }
+.pc-desc { font-size:12px; color:var(--text); line-height:1.6; }
+.pc-zion { font-size:11px; color:var(--teal); margin-top:8px; padding-top:8px; border-top:1px solid var(--border); line-height:1.55; }
+.pc-zion::before { content:'◆ ZION: '; font-family:var(--font-data); font-size:9px; }
+
+/* Inline SVG candles */
+svg.candle { overflow:visible; }
+
+/* ── CHART BASICS ── */
+.chart-concept { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:20px 22px; margin-bottom:12px; display:grid; grid-template-columns:40px 1fr; gap:16px; align-items:flex-start; border-left:3px solid transparent; transition:border-color .2s; }
+.chart-concept:hover { border-left-color:var(--blue); }
+.cc-icon { font-size:22px; }
+.cc-title { font-weight:600; color:var(--hdr); margin-bottom:6px; font-size:14px; }
+.cc-desc { font-size:13px; color:var(--text); line-height:1.65; }
+.cc-zion { font-size:12px; color:var(--blue); margin-top:8px; line-height:1.55; }
+.cc-zion::before { content:'In ZION: '; font-weight:600; }
+
+/* ── ICHIMOKU INTRO ── */
+.ichi-component { background:var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:10px; }
+.ic-header { display:flex; align-items:center; gap:14px; padding:14px 18px; cursor:pointer; transition:background .12s; }
+.ic-header:hover { background:var(--panel2); }
+.ic-color { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+.ic-name { font-weight:600; color:var(--hdr); font-size:14px; flex:1; }
+.ic-tag  { font-family:var(--font-data); font-size:10px; color:var(--dim); }
+.ic-toggle { font-family:var(--font-data); font-size:16px; color:var(--dim); transition:transform .3s; }
+.ichi-component.open .ic-toggle { transform:rotate(45deg); color:var(--teal); }
+.ic-body { display:none; padding:0 18px 18px; border-top:1px solid var(--border); }
+.ichi-component.open .ic-body { display:block; }
+.ic-formula { font-family:var(--font-data); font-size:10px; color:var(--dim); background:var(--panel2); padding:6px 10px; border-radius:4px; margin:12px 0; }
+.ic-desc { font-size:13px; color:var(--text); line-height:1.7; }
+.ic-options { font-size:12px; color:var(--gold); margin-top:10px; padding-top:10px; border-top:1px solid var(--border); line-height:1.6; }
+.ic-options::before { content:'Options impact: '; font-weight:600; font-family:var(--font-data); font-size:10px; display:block; margin-bottom:4px; letter-spacing:.08em; }
+
+.ichi-preview { background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:20px; margin:28px 0; }
+.ip-label { font-family:var(--font-data); font-size:9px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; margin-bottom:16px; }
+
+/* ── Next steps ── */
+.next-steps { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:48px; }
+@media(max-width:560px){ .next-steps { grid-template-columns:1fr; } }
+.next-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:18px 20px; text-decoration:none; transition:all .2s; display:block; }
+.next-card:hover { background:var(--panel2); }
+.next-card.m1:hover { border-color:var(--blue); }
+.next-card.m2:hover { border-color:var(--teal); }
+.nc-tag { font-family:var(--font-data); font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }
+.nc-title { font-weight:600; color:var(--hdr); font-size:14px; margin-bottom:4px; }
+.nc-desc { font-size:12px; color:var(--dim); }
+.nc-arrow { font-family:var(--font-data); font-size:12px; color:var(--dim); margin-top:10px; transition:transform .2s; display:inline-block; }
+.next-card:hover .nc-arrow { transform:translateX(4px); }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="ZION_Academy.html"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></a>
+  <div class="nav-right">
+    <a class="nav-link" href="ZION_Academy.html">← Academy</a>
+    <a class="nav-link" href="ZION_Module1_Foundation.html">Module 1 →</a>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="eyebrow">ZION Academy · Start Here</div>
+  <h1 class="hero-title">Before the cloud,<br><em>learn the language.</em></h1>
+  <p class="hero-sub">Four tabs. Everything you need before Module 1. Skim what you know, study what you don't, and use this as a reference any time you hit an unfamiliar term. No judgment — everyone started somewhere.</p>
+</div>
+
+<!-- Tab nav -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('glossary',this)">📖 Glossary</button>
+  <button class="tab-btn" onclick="switchTab('candles',this)">🕯 Candlesticks</button>
+  <button class="tab-btn" onclick="switchTab('chart',this)">📊 Chart Basics</button>
+  <button class="tab-btn" onclick="switchTab('ichimoku',this)">☁️ Ichimoku Intro</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 1 — GLOSSARY
+══════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-glossary">
+  <div class="sec-label">Tab 01</div>
+  <h2 class="sec-title">Trading Glossary</h2>
+  <p class="sec-intro">The market has its own language. Learn it and you'll understand what people are talking about in trading rooms, Discord servers, and financial news. Use the search to find any term instantly.</p>
+
+  <div class="gloss-search-wrap">
+    <span class="gloss-search-icon">🔍</span>
+    <input class="gloss-search" id="glossSearch" placeholder="Search any term or acronym…" oninput="filterGloss(this.value)">
+  </div>
+
+  <div class="gloss-grid" id="glossGrid">
+
+    <div class="gloss-category">Price Action</div>
+
+    <div class="gloss-item" data-terms="hod high of day">
+      <span class="gloss-abbr">HOD</span>
+      <div class="gloss-def"><strong>High of Day</strong>The highest price a stock reached during the current trading session.</div>
+    </div>
+    <div class="gloss-item" data-terms="lod low of day">
+      <span class="gloss-abbr">LOD</span>
+      <div class="gloss-def"><strong>Low of Day</strong>The lowest price a stock reached during the current trading session.</div>
+    </div>
+    <div class="gloss-item" data-terms="ath all time high">
+      <span class="gloss-abbr">ATH</span>
+      <div class="gloss-def"><strong>All Time High</strong>The highest price a stock has ever traded at in its history.</div>
+    </div>
+    <div class="gloss-item" data-terms="52s 52 week high new high">
+      <span class="gloss-abbr">52s</span>
+      <div class="gloss-def"><strong>52-Week High</strong>The highest price a stock has traded at in the last 52 weeks. A breakout above the 52-week high is often significant.</div>
+    </div>
+    <div class="gloss-item" data-terms="hh higher high">
+      <span class="gloss-abbr">HH</span>
+      <div class="gloss-def"><strong>Higher High</strong>Each successive peak in price is higher than the last. Sign of an uptrend.</div>
+    </div>
+    <div class="gloss-item" data-terms="hl higher low">
+      <span class="gloss-abbr">HL</span>
+      <div class="gloss-def"><strong>Higher Low</strong>Each successive trough in price is higher than the last. Also a sign of uptrend strength — buyers stepping in earlier each time.</div>
+    </div>
+    <div class="gloss-item" data-terms="lh lower high">
+      <span class="gloss-abbr">LH</span>
+      <div class="gloss-def"><strong>Lower High</strong>Each successive peak is lower than the last. Sign of downtrend — sellers taking control sooner each rally.</div>
+    </div>
+    <div class="gloss-item" data-terms="ll lower low">
+      <span class="gloss-abbr">LL</span>
+      <div class="gloss-def"><strong>Lower Low</strong>Each successive trough is lower than the last. Classic downtrend pattern.</div>
+    </div>
+    <div class="gloss-item" data-terms="bo breakout break out">
+      <span class="gloss-abbr">B/O</span>
+      <div class="gloss-def"><strong>Breakout</strong>Price moves above a key resistance level with conviction. Often accompanied by increased volume. In ZION, we want breakouts above cloud or Kijun.</div>
+    </div>
+    <div class="gloss-item" data-terms="bos break of structure">
+      <span class="gloss-abbr">BOS</span>
+      <div class="gloss-def"><strong>Break of Structure</strong>Price breaks a previously established swing high or low, signaling a potential trend change.</div>
+    </div>
+    <div class="gloss-item" data-terms="sr support resistance">
+      <span class="gloss-abbr">S/R</span>
+      <div class="gloss-def"><strong>Support & Resistance</strong>Price levels where buying (support) or selling (resistance) has historically been strong. In ZION, the Kijun and cloud act as dynamic S/R levels.</div>
+    </div>
+    <div class="gloss-item" data-terms="fvg fair value gap imbalance">
+      <span class="gloss-abbr">FVG</span>
+      <div class="gloss-def"><strong>Fair Value Gap</strong>A price gap created when price moves so fast that not all buyers and sellers got to transact. Acts as a magnet — price often returns to fill it. Covered in depth in Module 1.</div>
+    </div>
+
+    <div class="gloss-category">Analysis</div>
+
+    <div class="gloss-item" data-terms="ta technical analysis">
+      <span class="gloss-abbr">TA</span>
+      <div class="gloss-def"><strong>Technical Analysis</strong>Reading price charts, patterns, and indicators to forecast future price movement. Everything in ZION is TA.</div>
+    </div>
+    <div class="gloss-item" data-terms="fa fundamental analysis">
+      <span class="gloss-abbr">FA</span>
+      <div class="gloss-def"><strong>Fundamental Analysis</strong>Evaluating a company's financial health — earnings, revenue, debt. ZION is primarily TA, but FA matters for catalyst scans.</div>
+    </div>
+    <div class="gloss-item" data-terms="vwap volume weighted average price">
+      <span class="gloss-abbr">VWAP</span>
+      <div class="gloss-def"><strong>Volume Weighted Average Price</strong>The average price weighted by volume. Institutions use it as a benchmark. Price above VWAP = buyers in control. Covered in depth in Module 1.</div>
+    </div>
+    <div class="gloss-item" data-terms="rsi relative strength index momentum">
+      <span class="gloss-abbr">RSI</span>
+      <div class="gloss-def"><strong>Relative Strength Index</strong>A 0–100 momentum oscillator. Above 70 = overbought territory. Below 30 = oversold. In ZION, we watch for RSI divergence on the 65m chart. Module 1 covers this.</div>
+    </div>
+    <div class="gloss-item" data-terms="bb bollinger bands volatility">
+      <span class="gloss-abbr">BB</span>
+      <div class="gloss-def"><strong>Bollinger Bands</strong>Three lines: a moving average (basis) plus upper and lower bands two standard deviations away. Measures volatility and price extremes. Module 1.</div>
+    </div>
+    <div class="gloss-item" data-terms="ms market structure">
+      <span class="gloss-abbr">MS</span>
+      <div class="gloss-def"><strong>Market Structure</strong>The overall pattern of highs and lows that defines whether the market is trending up, down, or sideways. ZION reads structure through Ichimoku.</div>
+    </div>
+    <div class="gloss-item" data-terms="htf higher time frame">
+      <span class="gloss-abbr">HTF</span>
+      <div class="gloss-def"><strong>Higher Time Frame</strong>A chart with longer bars — Daily, Weekly. In ZION, the Daily chart is the HTF gate. If the Daily is bearish, we don't take bullish 65m trades.</div>
+    </div>
+    <div class="gloss-item" data-terms="ltf lower time frame">
+      <span class="gloss-abbr">LTF</span>
+      <div class="gloss-def"><strong>Lower Time Frame</strong>A chart with shorter bars — 5m, 15m. In ZION, we use 5m for entry timing after the 65m and Daily structure is confirmed.</div>
+    </div>
+    <div class="gloss-item" data-terms="tf timeframe time frame">
+      <span class="gloss-abbr">TF</span>
+      <div class="gloss-def"><strong>Time Frame</strong>The duration each candle on a chart represents. 5m = each candle is 5 minutes. 1H = 1 hour. Daily = one trading day.</div>
+    </div>
+
+    <div class="gloss-category">Options Terms</div>
+
+    <div class="gloss-item" data-terms="call option bullish">
+      <span class="gloss-abbr">Call</span>
+      <div class="gloss-def"><strong>Call Option</strong>A contract giving you the right to buy 100 shares at a set price (strike). Profitable when the stock goes UP. In ZION, we buy calls when the signal is READY ▲.</div>
+    </div>
+    <div class="gloss-item" data-terms="put option bearish">
+      <span class="gloss-abbr">Put</span>
+      <div class="gloss-def"><strong>Put Option</strong>A contract giving you the right to sell 100 shares at the strike price. Profitable when the stock goes DOWN. READY ▼ in ZION signals a potential put.</div>
+    </div>
+    <div class="gloss-item" data-terms="strike price options">
+      <span class="gloss-abbr">Strike</span>
+      <div class="gloss-def"><strong>Strike Price</strong>The price at which your option contract can be exercised. A $500 call gives you the right to buy at $500 regardless of where the stock trades.</div>
+    </div>
+    <div class="gloss-item" data-terms="dte days to expiration expiry">
+      <span class="gloss-abbr">DTE</span>
+      <div class="gloss-def"><strong>Days to Expiration</strong>How many days until your option contract expires and becomes worthless if it hasn't moved in your direction. ZION favors 30-90 DTE to allow time for structure to play out.</div>
+    </div>
+    <div class="gloss-item" data-terms="theta time decay options">
+      <span class="gloss-abbr">Theta</span>
+      <div class="gloss-def"><strong>Time Decay</strong>The daily loss in option value as expiration approaches. Options lose value every day even if price doesn't move. This is why ZION structure confirmation matters — you need the move to happen before theta kills the position.</div>
+    </div>
+    <div class="gloss-item" data-terms="premium options price cost">
+      <span class="gloss-abbr">Premium</span>
+      <div class="gloss-def"><strong>Option Premium</strong>The price you pay for an options contract. A premium of $3.20 on a contract = $320 total cost (premium × 100 shares per contract).</div>
+    </div>
+    <div class="gloss-item" data-terms="itm in the money">
+      <span class="gloss-abbr">ITM</span>
+      <div class="gloss-def"><strong>In The Money</strong>A call option where the stock price is ABOVE the strike. The option has intrinsic value. ITM options cost more but move more with the stock.</div>
+    </div>
+    <div class="gloss-item" data-terms="otm out of the money">
+      <span class="gloss-abbr">OTM</span>
+      <div class="gloss-def"><strong>Out of The Money</strong>A call option where the stock price is BELOW the strike. No intrinsic value — purely speculative. Cheaper but requires a bigger move to profit.</div>
+    </div>
+    <div class="gloss-item" data-terms="atm at the money">
+      <span class="gloss-abbr">ATM</span>
+      <div class="gloss-def"><strong>At The Money</strong>Strike price is approximately equal to the current stock price. Balanced between cost and movement sensitivity.</div>
+    </div>
+    <div class="gloss-item" data-terms="0dte 0dte zero days to expiration same day">
+      <span class="gloss-abbr">0DTE</span>
+      <div class="gloss-def"><strong>Zero Days to Expiration</strong>Options expiring today. Extremely high risk, high reward. Heavily influenced by intraday moves. A different style than ZION's structure approach — both are valid, different clocks.</div>
+    </div>
+    <div class="gloss-item" data-terms="iv implied volatility">
+      <span class="gloss-abbr">IV</span>
+      <div class="gloss-def"><strong>Implied Volatility</strong>The market's expectation of future price movement, baked into the option price. High IV = expensive options. Buying into high IV means the move has to be bigger to profit.</div>
+    </div>
+    <div class="gloss-item" data-terms="er earnings report catalyst">
+      <span class="gloss-abbr">E/R</span>
+      <div class="gloss-def"><strong>Earnings Report</strong>Quarterly financial results released by companies. Major catalyst for price movement. ZION's pre-trade checklist includes a catalyst scan for exactly this reason.</div>
+    </div>
+
+    <div class="gloss-category">Risk Management</div>
+
+    <div class="gloss-item" data-terms="rr risk reward ratio">
+      <span class="gloss-abbr">R/R</span>
+      <div class="gloss-def"><strong>Risk / Reward</strong>The ratio of potential loss to potential gain. ZION targets minimum 2:1 R/R — risk $1 to make $2. This ensures you can be wrong 40% of the time and still be profitable.</div>
+    </div>
+    <div class="gloss-item" data-terms="sl stop loss exit">
+      <span class="gloss-abbr">SL</span>
+      <div class="gloss-def"><strong>Stop Loss</strong>A pre-defined price at which you exit a losing trade to prevent further damage. In ZION, the Kijun on the 65m chart serves as the structural stop.</div>
+    </div>
+    <div class="gloss-item" data-terms="tp take profit target exit">
+      <span class="gloss-abbr">TP</span>
+      <div class="gloss-def"><strong>Take Profit</strong>A pre-defined price at which you exit a winning trade. Having a TP before you enter removes the emotional "how much higher can it go?" dilemma.</div>
+    </div>
+    <div class="gloss-item" data-terms="be break even">
+      <span class="gloss-abbr">BE</span>
+      <div class="gloss-def"><strong>Break Even</strong>The point at which a trade has neither gained nor lost money. For options, your break even is strike price + premium paid (for calls).</div>
+    </div>
+    <div class="gloss-item" data-terms="dd drawdown loss streak">
+      <span class="gloss-abbr">DD</span>
+      <div class="gloss-def"><strong>Drawdown</strong>The peak-to-trough decline in account value. Every trader has drawdowns. Managing position size limits how deep they go. Module 3 covers this in depth.</div>
+    </div>
+    <div class="gloss-item" data-terms="ytd year to date">
+      <span class="gloss-abbr">YTD</span>
+      <div class="gloss-def"><strong>Year to Date</strong>Performance measured from January 1st to the current date. A useful benchmark for tracking your progress against the market.</div>
+    </div>
+
+    <div class="gloss-category">Session & Market</div>
+
+    <div class="gloss-item" data-terms="pre premarket pre-market">
+      <span class="gloss-abbr">Pre</span>
+      <div class="gloss-def"><strong>Pre-Market</strong>Trading activity before the regular session opens at 9:30am ET. Lower volume, wider spreads. ZION reads pre-market for context, not for trades.</div>
+    </div>
+    <div class="gloss-item" data-terms="ah after hours afterhours">
+      <span class="gloss-abbr">AH</span>
+      <div class="gloss-def"><strong>After Hours</strong>Trading after the regular session closes at 4:00pm ET. Similar caveats as pre-market — thin volume, can gap against you overnight.</div>
+    </div>
+    <div class="gloss-item" data-terms="on overnight">
+      <span class="gloss-abbr">O/N</span>
+      <div class="gloss-def"><strong>Overnight</strong>Holding a position through the close into the next session. Carries gap risk — news or earnings overnight can open price dramatically against your position.</div>
+    </div>
+    <div class="gloss-item" data-terms="bullish bull">
+      <span class="gloss-abbr">Bu</span>
+      <div class="gloss-def"><strong>Bullish</strong>Expecting price to go UP. A bullish signal, bullish candle, bullish structure — all mean the bias is upward. In ZION: TK bullish, above cloud, Chikou above.</div>
+    </div>
+    <div class="gloss-item" data-terms="bearish bear">
+      <span class="gloss-abbr">Be</span>
+      <div class="gloss-def"><strong>Bearish</strong>Expecting price to go DOWN. The inverse of bullish. In ZION: TK bearish, below cloud, Chikou below.</div>
+    </div>
+
+    <div class="gloss-category">ZION Specific</div>
+
+    <div class="gloss-item" data-terms="tk tenkan kijun cross signal">
+      <span class="gloss-abbr">TK</span>
+      <div class="gloss-def"><strong>Tenkan / Kijun</strong>The two primary lines of the Ichimoku system. Tenkan = 9-period midpoint (fast). Kijun = 26-period midpoint (slow). Tenkan above Kijun = bullish. The first gate in the ZION signal stack. Module 2.</div>
+    </div>
+    <div class="gloss-item" data-terms="kumo cloud ichimoku">
+      <span class="gloss-abbr">Kumo</span>
+      <div class="gloss-def"><strong>The Cloud</strong>The shaded zone between Span A and Span B in Ichimoku. Green cloud = bullish. Red cloud = bearish. Price above the cloud = strong bull. Inside = no man's land. Module 2.</div>
+    </div>
+    <div class="gloss-item" data-terms="chikou span confirmation">
+      <span class="gloss-abbr">Chikou</span>
+      <div class="gloss-def"><strong>Chikou Span</strong>Current closing price plotted 26 bars in the past. Above historical price = bullish confirmation. The most underused and most important confirmation in Ichimoku. Module 2.</div>
+    </div>
+    <div class="gloss-item" data-terms="prime watch wait bear signal zion">
+      <span class="gloss-abbr">Signal</span>
+      <div class="gloss-def"><strong>ZION Signal</strong>PRIME ▲/▼ = 4-5 conditions aligned. WATCH = 2-3 aligned. WAIT = mixed. BEAR = bearish structure. The composite read from the full ZION signal stack on the 65m chart.</div>
+    </div>
+    <div class="gloss-item" data-terms="uoa unusual options activity flow">
+      <span class="gloss-abbr">UOA</span>
+      <div class="gloss-def"><strong>Unusual Options Activity</strong>Options volume that significantly exceeds normal levels — often a sign of informed money positioning. ZION's Flow Scanner cross-references UOA with Ichimoku structure.</div>
+    </div>
+
+  <!-- Indicators You'll See Elsewhere -->
+    <div class="gloss-category" style="margin-top:8px">Indicators You'll See Elsewhere — Why ZION Chose Differently</div>
+
+    <div class="gloss-item" data-terms="macd moving average convergence divergence" style="grid-column:1/-1;background:#0d1e35;border-color:var(--border2)">
+      <span class="gloss-abbr" style="color:var(--purple)">MACD</span>
+      <div class="gloss-def">
+        <strong>Moving Average Convergence Divergence</strong>
+        A momentum indicator showing the relationship between two EMAs (typically 12 and 26 period). Generates signals when lines cross. Widely used — you'll see it everywhere.
+        <div style="margin-top:8px;padding:8px 10px;background:var(--panel);border-radius:4px;border-left:2px solid var(--purple);font-size:11px;color:var(--text);line-height:1.6"><span style="color:var(--purple);font-family:var(--font-data);font-size:9px;letter-spacing:.1em">WHY ZION DOESN'T USE IT: </span>MACD is a lagging indicator built from lagging indicators. Ichimoku's TK cross gives the same momentum read with built-in S/R context and a forward-looking cloud. One system that does more with less noise.</div>
+      </div>
+    </div>
+
+    <div class="gloss-item" data-terms="ema exponential moving average 9 21 50 200" style="grid-column:1/-1;background:#0d1e35;border-color:var(--border2)">
+      <span class="gloss-abbr" style="color:var(--purple)">EMA</span>
+      <div class="gloss-def">
+        <strong>Exponential Moving Average (9, 21, 50, 200)</strong>
+        Moving averages weighting recent prices more heavily. The 9 EMA reacts fast, 200 EMA is slow and major. Many traders stack multiple EMAs to read trend and momentum.
+        <div style="margin-top:8px;padding:8px 10px;background:var(--panel);border-radius:4px;border-left:2px solid var(--purple);font-size:11px;color:var(--text);line-height:1.6"><span style="color:var(--purple);font-family:var(--font-data);font-size:9px;letter-spacing:.1em">WHY ZION DOESN'T USE THEM: </span>The Tenkan IS a 9-period midpoint average. The Kijun IS a 26-period midpoint average. The cloud forward-projects future S/R that no EMA can do. ZION gets everything EMAs provide plus the cloud and Chikou, in one unified system rather than four cluttered lines.</div>
+      </div>
+    </div>
+
+    <div class="gloss-item" data-terms="stochastic oscillator momentum overbought oversold" style="grid-column:1/-1;background:#0d1e35;border-color:var(--border2)">
+      <span class="gloss-abbr" style="color:var(--purple)">Stoch</span>
+      <div class="gloss-def">
+        <strong>Stochastic Oscillator</strong>
+        Momentum indicator comparing close to price range over a period. 0-100 scale. Above 80 = overbought, below 20 = oversold. Often paired with RSI for confirmation.
+        <div style="margin-top:8px;padding:8px 10px;background:var(--panel);border-radius:4px;border-left:2px solid var(--purple);font-size:11px;color:var(--text);line-height:1.6"><span style="color:var(--purple);font-family:var(--font-data);font-size:9px;letter-spacing:.1em">WHY ZION DOESN'T USE IT: </span>RSI already covers momentum and divergence in the ZION stack. Adding Stochastic creates redundant signals and decision paralysis. Fewer, better tools — not more indicators saying the same thing in different voices.</div>
+      </div>
+    </div>
+
+    <div class="gloss-item" data-terms="fibonacci fib retracement levels golden ratio" style="grid-column:1/-1;background:#0d1e35;border-color:var(--border2)">
+      <span class="gloss-abbr" style="color:var(--purple)">Fib</span>
+      <div class="gloss-def">
+        <strong>Fibonacci Retracement</strong>
+        Horizontal levels drawn between a swing high and low based on Fibonacci ratios (23.6%, 38.2%, 50%, 61.8%, 78.6%). Price often reacts at these levels because enough traders watch them.
+        <div style="margin-top:8px;padding:8px 10px;background:var(--panel);border-radius:4px;border-left:2px solid var(--purple);font-size:11px;color:var(--text);line-height:1.6"><span style="color:var(--purple);font-family:var(--font-data);font-size:9px;letter-spacing:.1em">THE ZION TAKE: </span>Fibonacci IS useful — especially when a 61.8% retracement lands exactly on the Kijun. That's meaningful confluence. ZION doesn't teach Fib standalone, but if you use it, don't throw it out. Use it as additional confluence evidence at ZION structure levels.</div>
+      </div>
+    </div>
+
+    <div style="grid-column:1/-1;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:16px 20px;margin-top:4px">
+      <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--teal);text-transform:uppercase;margin-bottom:8px">◆ The ZION Philosophy on Indicators</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.75">Every indicator above was built by smart people and has genuine utility. ZION didn't reject them — it evaluated them and chose the tools that provide the most signal with the least noise for <strong style="color:var(--hdr)">structure-based options trading specifically.</strong><br><br>The trap most traders fall into is <strong style="color:var(--hdr)">indicator stacking</strong> — adding more and more tools hoping they'll agree more often. They don't. They conflict. And conflicting signals lead to paralysis or, worse, cherry-picking the signal that confirms what you already want to do.<br><br><strong style="color:var(--teal)">ZION uses five reads:</strong> TK relationship, cloud position, Chikou confirmation, VWAP slope, daily alignment. Five independent conditions. When all five agree — that's signal. When they don't — that's WAIT. Clean, consistent, disciplined. That's the edge.</div>
+    </div>
+
+  </div><!-- /gloss-grid -->
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 2 — CANDLESTICKS
+══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-candles">
+  <div class="sec-label">Tab 02</div>
+  <h2 class="sec-title">Candlestick Patterns</h2>
+  <p class="sec-intro">Every candle tells a story about the battle between buyers and sellers during that time period. Learning to read them is like learning to read body language — it won't tell you everything, but it adds important context to every structure read.</p>
+
+  <!-- What is a candle -->
+  <div class="candle-intro">
+    <div class="candle-svg-wrap">
+      <svg width="100" height="160" viewBox="0 0 100 160">
+        <!-- Bull candle -->
+        <line x1="25" y1="10" x2="25" y2="35" stroke="#00f5d4" stroke-width="2"/>
+        <rect x="14" y="35" width="22" height="60" rx="2" fill="#00f5d4" opacity=".9"/>
+        <line x1="25" y1="95" x2="25" y2="120" stroke="#00f5d4" stroke-width="2"/>
+        <text x="25" y="140" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4a6080">Bull</text>
+        <!-- Bear candle -->
+        <line x1="75" y1="10" x2="75" y2="35" stroke="#ff4d6d" stroke-width="2"/>
+        <rect x="64" y="35" width="22" height="60" rx="2" fill="#ff4d6d" opacity=".9"/>
+        <line x1="75" y1="95" x2="75" y2="120" stroke="#ff4d6d" stroke-width="2"/>
+        <text x="75" y="140" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4a6080">Bear</text>
+        <!-- Labels -->
+        <text x="25" y="8" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#4a6080">High</text>
+        <text x="52" y="42" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#00f5d4">Open</text>
+        <text x="52" y="92" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#00f5d4">Close</text>
+        <text x="25" y="128" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#4a6080">Low</text>
+      </svg>
+    </div>
+    <div>
+      <div style="font-weight:600;color:var(--hdr);margin-bottom:10px;font-size:15px">Reading a Candle</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.75">
+        Each candle represents one time period — could be 5 minutes, 1 hour, or 1 day. The <strong style="color:var(--hdr)">body</strong> (thick part) shows the open and close price. The <strong style="color:var(--hdr)">wicks</strong> (thin lines) show the high and low reached during that period.<br><br>
+        <span style="color:var(--teal)">Teal/green</span> = price closed higher than it opened (bulls won)<br>
+        <span style="color:var(--crimson)">Red/crimson</span> = price closed lower than it opened (bears won)<br><br>
+        <span style="color:var(--gold);font-size:12px">ZION key insight:</span> <span style="font-size:12px">Candlestick patterns confirm what structure is already telling you. They're a trigger, not a thesis.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-bottom:16px">Bullish Reversal Patterns</div>
+  <div class="pattern-grid">
+
+    <div class="pattern-card bull-card">
+      <div class="pc-header">
+        <svg width="32" height="48" viewBox="0 0 32 48" class="candle">
+          <line x1="16" y1="2" x2="16" y2="14" stroke="#ff4d6d" stroke-width="1.5"/>
+          <rect x="10" y="14" width="12" height="16" rx="1" fill="#ff4d6d" opacity=".8"/>
+          <line x1="16" y1="30" x2="16" y2="46" stroke="#ff4d6d" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Hammer</div><span class="pc-signal sig-bull">Bullish Reversal</span></div>
+      </div>
+      <div class="pc-desc">Small body near the top of the range with a long lower wick (2× the body). Appears in a downtrend. Buyers rejected lower prices and pushed back up by the close. The longer the lower wick, the stronger the signal.</div>
+      <div class="pc-zion">Wait for a confirmation candle closing higher. Check that Kijun is nearby as support. Chikou should be above historical price before entering.</div>
+    </div>
+
+    <div class="pattern-card bull-card">
+      <div class="pc-header">
+        <svg width="48" height="48" viewBox="0 0 48 48" class="candle">
+          <line x1="14" y1="6" x2="14" y2="12" stroke="#ff4d6d" stroke-width="1.5"/>
+          <rect x="8" y="12" width="12" height="20" rx="1" fill="#ff4d6d" opacity=".8"/>
+          <line x1="14" y1="32" x2="14" y2="38" stroke="#ff4d6d" stroke-width="1.5"/>
+          <line x1="34" y1="4" x2="34" y2="16" stroke="#00f5d4" stroke-width="1.5"/>
+          <rect x="28" y="16" width="12" height="26" rx="1" fill="#00f5d4" opacity=".9"/>
+          <line x1="34" y1="42" x2="34" y2="46" stroke="#00f5d4" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Bullish Engulfing</div><span class="pc-signal sig-bull">Bullish Reversal</span></div>
+      </div>
+      <div class="pc-desc">A large bull candle completely engulfs the prior bear candle's body. Appears at the end of a downtrend. Shows bulls overwhelmed bears in a single session — a strong momentum shift.</div>
+      <div class="pc-zion">One of the most reliable single-session signals. Especially powerful when it occurs at a Kijun or cloud support level. Confirms a structure bounce is genuine.</div>
+    </div>
+
+    <div class="pattern-card bull-card">
+      <div class="pc-header">
+        <svg width="64" height="48" viewBox="0 0 64 48" class="candle">
+          <line x1="12" y1="4" x2="12" y2="10" stroke="#ff4d6d" stroke-width="1.5"/>
+          <rect x="6" y="10" width="12" height="22" rx="1" fill="#ff4d6d" opacity=".8"/>
+          <line x1="12" y1="32" x2="12" y2="38" stroke="#ff4d6d" stroke-width="1.5"/>
+          <line x1="32" y1="28" x2="32" y2="30" stroke="#4a6080" stroke-width="1.5"/>
+          <rect x="29" y="30" width="6" height="6" rx="1" fill="#4a6080" opacity=".8"/>
+          <line x1="32" y1="36" x2="32" y2="44" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="52" y1="6" x2="52" y2="12" stroke="#00f5d4" stroke-width="1.5"/>
+          <rect x="46" y="12" width="12" height="26" rx="1" fill="#00f5d4" opacity=".9"/>
+          <line x1="52" y1="38" x2="52" y2="44" stroke="#00f5d4" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Morning Star</div><span class="pc-signal sig-bull">Bullish Reversal</span></div>
+      </div>
+      <div class="pc-desc">Three-candle pattern: large bear candle, small indecision candle (doji or small body), large bull candle. The indecision in the middle shows the sellers ran out of steam. Strong reversal signal.</div>
+      <div class="pc-zion">Powerful when the middle candle sits near a key VWAP or Kijun level. The bull candle closing above the midpoint of the first candle adds conviction.</div>
+    </div>
+
+    <div class="pattern-card bull-card">
+      <div class="pc-header">
+        <svg width="32" height="48" viewBox="0 0 32 48" class="candle">
+          <line x1="16" y1="2" x2="16" y2="20" stroke="#00f5d4" stroke-width="1.5"/>
+          <rect x="10" y="20" width="12" height="10" rx="1" fill="#00f5d4" opacity=".8"/>
+          <line x1="16" y1="30" x2="16" y2="34" stroke="#00f5d4" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Inverted Hammer</div><span class="pc-signal sig-bull">Bullish Warning</span></div>
+      </div>
+      <div class="pc-desc">Small body at the bottom with a long upper wick. Appears in a downtrend. Buyers tried to push higher but got pushed back down — however sellers couldn't close it at the low. Warning sign of potential reversal.</div>
+      <div class="pc-zion">Requires confirmation. Don't enter on the inverted hammer alone — wait for the next candle to close bullish. Check cloud and Kijun position first.</div>
+    </div>
+
+  </div>
+
+  <div class="sec-label" style="margin:28px 0 16px">Bearish Reversal Patterns</div>
+  <div class="pattern-grid">
+
+    <div class="pattern-card bear-card">
+      <div class="pc-header">
+        <svg width="32" height="48" viewBox="0 0 32 48" class="candle">
+          <line x1="16" y1="2" x2="16" y2="18" stroke="#00f5d4" stroke-width="1.5"/>
+          <rect x="10" y="18" width="12" height="16" rx="1" fill="#00f5d4" opacity=".8"/>
+          <line x1="16" y1="34" x2="16" y2="46" stroke="#00f5d4" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Hanging Man</div><span class="pc-signal sig-bear">Bearish Reversal</span></div>
+      </div>
+      <div class="pc-desc">Looks identical to a Hammer — but it appears in an UPTREND. Same structure, opposite meaning. Sellers pushed price way down during the session before buyers recovered. Distribution warning.</div>
+      <div class="pc-zion">Context is everything. The same candle pattern means different things depending on where it appears. Always check the trend direction and ZION structure first.</div>
+    </div>
+
+    <div class="pattern-card bear-card">
+      <div class="pc-header">
+        <svg width="32" height="48" viewBox="0 0 32 48" class="candle">
+          <line x1="16" y1="2" x2="16" y2="14" stroke="#ff4d6d" stroke-width="1.5"/>
+          <rect x="10" y="14" width="12" height="10" rx="1" fill="#ff4d6d" opacity=".8"/>
+          <line x1="16" y1="24" x2="16" y2="46" stroke="#ff4d6d" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Shooting Star</div><span class="pc-signal sig-bear">Bearish Reversal</span></div>
+      </div>
+      <div class="pc-desc">Small body near the bottom of the range with a long upper wick in an UPTREND. Buyers pushed price high but sellers overwhelmed them and pushed it back down. Momentum is fading.</div>
+      <div class="pc-zion">Watch for this at cloud resistance or near the upper Bollinger Band. In ZION, a shooting star at a resistance level with RSI divergence = strong caution signal.</div>
+    </div>
+
+    <div class="pattern-card bear-card">
+      <div class="pc-header">
+        <svg width="48" height="48" viewBox="0 0 48 48" class="candle">
+          <line x1="14" y1="4" x2="14" y2="10" stroke="#00f5d4" stroke-width="1.5"/>
+          <rect x="8" y="10" width="12" height="26" rx="1" fill="#00f5d4" opacity=".9"/>
+          <line x1="14" y1="36" x2="14" y2="42" stroke="#00f5d4" stroke-width="1.5"/>
+          <line x1="34" y1="4" x2="34" y2="8" stroke="#ff4d6d" stroke-width="1.5"/>
+          <rect x="28" y="8" width="12" height="32" rx="1" fill="#ff4d6d" opacity=".8"/>
+          <line x1="34" y1="40" x2="34" y2="46" stroke="#ff4d6d" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Bearish Engulfing</div><span class="pc-signal sig-bear">Bearish Reversal</span></div>
+      </div>
+      <div class="pc-desc">A large bear candle completely engulfs the prior bull candle. Appears at the end of an uptrend. Bears overwhelmed bulls in a single session. One of the most reliable bearish signals.</div>
+      <div class="pc-zion">Especially significant when it occurs at cloud resistance or after a failed Kijun breakout. Confirms the ZION signal flipping to bearish structure.</div>
+    </div>
+
+    <div class="pattern-card bear-card">
+      <div class="pc-header">
+        <svg width="64" height="48" viewBox="0 0 64 48" class="candle">
+          <line x1="12" y1="4" x2="12" y2="8" stroke="#00f5d4" stroke-width="1.5"/>
+          <rect x="6" y="8" width="12" height="26" rx="1" fill="#00f5d4" opacity=".9"/>
+          <line x1="12" y1="34" x2="12" y2="40" stroke="#00f5d4" stroke-width="1.5"/>
+          <line x1="32" y1="4" x2="32" y2="6" stroke="#4a6080" stroke-width="1.5"/>
+          <rect x="29" y="6" width="6" height="6" rx="1" fill="#4a6080" opacity=".8"/>
+          <line x1="32" y1="12" x2="32" y2="20" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="52" y1="14" x2="52" y2="18" stroke="#ff4d6d" stroke-width="1.5"/>
+          <rect x="46" y="18" width="12" height="24" rx="1" fill="#ff4d6d" opacity=".8"/>
+          <line x1="52" y1="42" x2="52" y2="46" stroke="#ff4d6d" stroke-width="1.5"/>
+        </svg>
+        <div><div class="pc-name">Evening Star</div><span class="pc-signal sig-bear">Bearish Reversal</span></div>
+      </div>
+      <div class="pc-desc">Three-candle pattern: large bull candle, small indecision candle at the top, large bear candle. Mirror image of the Morning Star. Buyers ran out of conviction at the top.</div>
+      <div class="pc-zion">Powerful when the third candle breaks below the Kijun or cloud. Confirms the ZION HUD showing Tenkan crossing below Kijun on the 65m.</div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:28px;background:var(--panel);border:1px solid var(--border2);border-radius:8px;padding:16px 20px;">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:8px">◆ The ZION Rule on Candlesticks</div>
+    <div style="font-size:13px;color:var(--text);line-height:1.7">Candlestick patterns are a <strong style="color:var(--hdr)">final entry trigger</strong>, not a standalone reason to trade. A hammer at Kijun support with ZION structure PRIME ▲ is powerful. A hammer in the middle of nowhere with WAIT on the HUD is noise. Always read the structure first. Candles confirm — they don't lead.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 3 — CHART BASICS
+══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-chart">
+  <div class="sec-label">Tab 03</div>
+  <h2 class="sec-title">Chart Basics</h2>
+  <p class="sec-intro">Before indicators, before patterns, before systems — you need to be able to read a price chart. Here's what everything means and how ZION uses each element.</p>
+
+  <div class="chart-concept">
+    <div class="cc-icon">📅</div>
+    <div>
+      <div class="cc-title">Time Frames</div>
+      <div class="cc-desc">A chart's time frame determines what each candle represents. A 5-minute chart means each candle is 5 minutes of trading. A Daily chart means each candle is one full trading day. Higher time frames give you more context; lower time frames give you more precision.</div>
+      <div class="cc-zion">ZION uses three time frames simultaneously — 5m for entries, 65m for primary structure, Daily for the macro gate. All three must align before taking a trade.</div>
+    </div>
+  </div>
+
+  <div class="chart-concept">
+    <div class="cc-icon">📊</div>
+    <div>
+      <div class="cc-title">Volume</div>
+      <div class="cc-desc">The number of shares traded during a given period, usually shown as bars at the bottom of the chart. High volume confirms a move — a breakout on high volume is more significant than one on thin volume. Low volume moves are suspect.</div>
+      <div class="cc-zion">VWAP weights price by volume — high-volume price levels carry more weight than low-volume ones. When price is above VWAP on rising volume, institutions are participating in the move.</div>
+    </div>
+  </div>
+
+  <div class="chart-concept">
+    <div class="cc-icon">↔️</div>
+    <div>
+      <div class="cc-title">Support & Resistance</div>
+      <div class="cc-desc">Support is a price level where buying has historically been strong enough to stop a decline. Resistance is a level where selling has historically capped a rally. These levels form because traders remember them — and act on them repeatedly.</div>
+      <div class="cc-zion">In ZION, the Kijun-sen (26-period midpoint) acts as dynamic support in uptrends and dynamic resistance in downtrends. The cloud provides a zone of support/resistance rather than a single line.</div>
+    </div>
+  </div>
+
+  <div class="chart-concept">
+    <div class="cc-icon">📈</div>
+    <div>
+      <div class="cc-title">Trend</div>
+      <div class="cc-desc">A trend is a sustained directional move in price. Uptrend = higher highs and higher lows (HH/HL). Downtrend = lower highs and lower lows (LH/LL). Sideways = no clear direction. Trading with the trend dramatically improves probability.</div>
+      <div class="cc-zion">ZION reads trend through Ichimoku — price above a green cloud in an uptrend, below a red cloud in a downtrend. The 20-period moving average (BB basis) provides a secondary trend read. Both must agree before calling it a trend.</div>
+    </div>
+  </div>
+
+  <div class="chart-concept">
+    <div class="cc-icon">🕳</div>
+    <div>
+      <div class="cc-title">Gaps</div>
+      <div class="cc-desc">A gap occurs when price opens significantly above or below the prior close, leaving an empty space on the chart. Common after earnings announcements or major news. Gaps often act as magnets — price tends to return and "fill" them over time.</div>
+      <div class="cc-zion">Fair Value Gaps (FVGs) in ZION are an intrabar version of this — rapid price moves that skip levels. The ZION Cockpit script on TradingView draws and tracks these automatically.</div>
+    </div>
+  </div>
+
+  <div class="chart-concept">
+    <div class="cc-icon">〰️</div>
+    <div>
+      <div class="cc-title">Moving Averages</div>
+      <div class="cc-desc">A moving average smooths price action by calculating the average over a set number of periods. The 20-period simple moving average (SMA) is the basis of Bollinger Bands. Moving averages lag price — they react to what already happened, not what's coming.</div>
+      <div class="cc-zion">The Bollinger Band basis (20 SMA) is used in ZION as the middle reference for the BB position read. In an uptrend, pullbacks to the 20 SMA often represent buying opportunities when structure supports it.</div>
+    </div>
+  </div>
+
+  <div class="chart-concept">
+    <div class="cc-icon">🎯</div>
+    <div>
+      <div class="cc-title">Price Action vs. Indicators</div>
+      <div class="cc-desc">Price action is what price actually does — the raw candles and levels. Indicators are mathematical calculations applied to price (VWAP, RSI, Bollinger Bands, Ichimoku). Indicators help — but they all derive from price. When indicators conflict, trust the price action.</div>
+      <div class="cc-zion">ZION uses both — Ichimoku for structure, VWAP for institutional context, RSI for momentum, BB for volatility. But if price is hammering a key level and holding, that matters more than what any indicator says in isolation.</div>
+    </div>
+  </div>
+
+  <div class="chart-concept">
+    <div class="cc-icon">🔢</div>
+    <div>
+      <div class="cc-title">Multiple Time Frame Analysis</div>
+      <div class="cc-desc">Looking at the same stock across different time frames to build a complete picture. The higher time frame sets the bias. The lower time frame finds the entry. A bullish Daily chart + bullish 65m chart + 5m entry trigger = high-confidence trade.</div>
+      <div class="cc-zion">This is the foundation of the ZION daily gate. No matter how good the 65m setup looks, if the Daily structure is bearish — TK bearish, below cloud — the gate is closed. HTF always has veto power over LTF signals.</div>
+    </div>
+  </div>
+
+  <!-- ── Trading Hours ── -->
+  <div style="margin-top:48px">
+    <div class="sec-label" style="margin-bottom:16px">Market Sessions — Not All Hours Are Equal</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:680px">The market is open 6.5 hours a day. But not all 6.5 hours are worth trading. Professional traders know when to act and when to walk away from the screen. Beginners trade every hour and wonder why they're losing.</p>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:grid;grid-template-columns:32px 160px 1fr;gap:14px;align-items:flex-start;background:#ff4d6d12;border:1px solid #ff4d6d33;border-radius:8px;padding:14px 16px">
+        <div style="font-size:20px">🚫</div>
+        <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--crimson)">Amateur Hour<br><span style="color:var(--dim);font-weight:400">9:30 – 10:00 AM ET</span></div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Wild volatility, emotional orderflow, erratic price action. Scalpers love it. Structure traders avoid it. Your 65m bar hasn't even closed yet — you have no signal to trade on. <span style="color:var(--crimson)">Watch, don't trade.</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:32px 160px 1fr;gap:14px;align-items:flex-start;background:#00f5d412;border:1px solid #00f5d433;border-radius:8px;padding:14px 16px">
+        <div style="font-size:20px">✅</div>
+        <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--teal)">Pro Setup Window<br><span style="color:var(--dim);font-weight:400">10:00 – 11:30 AM ET</span></div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">The dust settles. Clean structure emerges. Your first full 65m bar has closed and given you a real signal. VWAP is establishing direction. <span style="color:var(--teal)">This is the ZION primary entry window.</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:32px 160px 1fr;gap:14px;align-items:flex-start;background:#ff4d6d12;border:1px solid #ff4d6d33;border-radius:8px;padding:14px 16px">
+        <div style="font-size:20px">🚫</div>
+        <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--crimson)">Midday Chop<br><span style="color:var(--dim);font-weight:400">11:30 AM – 1:30 PM ET</span></div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Volume drops. Institutions go to lunch (literally). Moves become random and noisy. The ZION HUD will often show WAIT during this window for good reason. <span style="color:var(--crimson)">High risk of overtrading. Step away.</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:32px 160px 1fr;gap:14px;align-items:flex-start;background:#00f5d412;border:1px solid #00f5d433;border-radius:8px;padding:14px 16px">
+        <div style="font-size:20px">✅</div>
+        <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--teal)">Smart Money Return<br><span style="color:var(--dim);font-weight:400">1:30 – 3:00 PM ET</span></div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Institutions re-enter. Real momentum rebuilds. VWAP slope often reestablishes direction. If the 65m structure is still aligned from the morning, continuation plays can set up here. <span style="color:var(--teal)">Second ZION entry window.</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:32px 160px 1fr;gap:14px;align-items:flex-start;background:#60a5fa12;border:1px solid #60a5fa33;border-radius:8px;padding:14px 16px">
+        <div style="font-size:20px">⚡</div>
+        <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--blue)">Power Hour<br><span style="color:var(--dim);font-weight:400">3:00 – 4:00 PM ET</span></div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Liquidity surges. Breakouts or reversals often happen here as institutions rebalance positions. Strong moves but also sudden reversals. Watch your open positions carefully. <span style="color:var(--blue)">Good for managing exits, not always new entries.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Market Structure ── -->
+  <div style="margin-top:48px">
+    <div class="sec-label" style="margin-bottom:16px">Market Structure — Reading the Big Picture</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:680px">Price doesn't move randomly. It forms a structure of highs and lows across timeframes. Understanding that structure tells you whether you're early, on time, or late — and whether the trend you're trading is real or a counter-trend bounce that will reverse against you.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="chart-concept" style="margin-bottom:0">
+        <div class="cc-icon">📈</div>
+        <div>
+          <div class="cc-title">Uptrend Structure</div>
+          <div class="cc-desc">Higher Highs (HH) and Higher Lows (HL). Each rally exceeds the last peak. Each pullback holds above the last trough. Buyers are consistently stepping in at higher and higher prices. This is the only structure in which ZION takes long positions.</div>
+          <div class="cc-zion">In ZION, an uptrend on the 65m chart shows price above a green cloud with Tenkan above Kijun. The Daily chart should confirm the same structure before any long entry.</div>
+        </div>
+      </div>
+      <div class="chart-concept" style="margin-bottom:0">
+        <div class="cc-icon">📉</div>
+        <div>
+          <div class="cc-title">Downtrend Structure</div>
+          <div class="cc-desc">Lower Highs (LH) and Lower Lows (LL). Each rally fails below the previous peak. Each drop exceeds the previous low. Sellers are in control and buyers can't sustain any recovery. Trading longs in a downtrend is fighting the tape.</div>
+          <div class="cc-zion">In ZION, a downtrend shows price below a red cloud with Tenkan below Kijun. The daily gate will be closed — no long entries until structure genuinely recovers.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-concept">
+      <div class="cc-icon">🔀</div>
+      <div>
+        <div class="cc-title">Structure Across Timeframes</div>
+        <div class="cc-desc">The same stock can be in an uptrend on the Daily, a downtrend on the 65m, and ranging on the 5m — all simultaneously. This is why multiple timeframe analysis is non-negotiable. The higher timeframe always sets the bias. The lower timeframe finds the entry within that bias.</div>
+        <div class="cc-zion">ZION's daily gate exists precisely for this reason. A bullish 65m setup inside a Daily downtrend is a counter-trend trade — lower probability, higher risk. The gate says no. Trust it.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Breakouts ── -->
+  <div style="margin-top:48px">
+    <div class="sec-label" style="margin-bottom:16px">Breakouts — When Price Escapes a Level</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:680px">A breakout happens when price moves decisively above a resistance level it's been unable to clear. Breakouts are some of the highest-probability setups in trading — but also the most frequently faked. Here's how to tell the difference.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;border-top:3px solid var(--gold)">
+        <div style="font-family:var(--font-data);font-size:10px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;margin-bottom:8px">Build-Up Breakout</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65">Price consolidates in a tight range just below resistance — a "build-up." Energy coils. When it breaks, it has conviction because the sellers couldn't push it back down during consolidation. The build-up IS the signal — watch for Bollinger Band squeeze during the consolidation.</div>
+        <div style="font-size:11px;color:var(--gold);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">◆ ZION: BB squeeze + price coiling below cloud top = watch for the break above</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;border-top:3px solid var(--teal)">
+        <div style="font-family:var(--font-data);font-size:10px;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;margin-bottom:8px">Retest Breakout</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65">Price breaks above resistance, then pulls back to retest that level (which should now act as support) before continuing higher. This retest is your confirmation — the level flipped from resistance to support. More reliable than chasing the initial break. Higher R/R entry.</div>
+        <div style="font-size:11px;color:var(--teal);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">◆ ZION: Price breaks Kijun, pulls back to Kijun, holds — that's your entry. Classic ZION setup.</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;border-top:3px solid var(--wait)">
+        <div style="font-family:var(--font-data);font-size:10px;letter-spacing:.12em;color:var(--wait);text-transform:uppercase;margin-bottom:8px">Non-Retest Breakout</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65">Price breaks above resistance and continues aggressively without looking back. Early entry opportunity — but higher risk. No confirmation that the level held. Common in strong momentum moves. If you chase and it fails, you have no logical stop close by.</div>
+        <div style="font-size:11px;color:var(--wait);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">◆ ZION: Only consider if PRIME ▲ with strength +4 and sector aligned. Otherwise wait for retest.</div>
+      </div>
+    </div>
+
+    <div class="chart-concept">
+      <div class="cc-icon">⏱</div>
+      <div>
+        <div class="cc-title">Breakout Sign — Shrinking Resistance Tests</div>
+        <div class="cc-desc">When price tests a resistance level multiple times but takes progressively fewer bars to return to it — 10 candles between touches, then 7, then 4 — that's a compression signal. Sellers are losing strength. The retracements are getting shallower. The breakout is loading.</div>
+        <div class="cc-zion">Watch for this pattern at cloud resistance or the Kijun. Tightening tests + BB squeeze + VWAP slope turning positive = breakout is close. Set your alert.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Reversal Patterns ── -->
+  <div style="margin-top:48px">
+    <div class="sec-label" style="margin-bottom:16px">Reversal Patterns — When Trend Changes Direction</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:680px">While candlestick patterns capture single or multi-bar reversals, chart patterns form over weeks or months and signal larger structural trend changes. These are the patterns that often precede the biggest options moves.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+
+      <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:8px;padding:14px 16px">
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:6px">Double Bottom <span style="font-size:11px;color:var(--teal)">◆ Bullish</span></div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Price makes two lows at approximately the same level, forming a "W" shape. The neckline (resistance between the two lows) is the trigger — break above it with volume confirms the reversal.</div>
+        <div style="font-size:11px;color:var(--teal);margin-top:8px">ZION: Double bottom at cloud support with bullish TK cross on the second low = high conviction reversal setup.</div>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--crimson);border-radius:8px;padding:14px 16px">
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:6px">Double Top <span style="font-size:11px;color:var(--crimson)">◆ Bearish</span></div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Price makes two highs at approximately the same level, forming an "M" shape. Sellers defended that level twice. Break below the neckline (support between the two highs) confirms the reversal downward.</div>
+        <div style="font-size:11px;color:var(--crimson);margin-top:8px">ZION: Double top at cloud resistance with bearish TK cross = structure confirming the reversal. Watch for Chikou below.</div>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--crimson);border-radius:8px;padding:14px 16px">
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:6px">Head & Shoulders <span style="font-size:11px;color:var(--crimson)">◆ Bearish</span></div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Three peaks: left shoulder, higher head, right shoulder (approximately equal height to left). The "neckline" connecting the two troughs is the key level. Break below neckline = significant bearish reversal. One of the most reliable reversal patterns in TA.</div>
+        <div style="font-size:11px;color:var(--crimson);margin-top:8px">ZION: H&S completion often coincides with price dropping below cloud and Chikou going below candles — the whole structure flips at once.</div>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:8px;padding:14px 16px">
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:6px">Inv. Head & Shoulders <span style="font-size:11px;color:var(--teal)">◆ Bullish</span></div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">The mirror of H&S — three troughs with the middle being the lowest. Break above the neckline signals a bullish reversal. Often the setup where ZION signals flip from BEAR to PRIME ▲ as all five conditions align on the breakout.</div>
+        <div style="font-size:11px;color:var(--teal);margin-top:8px">ZION: Neckline break + cloud flip to green + TK bullish = one of the cleanest PRIME ▲ setups you'll ever see.</div>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:8px;padding:14px 16px">
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:6px">Cup & Handle <span style="font-size:11px;color:var(--teal)">◆ Bullish</span></div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">A rounded bottom (the cup) followed by a short consolidation (the handle). The handle is the build-up — a small pullback and compression before the breakout. Handle should not retrace more than 1/3 of the cup. Classic institutional accumulation pattern.</div>
+        <div style="font-size:11px;color:var(--teal);margin-top:8px">ZION: The handle often shows a BB squeeze. When the handle breaks higher, look for VWAP slope turning positive as confirmation.</div>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--wait);border-radius:8px;padding:14px 16px">
+        <div style="font-weight:600;color:var(--hdr);margin-bottom:6px">Diamond Pattern <span style="font-size:11px;color:var(--wait)">◆ Both Directions</span></div>
+        <div style="font-size:12px;color:var(--text);line-height:1.6">Price expands into a wide range then contracts — forming a diamond shape. Rare but powerful. Break direction determines bias — bullish diamond at a bottom, bearish at a top. Volume should expand on the break for confirmation.</div>
+        <div style="font-size:11px;color:var(--wait);margin-top:8px">ZION: Diamond patterns often coincide with WAIT on the HUD during formation — the signal fires when the break is confirmed.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Dow Theory / Market Phases ── -->
+  <div style="margin-top:48px">
+    <div class="sec-label" style="margin-bottom:16px">Dow Theory — Why Markets Move in Phases</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:680px">Charles Dow figured out in the 1890s that markets move in predictable phases. Understanding which phase you're in tells you whether you're early to a trend, riding its prime, or about to get caught in the reversal.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:var(--panel);border:1px solid var(--teal);border-radius:8px;padding:16px">
+        <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--teal);text-transform:uppercase;margin-bottom:12px">Bull Market — 3 Phases</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;color:var(--text);line-height:1.6;padding:8px;background:var(--panel2);border-radius:4px"><strong style="color:var(--hdr)">Phase 1 — Accumulation:</strong> Smart money quietly buys while most are still bearish. Prices are low, sentiment is terrible. This is where the cloud flips green but most people don't trust it yet.</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6;padding:8px;background:var(--panel2);border-radius:4px"><strong style="color:var(--hdr)">Phase 2 — Participation:</strong> The trend becomes obvious. Technical traders pile in. ZION signals PRIME ▲ consistently. This is where structure traders live and profit.</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6;padding:8px;background:var(--panel2);border-radius:4px"><strong style="color:var(--hdr)">Phase 3 — Excess:</strong> Everyone is bullish. Retail FOMO kicks in. Smart money is quietly distributing. RSI divergence appears. ZION starts showing WAIT signals. Exit here, not after.</div>
+        </div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--crimson);border-radius:8px;padding:16px">
+        <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--crimson);text-transform:uppercase;margin-bottom:12px">Bear Market — 3 Phases</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;color:var(--text);line-height:1.6;padding:8px;background:var(--panel2);border-radius:4px"><strong style="color:var(--hdr)">Phase 1 — Distribution:</strong> Smart money sells into strength while most are still bullish. The cloud starts thinning. ZION HUD shows WAIT where it used to show PRIME.</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6;padding:8px;background:var(--panel2);border-radius:4px"><strong style="color:var(--hdr)">Phase 2 — Panic:</strong> The trend reversal becomes undeniable. Forced selling. Price below cloud, Chikou below candles, TK bearish. ZION signals PRIME ▼. Put buyers are printing.</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6;padding:8px;background:var(--panel2);border-radius:4px"><strong style="color:var(--hdr)">Phase 3 — Despair:</strong> Everyone is bearish. Volume dries up. Smart money begins accumulating again. The cloud starts attempting to flip. Watch for the first WATCH ▲ signal.</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:12px 16px;font-size:12px;color:var(--text);line-height:1.7">
+      <strong style="color:var(--gold)">The ZION connection:</strong> The breadth regime classifier in the HUD (TREND / ROTATION / FRAGILE RALLY / LIQUIDATION / DE-RISKING / DIGESTION) maps directly to these Dow Theory phases. When the regime says LIQUIDATION, that's Phase 2 of the bear market. When it says FRAGILE RALLY, that's the attempted Phase 1 accumulation — not confirmed yet.
+    </div>
+  </div>
+
+  <!-- ── Confluence Zones ── -->
+  <div style="margin-top:48px">
+    <div class="sec-label" style="margin-bottom:16px">Confluence Zones — Where Everything Lines Up</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:680px">A confluence zone is where multiple independent signals all point to the same price level. A trendline support AND the Kijun AND a previous resistance-turned-support AND VWAP all sitting at the same price — that's not a coincidence. That's a significant level that the market will likely react to.</p>
+
+    <div class="chart-concept">
+      <div class="cc-icon">🎯</div>
+      <div>
+        <div class="cc-title">Why Confluence Matters</div>
+        <div class="cc-desc">Any single support level can be a fluke. Two levels at the same price is interesting. Three or more is significant. When multiple different analytical methods independently identify the same price as important, the market tends to honor it — because different types of traders (technical, institutional, algorithmic) are all watching the same level.</div>
+        <div class="cc-zion">This is exactly what the ZION signal stack measures. TK bullish + above cloud + Chikou above + VWAP slope positive + daily aligned = five independent conditions all agreeing. That's confluence. That's PRIME ▲.</div>
+      </div>
+    </div>
+    <div class="chart-concept">
+      <div class="cc-icon">📐</div>
+      <div>
+        <div class="cc-title">Building a Confluence Entry</div>
+        <div class="cc-desc">A high-quality confluence entry combines: a structural level (Kijun, cloud boundary, previous S/R), a candlestick trigger (hammer, engulfing, morning star), and an indicator confirmation (RSI not diverging, VWAP holding slope). When all three appear together at the same price, the probability of a sustained move improves dramatically.</div>
+        <div class="cc-zion">In ZION the entry checklist is: structure (PRIME ▲ on HUD) + trigger (confirming 65m candle) + context (sector aligned, pre-trade checklist clear). Three layers. Not one.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Trading Styles ── -->
+  <div style="margin-top:48px">
+    <div class="sec-label" style="margin-bottom:16px">Trading Styles — Know Which Clock You're On</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:20px;max-width:680px">Not all trading is the same. The timeframe you trade determines your strategy, your stress level, your screen time requirements, and which tools matter. Know which style fits your life before you build a system around the wrong one.</p>
+
+    <div style="overflow-x:auto;margin-bottom:20px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:#070f1e;border-bottom:1px solid var(--border)">
+            <th style="padding:10px 14px;text-align:left;font-family:var(--font-data);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase">Style</th>
+            <th style="padding:10px 14px;text-align:left;font-family:var(--font-data);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase">Timeframe</th>
+            <th style="padding:10px 14px;text-align:left;font-family:var(--font-data);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase">Screen Time</th>
+            <th style="padding:10px 14px;text-align:left;font-family:var(--font-data);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase">Best For</th>
+            <th style="padding:10px 14px;text-align:left;font-family:var(--font-data);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase">Theta Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:10px 14px;color:var(--text);font-weight:600">Scalping</td>
+            <td style="padding:10px 14px;color:var(--dim)">Seconds–minutes</td>
+            <td style="padding:10px 14px;color:var(--crimson)">All day</td>
+            <td style="padding:10px 14px;color:var(--dim)">Full-time traders</td>
+            <td style="padding:10px 14px;color:var(--crimson)">Extreme — 0DTE only</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--panel2)">
+            <td style="padding:10px 14px;color:var(--text);font-weight:600">Day Trading</td>
+            <td style="padding:10px 14px;color:var(--dim)">Minutes–hours</td>
+            <td style="padding:10px 14px;color:var(--wait)">Market hours</td>
+            <td style="padding:10px 14px;color:var(--dim)">Active traders</td>
+            <td style="padding:10px 14px;color:var(--wait)">High — short DTE needed</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:10px 14px;color:var(--teal);font-weight:700">Structure Trading ◆</td>
+            <td style="padding:10px 14px;color:var(--teal)">Days–weeks</td>
+            <td style="padding:10px 14px;color:var(--teal)">1–2 hrs/day</td>
+            <td style="padding:10px 14px;color:var(--teal)">Part-time / disciplined</td>
+            <td style="padding:10px 14px;color:var(--teal)">Manageable — 30-90 DTE</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--panel2)">
+            <td style="padding:10px 14px;color:var(--text);font-weight:600">Position Trading</td>
+            <td style="padding:10px 14px;color:var(--dim)">Weeks–months</td>
+            <td style="padding:10px 14px;color:var(--bull)">Minimal</td>
+            <td style="padding:10px 14px;color:var(--dim)">Patient investors</td>
+            <td style="padding:10px 14px;color:var(--bull)">Low — LEAPS territory</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;color:var(--text);font-weight:600">Investing</td>
+            <td style="padding:10px 14px;color:var(--dim)">Months–years</td>
+            <td style="padding:10px 14px;color:var(--bull)">Weekly check</td>
+            <td style="padding:10px 14px;color:var(--dim)">Long-term builders</td>
+            <td style="padding:10px 14px;color:var(--dim)">N/A — stocks/ETFs</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:#00f5d412;border:1px solid #00f5d433;border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text);line-height:1.7">
+      <strong style="color:var(--teal)">ZION is structure trading.</strong> Days to weeks. 1-2 hours of active screen time per day. You read the structure in the morning, set your alerts, check back at the Pro Setup Window and Smart Money Return window, and let the system work. Less stress. Less screen time. Same potential — but only if you have the patience to wait for full confluence.
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 4 — ICHIMOKU INTRO
+══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-ichimoku">
+  <div class="sec-label">Tab 04</div>
+  <h2 class="sec-title">Ichimoku — Meet the System</h2>
+  <p class="sec-intro">Before Module 2 takes you deep into each component, you need to know the names and the concept. This tab is your first handshake with Ichimoku Kinko Hyo — "one glance equilibrium chart." Five components. One view. The whole story.</p>
+
+  <div style="background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:32px">
+    <div style="font-size:13px;color:var(--text);line-height:1.8">
+      <strong style="color:var(--hdr)">The origin:</strong> A Japanese journalist named Goichi Hosoda spent 30 years — with a team of students running manual calculations — building a system that could tell a trader everything they needed to know at a single glance. He published it in 1969 after those three decades of refinement. The settings (9, 26, 52) were designed around the Japanese 6-day trading week. They still work today.<br><br>
+      <strong style="color:var(--hdr)">Why it matters for options:</strong> Options have time decay (theta) — every day costs you money whether price moves or not. Ichimoku tells you whether the structure genuinely supports a move. Strong structure = your option has tailwind. Weak or mixed structure = theta kills you while you wait.
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-bottom:16px">The Five Components — Click Each to Expand</div>
+
+  <div class="ichi-component" onclick="toggleIchi(this)">
+    <div class="ic-header">
+      <div class="ic-color" style="background:#3c78ff"></div>
+      <div class="ic-name">Tenkan-sen · Conversion Line</div>
+      <div class="ic-tag">Period: 9</div>
+      <div class="ic-toggle">+</div>
+    </div>
+    <div class="ic-body">
+      <div class="ic-formula">(9-period High + 9-period Low) ÷ 2</div>
+      <div class="ic-desc">The fast line. Tracks the midpoint of the last 9 bars — think of it as short-term momentum. When price is moving up with conviction, the Tenkan rises quickly. When it flattens, momentum is stalling. In a healthy uptrend, Tenkan is always above Kijun and rising.</div>
+      <div class="ic-options">The Tenkan crossing above the Kijun (TK bullish cross) is the first gate in the ZION signal stack. No bullish TK = no call entry consideration, period. On the 65m chart, this is the most immediate read of whether momentum supports your direction.</div>
+    </div>
+  </div>
+
+  <div class="ichi-component" onclick="toggleIchi(this)">
+    <div class="ic-header">
+      <div class="ic-color" style="background:#ff4d6d"></div>
+      <div class="ic-name">Kijun-sen · Base Line</div>
+      <div class="ic-tag">Period: 26</div>
+      <div class="ic-toggle">+</div>
+    </div>
+    <div class="ic-body">
+      <div class="ic-formula">(26-period High + 26-period Low) ÷ 2</div>
+      <div class="ic-desc">The slow line and the backbone of the system. The 26-bar midpoint acts as a dynamic support/resistance level — one of the most respected levels in any Ichimoku chart. Price in an uptrend tends to bounce off the Kijun. When price breaks convincingly below it, the structure is compromised.</div>
+      <div class="ic-options">The Kijun is your structural stop loss in ZION. Before entering any call, identify the Kijun price. If price closes a 65m bar below the Kijun, the trade thesis is broken — exit or accept the loss. Size your position so a Kijun break doesn't devastate you.</div>
+    </div>
+  </div>
+
+  <div class="ichi-component" onclick="toggleIchi(this)">
+    <div class="ic-header">
+      <div class="ic-color" style="background:#00f5d4;opacity:.8"></div>
+      <div class="ic-name">Senkou Span A · Leading Span A</div>
+      <div class="ic-tag">Plotted 26 bars ahead</div>
+      <div class="ic-toggle">+</div>
+    </div>
+    <div class="ic-body">
+      <div class="ic-formula">(Tenkan + Kijun) ÷ 2 · plotted 26 bars into the future</div>
+      <div class="ic-desc">One of the two lines that form the cloud (Kumo). Because it's plotted 26 bars in the future, you can see where Span A will be — giving you a forward look at where support or resistance is building. It reacts faster than Span B.</div>
+      <div class="ic-options">In a bull cloud (Span A above Span B), Span A is the first layer of cloud support. When price pulls back into a green cloud and finds support at Span A, that's a buy-the-dip signal — if the rest of the structure agrees.</div>
+    </div>
+  </div>
+
+  <div class="ichi-component" onclick="toggleIchi(this)">
+    <div class="ic-header">
+      <div class="ic-color" style="background:#ff4d6d;opacity:.6"></div>
+      <div class="ic-name">Senkou Span B · Leading Span B</div>
+      <div class="ic-tag">Period: 52 · Plotted 26 bars ahead</div>
+      <div class="ic-toggle">+</div>
+    </div>
+    <div class="ic-body">
+      <div class="ic-formula">(52-period High + 52-period Low) ÷ 2 · plotted 26 bars into the future</div>
+      <div class="ic-desc">The slower cloud boundary. Based on 52 bars — the longest lookback in the system. Moves slowly and carries heavy weight as support/resistance. The distance between Span A and Span B determines cloud thickness — and thick clouds are harder to break through.</div>
+      <div class="ic-options">A thick cloud ahead (wide gap between Span A and Span B) means strong support/resistance. Price entering thick cloud often stalls. Plan your options expiration to account for potential consolidation inside the cloud before the move continues.</div>
+    </div>
+  </div>
+
+  <div class="ichi-component" onclick="toggleIchi(this)">
+    <div class="ic-header">
+      <div class="ic-color" style="background:#fbbf24"></div>
+      <div class="ic-name">Chikou Span · Lagging Span</div>
+      <div class="ic-tag">Current close · plotted 26 bars back</div>
+      <div class="ic-toggle">+</div>
+    </div>
+    <div class="ic-body">
+      <div class="ic-formula">Current closing price · plotted 26 bars in the past</div>
+      <div class="ic-desc">The most misunderstood and most underused component. The Chikou simply plots today's close on the chart 26 bars ago. If today's close is ABOVE where price was 26 sessions ago, the Chikou is bullish — the current move has genuinely outpaced recent history.</div>
+      <div class="ic-options">Chikou is ZION's built-in reality check. TK can look bullish and price can look good, but if Chikou is tangled in historical candles from 26 bars ago, the move isn't as strong as it looks. Wait for Chikou to clear that overhead price action before adding conviction to the trade.</div>
+    </div>
+  </div>
+
+  <!-- Quick reference visual -->
+  <div class="ichi-preview" style="margin-top:28px">
+    <div class="ip-label">Quick Reference — Signal Summary</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      <div style="background:var(--panel);border:1px solid #00f5d433;border-radius:6px;padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:10px;color:var(--teal);margin-bottom:6px">BULLISH READ</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.8">
+          Tenkan <span style="color:var(--teal)">above</span> Kijun<br>
+          Price <span style="color:var(--teal)">above</span> green cloud<br>
+          Chikou <span style="color:var(--teal)">above</span> candles<br>
+          Cloud ahead is <span style="color:var(--teal)">green</span>
+        </div>
+      </div>
+      <div style="background:var(--panel);border:1px solid #ff4d6d33;border-radius:6px;padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:10px;color:var(--crimson);margin-bottom:6px">BEARISH READ</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.8">
+          Tenkan <span style="color:var(--crimson)">below</span> Kijun<br>
+          Price <span style="color:var(--crimson)">below</span> red cloud<br>
+          Chikou <span style="color:var(--crimson)">below</span> candles<br>
+          Cloud ahead is <span style="color:var(--crimson)">red</span>
+        </div>
+      </div>
+      <div style="background:var(--panel);border:1px solid #fb923c33;border-radius:6px;padding:12px 14px">
+        <div style="font-family:var(--font-data);font-size:10px;color:var(--wait);margin-bottom:6px">NO MAN'S LAND</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.8">
+          Price <span style="color:var(--wait)">inside</span> the cloud<br>
+          Signals <span style="color:var(--wait)">conflicting</span><br>
+          TK cross but <span style="color:var(--wait)">below</span> cloud<br>
+          → <strong style="color:var(--wait)">WAIT</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <a class="next-card m1" href="ZION_Module1_Foundation.html">
+      <div class="nc-tag" style="color:var(--blue)">Next Stop · Module 01</div>
+      <div class="nc-title">The Foundation</div>
+      <div class="nc-desc">VWAP, Bollinger Bands, RSI, Fair Value Gaps — the four tools that underpin every ZION trade read.</div>
+      <div class="nc-arrow" style="color:var(--blue)">→ Begin Module 1</div>
+    </a>
+    <a class="next-card m2" href="ZION_Module2_Ichimoku.html">
+      <div class="nc-tag" style="color:var(--teal)">Jump Ahead · Module 02</div>
+      <div class="nc-title">Ichimoku Deep Dive</div>
+      <div class="nc-desc">Already know VWAP and Bollinger Bands? Skip to the full Ichimoku module and build the system interactively.</div>
+      <div class="nc-arrow" style="color:var(--teal)">→ Begin Module 2</div>
+    </a>
+  </div>
+</div>
+
+<script>
+// ── Tab switching ─────────────────────────────────
+const TABS = ['glossary','candles','chart','ichimoku'];
+let progress = JSON.parse(localStorage.getItem('zion-primer-progress')||'{}');
+
+const switchTab = (id, btn) => {
+  TABS.forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===id);
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({top:52, behavior:'smooth'});
+  progress[id] = true;
+  localStorage.setItem('zion-primer-progress', JSON.stringify(progress));
+  updateProgress();
+};
+
+const updateProgress = () => {
+  const done = Object.keys(progress).length;
+  document.getElementById('progressFill').style.width = (done/TABS.length*100)+'%';
+};
+updateProgress();
+
+// ── Glossary search ───────────────────────────────
+const filterGloss = val => {
+  const q = val.toLowerCase().trim();
+  document.querySelectorAll('#glossGrid .gloss-item').forEach(item => {
+    const terms = item.dataset.terms || '';
+    const text  = item.textContent.toLowerCase();
+    item.classList.toggle('gloss-hidden', q && !terms.includes(q) && !text.includes(q));
+  });
+  // Hide/show category labels
+  document.querySelectorAll('#glossGrid .gloss-category').forEach(cat => {
+    const next = cat.nextElementSibling;
+    cat.style.display = (!q || (next && !next.classList.contains('gloss-hidden'))) ? '' : 'none';
+  });
+};
+
+// ── Ichimoku accordion ────────────────────────────
+const toggleIchi = el => {
+  el.classList.toggle('open');
+};
+
+// Mark all tabs visited if returning student
+progress['glossary'] = progress['glossary'] || true; // glossary is the default tab
+updateProgress();
+</script>
+</body>
+</html>

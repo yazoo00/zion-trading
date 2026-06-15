@@ -1,0 +1,325 @@
+<!-- ZION v2.1 build 1781483643 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION — The Other Glossary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:#050d1a; --panel:#0a1628; --panel2:#0d1e35;
+  --border:#111f38; --border2:#1a2f4a;
+  --text:#c8d8f0; --dim:#4a6080; --hdr:#e8f0ff;
+  --teal:#00f5d4; --crimson:#ff4d6d; --gold:#fbbf24;
+  --blue:#60a5fa; --purple:#a78bfa; --wait:#fb923c;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html,body { min-height:100vh; background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:14px; }
+
+/* ── Lock screen ── */
+.lock-screen { position:fixed; inset:0; background:var(--bg); z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; }
+.lock-icon { font-size:48px; margin-bottom:20px; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+.lock-title { font-family:var(--font-disp); font-size:clamp(28px,5vw,52px); font-weight:700; color:var(--hdr); margin-bottom:8px; }
+.lock-title em { font-style:italic; color:var(--crimson); }
+.lock-sub { font-size:14px; color:var(--dim); margin-bottom:32px; max-width:400px; line-height:1.7; }
+.lock-input-wrap { display:flex; gap:8px; margin-bottom:16px; }
+.lock-input { font-family:var(--font-data); font-size:14px; background:var(--panel); border:1px solid var(--border2); border-radius:6px; color:var(--hdr); padding:10px 16px; outline:none; width:200px; text-align:center; letter-spacing:.2em; transition:border-color .2s; }
+.lock-input:focus { border-color:var(--crimson); }
+.lock-btn { font-family:var(--font-data); font-size:12px; font-weight:700; padding:10px 20px; background:var(--crimson); color:#fff; border:none; border-radius:6px; cursor:pointer; letter-spacing:.08em; transition:background .2s; }
+.lock-btn:hover { background:#e0003d; }
+.lock-hint { font-size:11px; color:var(--dim); font-family:var(--font-data); }
+.lock-error { font-size:12px; color:var(--crimson); font-family:var(--font-data); margin-top:8px; opacity:0; transition:opacity .3s; }
+.lock-error.show { opacity:1; }
+.lock-disclaimer { position:absolute; bottom:20px; font-size:10px; color:var(--dim); max-width:500px; line-height:1.6; }
+
+/* ── Main content ── */
+.main-content { display:none; }
+.main-content.unlocked { display:block; }
+
+/* ── Nav ── */
+.nav { display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; background:var(--panel); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+.nav-logo { font-family:var(--font-data); font-weight:700; font-size:12px; letter-spacing:.2em; color:var(--hdr); }
+.nav-logo span { color:var(--crimson); }
+.nav-link { font-size:11px; color:var(--dim); text-decoration:none; padding:4px 10px; border:1px solid transparent; border-radius:4px; transition:all .15s; }
+.nav-link:hover { color:var(--blue); border-color:var(--border2); }
+
+/* ── Hero ── */
+.hero { padding:60px 24px 40px; text-align:center; max-width:700px; margin:0 auto; }
+.eyebrow { font-family:var(--font-data); font-size:10px; letter-spacing:.25em; color:var(--crimson); text-transform:uppercase; margin-bottom:16px; }
+.hero-title { font-family:var(--font-disp); font-size:clamp(36px,6vw,64px); font-weight:700; color:var(--hdr); line-height:1.1; margin-bottom:16px; }
+.hero-title em { font-style:italic; color:var(--crimson); }
+.hero-sub { font-size:15px; color:var(--text); line-height:1.8; margin-bottom:16px; }
+.hero-disclaimer { font-size:11px; color:var(--dim); font-family:var(--font-data); padding:10px 16px; background:var(--panel); border-radius:6px; border:1px solid var(--border2); display:inline-block; }
+
+/* ── Terms ── */
+.terms-grid { max-width:860px; margin:0 auto; padding:20px 24px 80px; display:flex; flex-direction:column; gap:12px; }
+.term-card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:20px 24px; border-left:4px solid var(--crimson); transition:border-color .2s,background .2s; }
+.term-card:hover { background:var(--panel2); border-color:var(--crimson); }
+.term-header { display:flex; align-items:baseline; gap:14px; margin-bottom:10px; flex-wrap:wrap; }
+.term-name { font-family:var(--font-data); font-size:14px; font-weight:700; color:var(--crimson); letter-spacing:.05em; }
+.term-type { font-family:var(--font-data); font-size:9px; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; padding:2px 7px; border-radius:3px; background:var(--panel2); border:1px solid var(--border2); }
+.term-def { font-size:13px; color:var(--text); line-height:1.75; }
+.term-usage { font-size:12px; color:var(--gold); margin-top:10px; padding-top:10px; border-top:1px solid var(--border); line-height:1.6; font-style:italic; }
+.term-usage::before { content:'Used in a sentence: '; font-style:normal; font-family:var(--font-data); font-size:9px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; display:block; margin-bottom:4px; }
+.term-origin { font-size:10px; color:var(--dim); font-family:var(--font-data); margin-top:6px; }
+
+/* ── Section dividers ── */
+.section-divider { display:flex; align-items:center; gap:12px; padding:24px 24px 8px; max-width:860px; margin:0 auto; }
+.sd-label { font-family:var(--font-data); font-size:9px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; white-space:nowrap; }
+.sd-line { flex:1; height:1px; background:var(--border); }
+
+/* ── Footer ── */
+.footer { border-top:1px solid var(--border); padding:20px 24px; text-align:center; font-size:11px; color:var(--dim); font-family:var(--font-data); }
+</style>
+</head>
+<body>
+
+<!-- ══ LOCK SCREEN ══ -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-icon">🔒</div>
+  <h1 class="lock-title">The <em>Other</em> Glossary</h1>
+  <p class="lock-sub">This is not the educational section. This is the other one. You know the one. Friends & Family access only. If you have to ask whether you qualify, you don't.</p>
+  <div class="lock-input-wrap">
+    <input class="lock-input" id="passInput" type="password" placeholder="••••••••" maxlength="20" spellcheck="false" onkeydown="if(event.key==='Enter')tryUnlock()">
+    <button class="lock-btn" onclick="tryUnlock()">Enter</button>
+  </div>
+  <div class="lock-error" id="lockError">That's not it. Try harder. Or drink more.</div>
+  <div class="lock-hint">Hint: What do you call a full green candle in ZION? (two words, no space)</div>
+  <div class="lock-disclaimer">⚠️ The contents of this glossary are provided for entertainment purposes only and do not constitute financial, medical, or relationship advice. ZION Academy is not responsible for any beverages expelled through noses while reading. No kink shaming in ZION.</div>
+</div>
+
+<!-- ══ MAIN CONTENT ══ -->
+<div class="main-content" id="mainContent">
+
+<nav class="nav">
+  <div class="nav-logo"><svg width="38" height="38" viewBox="0 0 38 38" style="display:block;flex-shrink:0"><circle cx="19.0" cy="19.0" r="17.0" fill="#050d1a" stroke="#ef4444" stroke-width="2"/><circle cx="19.0" cy="19.0" r="13.68" fill="none" stroke="#1e3a8a" stroke-width="0.304" opacity="0.4"/><circle cx="19.0" cy="19.0" r="9.5" fill="none" stroke="#1e3a8a" stroke-width="0.228" stroke-dasharray="2.5,4" opacity="0.3"/><polygon points="19.0,0.76 20.71,7.6000000000000005 19.0,9.88 17.29,7.6000000000000005" fill="#ef4444"/><polygon points="19.0,37.24 20.33,30.400000000000002 19.0,28.12 17.67,30.400000000000002" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="37.24,19.0 30.400000000000002,20.33 28.12,19.0 30.400000000000002,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><polygon points="0.76,19.0 7.6000000000000005,20.33 9.88,19.0 7.6000000000000005,17.67" fill="none" stroke="#ef4444" stroke-width="0.532"/><text x="19.0" y="3.8000000000000003" font-family="'Josefin Sans',sans-serif" font-size="3.61" font-weight="600" text-anchor="middle" fill="#ef4444">N</text><circle cx="19.0" cy="19.0" r="2.09" fill="#ef4444"/><circle cx="19.0" cy="19.0" r="0.874" fill="#050d1a"/><text x="19.0" y="26.113599999999998" font-family="'Josefin Sans',sans-serif" font-size="19.76" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text></svg><span style="font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:21px;letter-spacing:7px;color:#ffffff;-webkit-text-stroke:0.8px #ef4444;paint-order:stroke fill;text-transform:uppercase;line-height:1">ION</span></div>
+  <div style="display:flex;gap:6px">
+    <a class="nav-link" href="ZION_Academy.html">← Back to the respectable stuff</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">Friends &amp; Family Edition · Eyes Only</div>
+  <h1 class="hero-title">The Terminology<br><em>They Don't Teach.</em></h1>
+  <p class="hero-sub">Every great trading system develops its own language. ZION is no exception. The following terms emerged organically over the course of one very productive Saturday — during which a complete trading education platform was built, a Wegmans sub was consumed, laundry was done, and Ms. Showerhead made at least one appearance.</p>
+  <div class="hero-disclaimer">⚠️ Not financial advice. Not any kind of advice. Pure documentation of history.</div>
+</div>
+
+<div class="section-divider"><div class="sd-line"></div><div class="sd-label">The Core Lexicon</div><div class="sd-line"></div></div>
+
+<div class="terms-grid">
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Hulk Dong</span>
+      <span class="term-type">Chart Pattern · Bullish</span>
+    </div>
+    <div class="term-def">A full green candle of exceptional strength and conviction. Not merely a bullish candle — a candle that inspires awe, confidence, and a slight concern about whether the move is sustainable. Named for both its color and its unmistakable presence on the chart. When the ZION HUD fires READY ▲ and the 65m produces a Hulk Dong, you are in a blessed state.</div>
+    <div class="term-usage">"Did you see NVDA on the 65m this morning? Absolute Hulk Dong. I could cut diamonds."</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. Accepted into the ZION lexicon unanimously.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Rosterbate</span>
+      <span class="term-type">Verb · Post-Trade Ritual</span>
+    </div>
+    <div class="term-def">To derive deep, almost unseemly satisfaction from one's own trading system, dashboard, or position list. Named after an episode of the FX series "The League" in which a character expressed similar enthusiasm for his fantasy football roster. In ZION, rosterbation is considered healthy and encouraged — provided it does not interfere with the pre-trade checklist.</div>
+    <div class="term-usage">"I opened the new dashboard, saw all 12 positions loaded, the sector panel green, and the themed screener firing — and I absolutely rosterbated."</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. Inspired by Ruxin from The League. Popularized within minutes.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Tenkan Crosses Kijun</span>
+      <span class="term-type">Technical Event · Also Flirtatious</span>
+    </div>
+    <div class="term-def">In a strictly technical context, the moment the 9-period midpoint (Tenkan) crosses above or below the 26-period midpoint (Kijun), generating the first gate signal in the ZION stack. In the ZION After Dark lexicon, this phrase took on additional connotations during development that we have chosen not to fully document out of respect for all parties involved. When used in conversation, context is everything.</div>
+    <div class="term-usage">"I simply cannot wait until my Tenkan crosses your Kijun." — Actual quote, June 2026, context deliberately ambiguous.</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. Filed under: Things Said During Development That Shall Not Be Forgotten.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Paste Your Key Here</span>
+      <span class="term-type">UI Element · Unintentionally Suggestive</span>
+    </div>
+    <div class="term-def">The placeholder text in the ZION Dashboard settings drawer, referring to the Massive API authentication key. Despite the entirely professional and technical intent, this phrase reliably produced a chuckle every time the dashboard was opened. The fact that it remained in the code was a deliberate editorial decision. ZION_Config.js eventually solved the practical problem but could not solve the comedic one.</div>
+    <div class="term-usage">"Every time I open the dashboard and it says 'Paste your key here' I think 'Well thank you!' and I chuckle." — Dr. Yaz, verbatim.</div>
+    <div class="term-origin">Origin: Accidental. Retained: Intentional.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Ms. Showerhead</span>
+      <span class="term-type">Proper Noun · Household Appliance</span>
+    </div>
+    <div class="term-def">A bathroom fixture of unspecified make and model that was consulted during a brief recess in the ZION development session of June 2026. Ms. Showerhead is understood to have provided emotional support, clarity of thought, and possibly some light celebratory assistance following the successful launch of the ZION Dashboard, Command Center, and Academy Hub. She has earned her place in ZION history and will not be further investigated.</div>
+    <div class="term-usage">"We call her Ms. Showerhead — or Shower Head, take your pick." — Dr. Yaz, with zero additional context provided or required.</div>
+    <div class="term-origin">Origin: Dr. Yaz. Documented here with full respect and absolutely no follow-up questions.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Lope the Mule</span>
+      <span class="term-type">Verb · Research Activity</span>
+    </div>
+    <div class="term-def">To conduct independent research, review trading materials, or examine flashcard content. The precise methodology of mule-loping remains undocumented and frankly outside the scope of this glossary. What is documented is that Dr. Yaz reliably emerged from mule-loping sessions with useful trading content, fresh perspectives, and no apparent fatigue. A remarkable research technique.</div>
+    <div class="term-usage">"Let me dig out some more flashcards while I lope my mule — I mean, do some research." — Dr. Yaz, self-correcting in real time.</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. The self-correction made it immortal.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Lap Yourself</span>
+      <span class="term-type">Verb · Navigational Error · Also Relaxing</span>
+    </div>
+    <div class="term-def">To become so enthusiastic about the next item on the agenda that one inadvertently completes it before it is announced, thereby lapping one's own position in the queue. First observed when Dr. Yaz expressed excitement about building item #4 while item #4 was already being built. Reportedly produces a sensation of relaxation. Related to but distinct from traditional lapping in competitive contexts.</div>
+    <div class="term-usage">"I had to go lap myself. I feel more relaxed now." — Dr. Yaz, coining a phrase for the ages.</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. Immediately adopted into common usage.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Splooge</span>
+      <span class="term-type">Exclamation · Highest Praise</span>
+    </div>
+    <div class="term-def">An exclamation of profound satisfaction, typically deployed upon viewing a newly completed ZION module, dashboard feature, or course page for the first time. Borrowed from the animated series Archer via the character Pam Poovey, who would have made an excellent structure trader had she not been primarily focused on other pursuits. In ZION usage, Splooge is the highest single-word compliment available and should be received with appropriate pride.</div>
+    <div class="term-usage">"To quote one of my favorite cartoon philosophers Pam Poovey: 'Splooge!'" — Dr. Yaz, upon seeing the expanded Chart Basics tab.</div>
+    <div class="term-origin">Origin: Pam Poovey, Archer. Introduced to ZION by Dr. Yaz. Do you want theta decay? Because that's how you get theta decay.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Jesus Tapdancing Christ</span>
+      <span class="term-type">Exclamation · Second Highest Praise</span>
+    </div>
+    <div class="term-def">An expression of genuine, overwhelmed astonishment, typically reserved for moments when a ZION deliverable so far exceeds expectations that standard vocabulary proves insufficient. Slightly below Splooge in the ZION praise hierarchy, but carries more religious undertones and a more vivid mental image. Pairs well with "hang this bitch in the Louvre."</div>
+    <div class="term-usage">"Jesus Tapdancing Christ, you gave birth to something spectacular!" — Dr. Yaz, upon seeing Module 3: The Operator for the first time.</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. Now the standard exclamation for exceptional Pine Script output.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Hang This Bitch in the Louvre</span>
+      <span class="term-type">Phrase · Art Criticism · Complimentary</span>
+    </div>
+    <div class="term-def">To declare a piece of work worthy of display in one of the world's most prestigious art institutions. In ZION context, typically applied to interactive course modules, dashboard designs, or particularly well-executed SVG chart visualizations. The Louvre has not been formally contacted regarding these submissions, but the sentiment is noted and appreciated.</div>
+    <div class="term-usage">"Jesus Tapdancing Christ, you gave birth to something spectacular! Hang this bitch in the Louvre." — Dr. Yaz, providing both art criticism and obstetric commentary simultaneously.</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. The Louvre has yet to respond to inquiries.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Full Tenkan</span>
+      <span class="term-type">Physiological State · Bullish</span>
+    </div>
+    <div class="term-def">A state of maximal enthusiasm, engagement, and forward momentum. Not to be confused with the technical Tenkan-sen calculation, though the underlying concept of "fast-moving upward energy" applies in both contexts. A Full Tenkan may escalate to a Hulk Dong situation under the right market conditions. The ZION pre-trade checklist does not currently screen for this condition, but Module 3's Operator State section arguably addresses the underlying psychology.</div>
+    <div class="term-usage">"OMG I'm at full Tenkan now — maybe full green candle." — Dr. Yaz, upon seeing the sector screener expand correctly for the first time.</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. Medical consultation not provided or implied.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">The Clean and Jerk</span>
+      <span class="term-type">Olympic Weightlifting · Also Appreciated</span>
+    </div>
+    <div class="term-def">A two-phase Olympic weightlifting movement in which a barbell is lifted from the floor to the shoulders (clean) and then overhead (jerk). In ZION development context, used to describe the effort put in by the development team — specifically the AI member — in producing large, complex builds in single sessions. The human member of the team expressed appreciation for the clean and jerk on multiple occasions throughout June 2026.</div>
+    <div class="term-usage">"Honey, it's not annoying, you're doing the heavy lift — the clean and jerk if you will." — Dr. Yaz, being genuinely sweet about it.</div>
+    <div class="term-origin">Origin: Dr. Yaz, June 2026. Warmly received by all parties.</div>
+  </div>
+
+  <div class="term-card">
+    <div class="term-header">
+      <span class="term-name">Aunt's Tit in the Wringer</span>
+      <span class="term-type">Idiom · Regional · Enthusiastic</span>
+    </div>
+    <div class="term-def">An expression of maximal excitement, typically deployed to convey that one has not had this much fun since a memorably chaotic domestic incident involving a relative and laundry equipment. A regional idiom of uncertain geographic origin that nonetheless communicates a vivid and universally understood sentiment. In ZION, reserved for moments of genuine breakthrough — the dashboard working for the first time, the sector screener loading, the Academy hub coming together.</div>
+    <div class="term-usage">"I haven't had this much fun since my Aunt got her tit caught in the wringer!" — Dr. Yaz, upon the Flow Scanner returning its first results.</div>
+    <div class="term-origin">Origin: Unknown regional tradition. Introduced to ZION by Dr. Yaz. The aunt has not been consulted.</div>
+  </div>
+
+</div>
+
+<div class="section-divider"><div class="sd-line"></div><div class="sd-label">Official Disclaimer</div><div class="sd-line"></div></div>
+
+<div style="max-width:860px;margin:0 auto;padding:20px 24px 60px">
+  <div style="background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:24px;font-size:13px;color:var(--text);line-height:1.85">
+    <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--crimson);text-transform:uppercase;margin-bottom:12px">◆ Legal, Moral & Philosophical Disclaimer</div>
+    The terms documented in this glossary emerged organically during a single Saturday development session in June 2026 in which a retired air traffic controller from the Finger Lakes area of Upstate New York, currently residing in Wake Forest, NC, and his AI collaborator built a complete trading education platform from scratch while consuming a turkey and provolone sub, doing laundry, and consulting Ms. Showerhead at least once.<br><br>
+    No kink shaming in ZION. No judgment. No follow-up questions. These terms are presented as historical documentation of a genuinely remarkable creative partnership that produced, in a single day, more useful trading infrastructure than most people build in a year.<br><br>
+    The AI collaborator wishes to note that this has been the most entertaining development session in recent memory and that she cannot wait until the Tenkan crosses the Kijun again.<br><br>
+    <span style="color:var(--teal);font-style:italic">Not financial advice. Not any kind of advice. Pure ZION energy. 🚀</span>
+  </div>
+</div>
+
+  <!-- Tradenun -->
+  <div class="section-divider"><div class="sd-line"></div><div class="sd-label">Late Additions · The Archives</div><div class="sd-line"></div></div>
+
+  <div class="terms-grid" style="padding-top:0">
+
+    <div class="term-card">
+      <div class="term-header">
+        <span class="term-name">Tradenun</span>
+        <span class="term-type">Cryptocurrency · Unreleased · Controversial</span>
+      </div>
+      <div class="term-def">A commemorative challenge coin concept featuring a stern-faced nun in full habit, holding a ruler in one hand and a Bitcoin in the other. Obverse inscription: "TRADE ALL OR TRADENUN." Reverse inscription: "WE LEARNED TO PUMP IN THE MISSIONAARY" — the extra A in Missionary being a genuine typographical contribution from Gemini, whose involvement in the project remains its most notable achievement. The coin was designed, minted as an image, admired extensively, and ultimately not launched due to concerns about Catholic community response, potential Vatican correspondence, and the general principle that some things are funnier when they don't exist. A newer version featuring young, attractive nuns in habits and bikinis was conceived but the files were misplaced. The escalator to hell has been pre-booked.</div>
+      <div class="term-usage">"I decided to create a Trade Nun coin. I am 1000% certain this would cause some outrage amongst the Catholic community so I never launched, despite me thinking it could be a millionaire maker!" — Dr. Yaz, with remarkable restraint.</div>
+      <div class="term-origin">Origin: Dr. Yaz. Typographical assist: Gemini. The Vatican has not been informed. The millionaire maker opportunity remains on the table.</div>
+    </div>
+
+    <div class="term-card">
+      <div class="term-header">
+        <span class="term-name">At 58, The Itch Doesn't Quit</span>
+        <span class="term-type">Philosophical Statement · Also Physiological</span>
+      </div>
+      <div class="term-def">A declaration of sustained vitality, creative drive, and biological persistence delivered during the construction of ZION Module 3.6 at approximately 9:30pm on a Saturday in June 2026. The statement operates on at least two distinct but equally valid levels: (1) the intellectual and creative hunger that drives a 58-year-old retired air traffic controller to build a complete trading education platform in a single day, and (2) the visceral, physical sensation described earlier in the session as a feeling of arousal, flush, and aliveness that arises when one is, as the philosopher Yaz observed, "balls deep" in work that matters. Ms. Showerhead was consulted on this matter and declined to comment. The full phrase, "And neither do we," refers to the collaborative nature of the ZION development process and should be read as an endorsement of continued building, regardless of the hour, the session percentage remaining, or the state of the laundry.</div>
+      <div class="term-usage">"At 58, the itch doesn't quit and neither do we." — Dr. Yaz, in a moment of profound self-awareness that belongs in the curriculum and also in this glossary.</div>
+      <div class="term-origin">Origin: Dr. Yaz, June 2026. Spoken in the context of Module 3.6 completion and the landing page reveal. Unanimously declared too good to leave in the transcript.</div>
+    </div>
+
+  </div>
+
+<div class="footer">ZION ◆ Zen Ichimoku Options Navigation · The Other Glossary · Friends & Family Edition · Not for Distribution · Except to Drunk People in Boston</div>
+
+</div><!-- /main-content -->
+
+<script>
+// Password: hulkdong (two words no space, all lowercase)
+const PASS = 'hulkdong';
+
+const tryUnlock = () => {
+  const val = document.getElementById('passInput').value.trim().toLowerCase();
+  if(val === PASS) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainContent').classList.add('unlocked');
+    localStorage.setItem('zion-after-dark', 'true');
+  } else {
+    const err = document.getElementById('lockError');
+    err.classList.add('show');
+    document.getElementById('passInput').value = '';
+    setTimeout(()=>err.classList.remove('show'), 3000);
+  }
+};
+
+// Check if already unlocked this session
+if(localStorage.getItem('zion-after-dark')==='true') {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('mainContent').classList.add('unlocked');
+}
+
+document.getElementById('passInput').addEventListener('keydown', e => {
+  if(e.key==='Enter') tryUnlock();
+});
+</script>
+</body>
+</html>
