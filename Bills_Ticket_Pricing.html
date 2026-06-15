@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bills Ticket Pricing Tool — Section 141</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--panel:#0f1623;--panel2:#141d2e;
+  --border:#1e2d45;--border2:#243550;
+  --text:#c8d8f0;--dim:#4a6080;--hdr:#e8f0ff;
+  --bills-blue:#00338d;--bills-red:#c60c30;
+  --green:#4ade80;--gold:#fbbf24;--teal:#00f5d4;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;line-height:1.6;min-height:100vh}
+
+/* ── Header ── */
+.header{background:linear-gradient(135deg,var(--bills-blue),#001f5c);padding:18px 24px;border-bottom:3px solid var(--bills-red);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.header h1{font-size:18px;font-weight:700;color:#fff}
+.header p{font-size:11px;color:#93c5fd;font-family:var(--font-data);letter-spacing:1px}
+.section-badge{font-family:var(--font-data);font-size:11px;color:#fff;background:var(--bills-red);padding:4px 12px;border-radius:4px}
+
+/* ── Game selector ── */
+.game-selector{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.gs-label{font-family:var(--font-data);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.gs-select{font-family:var(--font-data);font-size:12px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;color:var(--hdr);padding:7px 12px;outline:none;cursor:pointer;transition:border-color .15s}
+.gs-select:focus{border-color:var(--bills-blue)}
+.gs-date{font-family:var(--font-data);font-size:11px;color:var(--dim)}
+.gs-network{font-size:9px;padding:2px 7px;border-radius:3px;font-weight:700;font-family:var(--font-data)}
+.net-tnf{background:#ff6900;color:#fff}
+.net-mnf{background:#004080;color:#fff}
+.net-snf{background:#1a1a2e;color:#fff}
+.net-thx{background:#6b21a8;color:#fff}
+.net-sat{background:#065f46;color:#fff}
+
+/* ── Main ── */
+.main{max-width:1080px;margin:0 auto;padding:20px}
+
+/* ── Your seats highlight ── */
+.your-seats{background:linear-gradient(135deg,#00338d22,var(--panel));border:1px solid var(--bills-blue);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ys-label{font-family:var(--font-data);font-size:9px;color:var(--bills-red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+.ys-val{font-family:var(--font-data);font-size:18px;font-weight:700;color:#fff}
+.ys-sub{font-size:11px;color:var(--dim);margin-top:2px}
+.ys-rec{text-align:right}
+.ys-rec-label{font-size:10px;color:var(--dim);margin-bottom:2px;font-family:var(--font-data);letter-spacing:.08em}
+.ys-rec-price{font-family:var(--font-data);font-size:22px;font-weight:700;color:var(--green)}
+.ys-rec-note{font-size:10px;color:var(--dim)}
+
+/* ── Tier grid ── */
+.tier-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+
+.tier-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tier-card.your-section{border-color:var(--bills-red);background:linear-gradient(135deg,#c60c3010,var(--panel))}
+.tier-card.your-section .tier-header{background:linear-gradient(90deg,#c60c3020,transparent)}
+
+.tier-header{padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.tier-num{font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.1em;min-width:28px}
+.tier-name{font-weight:600;color:var(--hdr);font-size:14px;flex:1}
+.tier-badge{font-size:9px;padding:2px 8px;border-radius:3px;font-family:var(--font-data);font-weight:700}
+.badge-yours{background:#c60c30;color:#fff}
+.badge-lower{background:#00338d;color:#fff}
+.badge-premium{background:#7c3aed;color:#fff}
+.badge-upper{background:#374151;color:#e5e7eb}
+
+.tier-body{padding:12px 16px;display:grid;grid-template-columns:repeat(4,1fr) 1fr;gap:10px;align-items:center}
+@media(max-width:650px){.tier-body{grid-template-columns:1fr 1fr;gap:8px}}
+
+.tier-input-group{display:flex;flex-direction:column;gap:3px}
+.til-label{font-size:9px;color:var(--dim);font-family:var(--font-data);letter-spacing:.06em;text-transform:uppercase}
+.til-input{font-family:var(--font-data);font-size:13px;font-weight:700;background:var(--panel2);border:1px solid var(--border2);border-radius:4px;color:var(--hdr);padding:5px 8px;outline:none;width:100%;transition:border-color .15s}
+.til-input:focus{border-color:var(--gold)}
+.til-input::placeholder{color:var(--dim);font-weight:400;font-size:11px}
+
+.tier-avg{display:flex;flex-direction:column;gap:3px;text-align:center;padding:4px 8px;background:var(--panel2);border-radius:4px;border:1px solid var(--border2)}
+.avg-label{font-size:9px;color:var(--dim);font-family:var(--font-data);letter-spacing:.06em;text-transform:uppercase}
+.avg-val{font-family:var(--font-data);font-size:16px;font-weight:700}
+
+/* ── Analysis card ── */
+.analysis-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px}
+.ac-title{font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.ac-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:600px){.analysis-grid{grid-template-columns:1fr 1fr}}
+
+.ag-item{background:var(--panel2);border-radius:6px;padding:12px;text-align:center}
+.ag-label{font-size:10px;color:var(--dim);font-family:var(--font-data);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;line-height:1.4}
+.ag-val{font-family:var(--font-data);font-size:18px;font-weight:700}
+
+/* ── Pricing recommendation ── */
+.rec-card{background:linear-gradient(135deg,#14532d20,var(--panel));border:1px solid #14532d;border-radius:8px;padding:18px;margin-bottom:16px}
+.rec-title{font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--green);text-transform:uppercase;margin-bottom:14px}
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rec-item{background:var(--panel2);border-radius:6px;padding:12px;text-align:center;border:1px solid var(--border)}
+.rec-label{font-size:10px;color:var(--dim);font-family:var(--font-data);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.rec-val{font-family:var(--font-data);font-size:20px;font-weight:700;color:var(--green)}
+.rec-desc{font-size:10px;color:var(--dim);margin-top:3px;line-height:1.4}
+
+/* ── Notes ── */
+.notes-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:16px}
+.notes-label{font-family:var(--font-data);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;padding-top:8px}
+.notes-input{flex:1;background:var(--panel);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--font-ui);font-size:12px;padding:8px 12px;outline:none;resize:none;line-height:1.6;transition:border-color .15s}
+.notes-input:focus{border-color:var(--bills-blue)}
+
+/* ── Save bar ── */
+.save-bar{position:sticky;bottom:0;background:rgba(10,14,26,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.save-btn{font-family:var(--font-data);font-size:11px;font-weight:700;padding:8px 18px;border:none;border-radius:6px;cursor:pointer;letter-spacing:.08em;transition:all .15s}
+.btn-save{background:var(--bills-red);color:#fff}
+.btn-save:hover{background:#a50a28}
+.btn-save.saved{background:var(--green);color:#050d1a}
+.btn-copy{background:var(--bills-blue);color:#fff}
+.btn-copy:hover{background:#002470}
+.last-saved{font-family:var(--font-data);font-size:10px;color:var(--dim)}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <h1>🦬 Bills Ticket Pricing Tool</h1>
+    <p>TONY & BRENT · HIGHMARK STADIUM · 2026 INAUGURAL SEASON</p>
+  </div>
+  <div class="section-badge">Section 141 · Row 27 · Seats 22–25</div>
+</div>
+
+<!-- Game selector -->
+<div class="game-selector">
+  <span class="gs-label">Select Game:</span>
+  <select class="gs-select" id="gameSelect" onchange="loadGame()">
+    <option value="">— Choose a home game —</option>
+    <option value="wk2">WK2 · Sep 17 · vs Lions (TNF)</option>
+    <option value="wk3">WK3 · Sep 27 · vs Chargers</option>
+    <option value="wk4">WK4 · Oct 4 · vs Patriots</option>
+    <option value="wk8">WK8 · Nov 1 · vs Ravens</option>
+    <option value="wk11">WK11 · Nov 22 · vs Dolphins</option>
+    <option value="wk12">WK12 · Nov 26 · vs Chiefs (Thanksgiving)</option>
+    <option value="wk15">WK15 · Dec 19 · vs Bears (Saturday Night)</option>
+    <option value="wk18">WK18 · TBD · vs Jets</option>
+    <option value="ps1">PS1 · Aug 15 · vs Panthers (Preseason)</option>
+    <option value="ps3">PS3 · Aug 27 · vs Steelers (Preseason)</option>
+  </select>
+  <span class="gs-date" id="gameDateBadge"></span>
+</div>
+
+<div class="main">
+
+  
+<!-- Paste and Parse Panel -->
+<div style="background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px">
+  <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px">
+      <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:6px">
+        ◆ Paste StubHub Data — Auto-populate all tiers
+      </div>
+      <textarea id="pasteInput" rows="3" 
+        style="width:100%;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--font-ui);font-size:12px;padding:8px 12px;outline:none;resize:vertical;line-height:1.5;transition:border-color .15s"
+        placeholder="1. Go to StubHub for a Bills home game&#10;2. Select All (Ctrl+A) then Copy (Ctrl+C)&#10;3. Paste here (Ctrl+V) then click Parse&#10;Works with any amount of data — 10 listings or 150!"
+        onfocus="this.style.borderColor='var(--gold)';"
+        onblur="this.style.borderColor='var(--border2)'"></textarea>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding-top:20px">
+      <button onclick="parseStubHub()" 
+        style="font-family:var(--font-data);font-size:11px;font-weight:700;padding:8px 18px;background:var(--gold);color:#050d1a;border:none;border-radius:6px;cursor:pointer;letter-spacing:.08em;white-space:nowrap">
+        ◆ Parse &amp; Auto-Fill
+      </button>
+      <button onclick="clearPaste()"
+        style="font-family:var(--font-data);font-size:11px;padding:6px 18px;background:transparent;color:var(--dim);border:1px solid var(--border2);border-radius:6px;cursor:pointer">
+        Clear
+      </button>
+    </div>
+    <div id="parseStatus" style="font-family:var(--font-data);font-size:10px;color:var(--dim);padding-top:22px;min-width:200px;line-height:1.8"></div>
+  </div>
+</div>
+
+<!-- Your seats highlight -->
+  <div class="your-seats" id="yourSeatsCard">
+    <div>
+      <div class="ys-label">Your Seats</div>
+      <div class="ys-val">Section 141 · Row 27 · Seats 22–25</div>
+      <div class="ys-sub">Lower Bowl · Aisle seats · 4 tickets total</div>
+    </div>
+    <div class="ys-rec">
+      <div class="ys-rec-label">Recommended List Price</div>
+      <div class="ys-rec-price" id="recPrice">Enter data below</div>
+      <div class="ys-rec-note" id="recNote">Based on section comp analysis</div>
+    </div>
+  </div>
+
+  <!-- Seven tier inputs -->
+  <div class="tier-grid" id="tierGrid">
+
+    <!-- Tier 1: Whole stadium -->
+    <div class="tier-card">
+      <div class="tier-header">
+        <span class="tier-num">01</span>
+        <span class="tier-name">Whole Stadium Average</span>
+        <span class="tier-badge badge-upper">MARKET BASELINE</span>
+      </div>
+      <div class="tier-body">
+        <div class="tier-input-group">
+          <div class="til-label">Low</div>
+          <input class="til-input" type="number" id="t1-low" placeholder="$" oninput="recalc()">
+        </div>
+        <div class="tier-input-group">
+          <div class="til-label">Median</div>
+          <input class="til-input" type="number" id="t1-med" placeholder="$" oninput="recalc()">
+        </div>
+        <div class="tier-input-group">
+          <div class="til-label">High</div>
+          <input class="til-input" type="number" id="t1-high" placeholder="$" oninput="recalc()">
+        </div>
+        <div class="tier-input-group">
+          <div class="til-label">Source</div>
+          <input class="til-input" type="text" id="t1-src" placeholder="StubHub / TM" style="font-size:11px;font-weight:400">
+        </div>
+        <div class="tier-avg">
+          <div class="avg-label">Avg</div>
+          <div class="avg-val" id="t1-avg" style="color:var(--dim)">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tier 2: Lower bowl -->
+    <div class="tier-card">
+      <div class="tier-header">
+        <span class="tier-num">02</span>
+        <span class="tier-name">Lower Bowl (All 100s)</span>
+        <span class="tier-badge badge-lower">LOWER BOWL</span>
+      </div>
+      <div class="tier-body">
+        <div class="tier-input-group"><div class="til-label">Low</div><input class="til-input" type="number" id="t2-low" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Median</div><input class="til-input" type="number" id="t2-med" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">High</div><input class="til-input" type="number" id="t2-high" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Source</div><input class="til-input" type="text" id="t2-src" placeholder="StubHub / TM" style="font-size:11px;font-weight:400"></div>
+        <div class="tier-avg"><div class="avg-label">Avg</div><div class="avg-val" id="t2-avg" style="color:var(--dim)">—</div></div>
+      </div>
+    </div>
+
+    <!-- Tier 3: Lower bowl minus 20s -->
+    <div class="tier-card">
+      <div class="tier-header">
+        <span class="tier-num">03</span>
+        <span class="tier-name">Lower Bowl — Excl. Between the 20s</span>
+        <span class="tier-badge badge-lower">BEST COMP</span>
+      </div>
+      <div class="tier-body">
+        <div class="tier-input-group"><div class="til-label">Low</div><input class="til-input" type="number" id="t3-low" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Median</div><input class="til-input" type="number" id="t3-med" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">High</div><input class="til-input" type="number" id="t3-high" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Source</div><input class="til-input" type="text" id="t3-src" placeholder="StubHub / TM" style="font-size:11px;font-weight:400"></div>
+        <div class="tier-avg"><div class="avg-label">Avg</div><div class="avg-val" id="t3-avg" style="color:var(--dim)">—</div></div>
+      </div>
+    </div>
+
+    <!-- Tier 4: Your section -->
+    <div class="tier-card your-section">
+      <div class="tier-header">
+        <span class="tier-num">04</span>
+        <span class="tier-name">Section 141 — Your Section</span>
+        <span class="tier-badge badge-yours">YOUR SEATS</span>
+      </div>
+      <div class="tier-body">
+        <div class="tier-input-group"><div class="til-label">Low</div><input class="til-input" type="number" id="t4-low" placeholder="$" oninput="recalc()" style="border-color:#c60c3044"></div>
+        <div class="tier-input-group"><div class="til-label">Median</div><input class="til-input" type="number" id="t4-med" placeholder="$" oninput="recalc()" style="border-color:#c60c3044"></div>
+        <div class="tier-input-group"><div class="til-label">High</div><input class="til-input" type="number" id="t4-high" placeholder="$" oninput="recalc()" style="border-color:#c60c3044"></div>
+        <div class="tier-input-group"><div class="til-label">Source</div><input class="til-input" type="text" id="t4-src" placeholder="StubHub / TM" style="font-size:11px;font-weight:400;border-color:#c60c3044"></div>
+        <div class="tier-avg" style="border-color:#c60c3044;background:#c60c3012"><div class="avg-label">Avg</div><div class="avg-val" id="t4-avg" style="color:var(--bills-red)">—</div></div>
+      </div>
+    </div>
+
+    <!-- Tier 5: 200 level -->
+    <div class="tier-card">
+      <div class="tier-header">
+        <span class="tier-num">05</span>
+        <span class="tier-name">200 Level (Club)</span>
+        <span class="tier-badge badge-premium">CLUB</span>
+      </div>
+      <div class="tier-body">
+        <div class="tier-input-group"><div class="til-label">Low</div><input class="til-input" type="number" id="t5-low" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Median</div><input class="til-input" type="number" id="t5-med" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">High</div><input class="til-input" type="number" id="t5-high" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Source</div><input class="til-input" type="text" id="t5-src" placeholder="StubHub / TM" style="font-size:11px;font-weight:400"></div>
+        <div class="tier-avg"><div class="avg-label">Avg</div><div class="avg-val" id="t5-avg" style="color:var(--dim)">—</div></div>
+      </div>
+    </div>
+
+    <!-- Tier 6: Club and suites -->
+    <div class="tier-card">
+      <div class="tier-header">
+        <span class="tier-num">06</span>
+        <span class="tier-name">Club Seats & Suites</span>
+        <span class="tier-badge badge-premium">PREMIUM</span>
+      </div>
+      <div class="tier-body">
+        <div class="tier-input-group"><div class="til-label">Low</div><input class="til-input" type="number" id="t6-low" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Median</div><input class="til-input" type="number" id="t6-med" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">High</div><input class="til-input" type="number" id="t6-high" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Source</div><input class="til-input" type="text" id="t6-src" placeholder="StubHub / TM" style="font-size:11px;font-weight:400"></div>
+        <div class="tier-avg"><div class="avg-label">Avg</div><div class="avg-val" id="t6-avg" style="color:var(--dim)">—</div></div>
+      </div>
+    </div>
+
+    <!-- Tier 7: 300 level -->
+    <div class="tier-card">
+      <div class="tier-header">
+        <span class="tier-num">07</span>
+        <span class="tier-name">300 Level (Upper Deck)</span>
+        <span class="tier-badge badge-upper">UPPER</span>
+      </div>
+      <div class="tier-body">
+        <div class="tier-input-group"><div class="til-label">Low</div><input class="til-input" type="number" id="t7-low" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Median</div><input class="til-input" type="number" id="t7-med" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">High</div><input class="til-input" type="number" id="t7-high" placeholder="$" oninput="recalc()"></div>
+        <div class="tier-input-group"><div class="til-label">Source</div><input class="til-input" type="text" id="t7-src" placeholder="StubHub / TM" style="font-size:11px;font-weight:400"></div>
+        <div class="tier-avg"><div class="avg-label">Avg</div><div class="avg-val" id="t7-avg" style="color:var(--dim)">—</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Analysis -->
+  <div class="analysis-card">
+    <div class="ac-title">Market Position Analysis</div>
+    <div class="analysis-grid">
+      <div class="ag-item">
+        <div class="ag-label">Your Section vs<br>Stadium Average</div>
+        <div class="ag-val" id="anal1" style="color:var(--dim)">—</div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-label">Your Section vs<br>Lower Bowl Excl 20s</div>
+        <div class="ag-val" id="anal2" style="color:var(--dim)">—</div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-label">Premium over<br>Upper Deck</div>
+        <div class="ag-val" id="anal3" style="color:var(--dim)">—</div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-label">Section 141<br>Median Price</div>
+        <div class="ag-val" id="anal4" style="color:var(--bills-red)">—</div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-label">4 Tickets<br>Total Value</div>
+        <div class="ag-val" id="anal5" style="color:var(--green)">—</div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-label">Tony & Brent<br>Each Receive</div>
+        <div class="ag-val" id="anal6" style="color:var(--gold)">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing recommendation -->
+  <div class="rec-card">
+    <div class="rec-title">◆ Pricing Recommendation — Section 141 Row 27</div>
+    <div class="rec-grid">
+      <div class="rec-item">
+        <div class="rec-label">Quick Sale</div>
+        <div class="rec-val" id="rec-quick">—</div>
+        <div class="rec-desc">Price to sell fast — 10% below section median</div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-label">Target Price</div>
+        <div class="rec-val" id="rec-target">—</div>
+        <div class="rec-desc">At section median — list here first</div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-label">Hold Price</div>
+        <div class="rec-val" id="rec-hold">—</div>
+        <div class="rec-desc">10% above median — worth waiting for premium buyers</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="notes-row">
+    <span class="notes-label">Game Notes</span>
+    <textarea class="notes-input" rows="2" id="gameNotes"
+      placeholder="e.g. Chiefs Thanksgiving game — high demand, list early. Set alerts on StubHub 6 weeks out..."></textarea>
+  </div>
+
+</div>
+
+<!-- Save bar -->
+<div class="save-bar">
+  <div class="last-saved" id="lastSaved">No data entered yet</div>
+  <div style="display:flex;gap:8px">
+    <button class="save-btn btn-copy" onclick="copyPricingSummary()">Copy Summary</button>
+    <button class="save-btn btn-save" id="saveBtn" onclick="saveData()">◆ Save</button>
+  </div>
+</div>
+
+<script>
+const GAMES = {
+  wk2:  { label:'WK2 · Sep 17 · vs Lions',    demand:'HIGH',   net:'TNF' },
+  wk3:  { label:'WK3 · Sep 27 · vs Chargers', demand:'MED',    net:'' },
+  wk4:  { label:'WK4 · Oct 4 · vs Patriots',  demand:'MED',    net:'' },
+  wk8:  { label:'WK8 · Nov 1 · vs Ravens',    demand:'HIGH',   net:'' },
+  wk11: { label:'WK11 · Nov 22 · vs Dolphins',demand:'MED',    net:'' },
+  wk12: { label:'WK12 · Nov 26 · vs Chiefs',  demand:'VERY HIGH', net:'THX' },
+  wk15: { label:'WK15 · Dec 19 · vs Bears',   demand:'MED',    net:'SAT' },
+  wk18: { label:'WK18 · TBD · vs Jets',       demand:'MED',    net:'' },
+  ps1:  { label:'PS1 · Aug 15 · vs Panthers', demand:'LOW',    net:'' },
+  ps3:  { label:'PS3 · Aug 27 · vs Steelers', demand:'LOW',    net:'' },
+};
+
+const TIERS = [1,2,3,4,5,6,7];
+const fmt   = n => n ? '$' + Number(n).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
+const pct   = (a,b) => a&&b ? ((a-b)/b*100).toFixed(0)+'%' : '—';
+const avg   = (lo,med,hi) => {
+  const vals = [lo,med,hi].map(Number).filter(v=>v>0);
+  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+};
+
+// State per game
+let allData = JSON.parse(localStorage.getItem('bills-pricing-2026')||'{}');
+let currentGame = '';
+
+const loadGame = () => {
+  currentGame = document.getElementById('gameSelect').value;
+  if (!currentGame) return;
+  const g = GAMES[currentGame];
+  document.getElementById('gameDateBadge').textContent =
+    `${g.label} · Demand: ${g.demand}`;
+
+  // Load saved data
+  const d = allData[currentGame] || {};
+  TIERS.forEach(t => {
+    ['low','med','high','src'].forEach(k => {
+      const el = document.getElementById(`t${t}-${k}`);
+      if (el) el.value = d[`t${t}_${k}`] || '';
+    });
+  });
+  document.getElementById('gameNotes').value = d.notes || '';
+  recalc();
+};
+
+const recalc = () => {
+  const avgs = {};
+  TIERS.forEach(t => {
+    const lo  = Number(document.getElementById(`t${t}-low`)?.value)||0;
+    const med = Number(document.getElementById(`t${t}-med`)?.value)||0;
+    const hi  = Number(document.getElementById(`t${t}-high`)?.value)||0;
+    const a   = avg(lo, med, hi);
+    avgs[t]   = a;
+    const el  = document.getElementById(`t${t}-avg`);
+    if (el) {
+      el.textContent = a ? fmt(Math.round(a)) : '—';
+      el.style.color = t===4 ? 'var(--bills-red)' : a ? 'var(--teal)' : 'var(--dim)';
+    }
+  });
+
+  // Your section median
+  const secMed = Number(document.getElementById('t4-med')?.value)||0;
+  const secAvg = avgs[4];
+  const stadAvg = avgs[1];
+  const lbExcl  = avgs[3];
+  const upperAvg = avgs[7];
+
+  // Analysis
+  const a1El = document.getElementById('anal1');
+  const a2El = document.getElementById('anal2');
+  const a3El = document.getElementById('anal3');
+  const a4El = document.getElementById('anal4');
+  const a5El = document.getElementById('anal5');
+  const a6El = document.getElementById('anal6');
+
+  if (secAvg && stadAvg) {
+    const diff = ((secAvg-stadAvg)/stadAvg*100).toFixed(0);
+    a1El.textContent = (diff>0?'+':'')+diff+'%';
+    a1El.style.color = diff>0?'var(--green)':'var(--bills-red)';
+  } else { a1El.textContent='—'; a1El.style.color='var(--dim)'; }
+
+  if (secAvg && lbExcl) {
+    const diff = ((secAvg-lbExcl)/lbExcl*100).toFixed(0);
+    a2El.textContent = (diff>0?'+':'')+diff+'%';
+    a2El.style.color = diff>0?'var(--green)':'var(--bills-red)';
+  } else { a2El.textContent='—'; a2El.style.color='var(--dim)'; }
+
+  if (secAvg && upperAvg) {
+    const diff = ((secAvg-upperAvg)/upperAvg*100).toFixed(0);
+    a3El.textContent = (diff>0?'+':'')+diff+'%';
+    a3El.style.color = 'var(--gold)';
+  } else { a3El.textContent='—'; a3El.style.color='var(--dim)'; }
+
+  a4El.textContent = secMed ? fmt(secMed) : '—';
+  a5El.textContent = secMed ? fmt(secMed*4) : '—';
+  a6El.textContent = secMed ? fmt(secMed*4/2) : '—';
+
+  // Recommendations
+  const base = secMed || (secAvg ? Math.round(secAvg) : 0);
+  document.getElementById('rec-quick').textContent  = base ? fmt(Math.round(base*0.90)) : '—';
+  document.getElementById('rec-target').textContent = base ? fmt(base) : '—';
+  document.getElementById('rec-hold').textContent   = base ? fmt(Math.round(base*1.10)) : '—';
+
+  // Your seats header
+  document.getElementById('recPrice').textContent   = base ? fmt(base) + ' / ticket' : 'Enter data below';
+  document.getElementById('recNote').textContent    = base ?
+    `Section 141 median · 4 tickets = ${fmt(base*4)} total` :
+    'Based on section comp analysis';
+};
+
+const saveData = () => {
+  if (!currentGame) { alert('Select a game first'); return; }
+  const d = {};
+  TIERS.forEach(t => {
+    ['low','med','high','src'].forEach(k => {
+      d[`t${t}_${k}`] = document.getElementById(`t${t}-${k}`)?.value || '';
+    });
+  });
+  d.notes = document.getElementById('gameNotes').value;
+  allData[currentGame] = d;
+  localStorage.setItem('bills-pricing-2026', JSON.stringify(allData));
+  const btn = document.getElementById('saveBtn');
+  btn.textContent='✓ Saved!'; btn.className='save-btn btn-save saved';
+  document.getElementById('lastSaved').textContent =
+    `Saved: ${GAMES[currentGame]?.label} · ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+  setTimeout(()=>{ btn.textContent='◆ Save'; btn.className='save-btn btn-save'; },2000);
+};
+
+const copyPricingSummary = () => {
+  if (!currentGame) { alert('Select a game first'); return; }
+  const g = GAMES[currentGame];
+  const secMed = Number(document.getElementById('t4-med')?.value)||0;
+  const base = secMed;
+  const notes = document.getElementById('gameNotes').value;
+  const txt = [
+    `BILLS TICKET PRICING — ${g.label}`,
+    `Section 141 · Row 27 · Seats 22-25 · 4 tickets`,
+    '',
+    `Section Median:  ${fmt(base)}/ticket`,
+    `Quick Sale:      ${fmt(Math.round(base*0.90))}/ticket`,
+    `Target Price:    ${fmt(base)}/ticket`,
+    `Hold Price:      ${fmt(Math.round(base*1.10))}/ticket`,
+    '',
+    `4 Tickets Total: ${fmt(base*4)}`,
+    `Tony receives:   ${fmt(base*4/2)}`,
+    `Brent receives:  ${fmt(base*4/2)}`,
+    notes ? `\nNotes: ${notes}` : '',
+  ].join('\n');
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent='✓ Copied!';
+    setTimeout(()=>{ btn.textContent='Copy Summary'; },2000);
+  });
+};
+
+// ── StubHub Paste Parser ──────────────────────────────────
+const parseStubHub = () => {
+  const raw = document.getElementById('pasteInput').value;
+  if (!raw.trim()) { alert('Paste some StubHub data first!'); return; }
+
+  const status = document.getElementById('parseStatus');
+  status.innerHTML = 'Parsing...';
+
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  const listings = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const secMatch = lines[i].match(/^Section\s+(\d+)$/i);
+    if (secMatch) {
+      const sec = parseInt(secMatch[1]);
+      for (let j = i+1; j < Math.min(i+12, lines.length); j++) {
+        const priceMatch = lines[j].match(/^\$([0-9,]+)$/);
+        if (priceMatch) {
+          const price = parseInt(priceMatch[1].replace(/,/g,''));
+          if (price > 50 && price < 50000) {
+            listings.push({ section: sec, price });
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  if (!listings.length) {
+    status.innerHTML = '⚠ No listings found. Try selecting all text on the StubHub results page (Ctrl+A, Ctrl+C) and pasting here.';
+    return;
+  }
+
+  const getStats = items => {
+    if (!items.length) return null;
+    const prices = items.map(l => l.price).sort((a,b) => a-b);
+    return {
+      low:   prices[0],
+      med:   prices[Math.floor(prices.length/2)],
+      high:  prices[prices.length-1],
+      count: prices.length,
+    };
+  };
+
+  const tiers = [
+    { id:1, label:'Whole Stadium',         fn: s => true },
+    { id:2, label:'Lower Bowl All 100s',   fn: s => s>=101 && s<=151 },
+    { id:3, label:'Lower Bowl Excl 20s',   fn: s => (s>=101&&s<=109)||(s>=131&&s<=151) },
+    { id:4, label:'Section 141',           fn: s => s===141 },
+    { id:5, label:'200 Level',             fn: s => s>=200&&s<=299 },
+    { id:6, label:'Club & Suites',         fn: s => s>=300&&s<=399 },
+    { id:7, label:'400 Level Upper',       fn: s => s>=400 },
+  ];
+
+  let lines2 = [`✓ <strong>${listings.length} listings parsed</strong>`,''];
+
+  tiers.forEach(tier => {
+    const filtered = listings.filter(l => tier.fn(l.section));
+    const st = getStats(filtered);
+    if (!st) { lines2.push(`T${tier.id}: ${tier.label} — no data`); return; }
+
+    const lo  = document.getElementById(`t${tier.id}-low`);
+    const med = document.getElementById(`t${tier.id}-med`);
+    const hi  = document.getElementById(`t${tier.id}-high`);
+    const src = document.getElementById(`t${tier.id}-src`);
+
+    if (lo)  lo.value  = st.low;
+    if (med) med.value = st.med;
+    if (hi)  hi.value  = st.high;
+    if (src && !src.value) src.value = 'StubHub';
+
+    lines2.push(`T${tier.id} ${tier.label}: ${st.count} listings · Low $${st.low.toLocaleString()} · Med $${st.med.toLocaleString()} · High $${st.high.toLocaleString()}`);
+  });
+
+  const sec141 = listings.filter(l => l.section===141);
+  if (sec141.length) {
+    lines2.push('');
+    lines2.push(`<strong>Sec 141 (${sec141.length}):</strong> ${sec141.map(l=>'$'+l.price.toLocaleString()).join(' · ')}`);
+  }
+
+  status.innerHTML = lines2.join('<br>');
+  recalc();
+};
+
+const clearPaste = () => {
+  document.getElementById('pasteInput').value = '';
+  document.getElementById('parseStatus').innerHTML = '';
+};
+
+</script>
+</body>
+</html>
