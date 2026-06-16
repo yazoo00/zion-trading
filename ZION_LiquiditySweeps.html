@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION · Liquidity Sweeps Reference</title>
+<base href="/">
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050d1a;--panel:#0a1628;--panel2:#0d1e35;
+  --border:#111f38;--border2:#1a2f4a;
+  --text:#c8d8f0;--dim:#4a6080;--hdr:#e8f0ff;
+  --teal:#00f5d4;--crimson:#ff4d6d;--gold:#fbbf24;
+  --blue:#60a5fa;--purple:#a78bfa;--wait:#fb923c;
+  --green:#4ade80;--navy:#1e3a8a;--accent:#f59e0b;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-brand:'Josefin Sans',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;line-height:1.7;overflow-x:hidden}
+
+/* ── Nav ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(5,13,26,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-ion{font-family:var(--font-brand);font-weight:300;font-size:21px;letter-spacing:7px;color:#fff;-webkit-text-stroke:.8px #ef4444;paint-order:stroke fill;text-transform:uppercase}
+.nav-right{display:flex;gap:6px}
+.nav-link{font-size:11px;color:var(--dim);text-decoration:none;padding:4px 10px;border:1px solid transparent;border-radius:4px;transition:all .15s}
+.nav-link:hover,.nav-link.active{color:var(--crimson);background:#ff4d6d10}
+
+/* ── Hero ── */
+.hero{padding:60px 24px 40px;max-width:900px;margin:0 auto;text-align:center}
+.eyebrow{font-family:var(--font-data);font-size:10px;letter-spacing:.25em;color:var(--crimson);text-transform:uppercase;margin-bottom:16px}
+.hero-title{font-family:var(--font-disp);font-size:clamp(32px,5vw,60px);font-weight:700;color:var(--hdr);line-height:1.15;margin-bottom:16px}
+.hero-title em{font-style:italic;color:var(--crimson)}
+.hero-sub{font-size:16px;color:var(--text);max-width:640px;line-height:1.8;margin:0 auto}
+
+/* ── Main ── */
+.main{max-width:980px;margin:0 auto;padding:40px 24px 80px}
+
+/* ── Section headers ── */
+.sec-hdr{font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin:40px 0 16px;display:flex;align-items:center;gap:10px}
+.sec-hdr::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec-title{font-family:var(--font-disp);font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--hdr);margin-bottom:12px}
+.sec-intro{font-size:14px;color:var(--text);line-height:1.8;max-width:720px;margin-bottom:28px}
+
+/* ── Concept cards ── */
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:32px}
+@media(max-width:640px){.concept-grid{grid-template-columns:1fr}}
+.concept-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px 20px;border-left:4px solid transparent}
+.concept-card.bull{border-left-color:var(--teal)}
+.concept-card.bear{border-left-color:var(--crimson)}
+.concept-card.neutral{border-left-color:var(--gold)}
+.concept-card.warning{border-left-color:var(--purple)}
+.cc-label{font-family:var(--font-data);font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
+.cc-title{font-size:15px;font-weight:700;color:var(--hdr);margin-bottom:8px}
+.cc-body{font-size:12px;color:var(--text);line-height:1.7}
+.cc-body strong{color:var(--hdr)}
+
+/* ── Insight box ── */
+.insight-box{background:linear-gradient(135deg,#ff4d6d10,#060e1e);border:1px solid #ff4d6d30;border-radius:8px;padding:20px 24px;margin:28px 0;position:relative}
+.insight-box::before{content:'"';font-family:var(--font-disp);font-size:60px;color:var(--crimson);opacity:.3;position:absolute;top:-10px;left:16px;line-height:1}
+.insight-text{font-family:var(--font-disp);font-style:italic;font-size:16px;color:var(--hdr);line-height:1.65;padding-left:8px}
+.insight-attr{font-family:var(--font-data);font-size:10px;color:var(--crimson);letter-spacing:.1em;margin-top:10px;padding-left:8px}
+
+/* ── Time windows ── */
+.time-grid{display:flex;flex-direction:column;gap:6px;margin-bottom:28px}
+.time-row{display:grid;grid-template-columns:140px 1fr 100px;gap:10px;align-items:center;padding:10px 14px;background:var(--panel);border-radius:6px;border-left:3px solid var(--border2)}
+.time-row.high{border-left-color:var(--crimson)}
+.time-row.med{border-left-color:var(--gold)}
+.time-row.low{border-left-color:var(--dim)}
+.tr-time{font-family:var(--font-data);font-size:11px;color:var(--dim)}
+.tr-desc{font-size:12px;color:var(--text);line-height:1.5}
+.tr-desc strong{color:var(--hdr)}
+.tr-badge{font-family:var(--font-data);font-size:9px;font-weight:700;padding:3px 8px;border-radius:3px;text-align:center}
+.badge-high{background:#ff4d6d20;color:var(--crimson);border:1px solid #ff4d6d40}
+.badge-med{background:#fbbf2420;color:var(--gold);border:1px solid #fbbf2440}
+.badge-low{background:#4a608020;color:var(--dim);border:1px solid #4a608040}
+
+/* ── Sweep anatomy ── */
+.anatomy{background:var(--panel2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:28px}
+.anatomy-header{padding:10px 16px;background:#070f1e;border-bottom:1px solid var(--border);font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase}
+.anatomy-steps{display:flex;flex-direction:column;gap:0}
+.a-step{display:grid;grid-template-columns:32px 1fr 160px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
+.a-step:last-child{border-bottom:none}
+.a-num{font-family:var(--font-data);font-size:14px;font-weight:700;color:var(--dim);text-align:center}
+.a-desc{font-size:13px;color:var(--text);line-height:1.6}
+.a-desc strong{color:var(--hdr)}
+.a-signal{font-family:var(--font-data);font-size:10px;text-align:right}
+
+/* ── How to read ── */
+.read-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px}
+@media(max-width:640px){.read-grid{grid-template-columns:1fr}}
+.read-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px}
+.rc-icon{font-size:24px;margin-bottom:10px}
+.rc-title{font-size:13px;font-weight:700;color:var(--hdr);margin-bottom:6px}
+.rc-body{font-size:12px;color:var(--text);line-height:1.65}
+
+/* ── Key rules ── */
+.rules{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.rule{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel);border-radius:6px}
+.rule-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:8px}
+.rule-text{font-size:13px;color:var(--text);line-height:1.65}
+.rule-text strong{color:var(--hdr)}
+
+/* ── Quick ref table ── */
+.ref-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:28px}
+.ref-table th{background:#070f1e;padding:8px 14px;text-align:left;font-family:var(--font-data);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--border)}
+.ref-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.5}
+.ref-table tr:last-child td{border-bottom:none}
+.ref-table tr:hover td{background:var(--panel2)}
+.ref-table td:first-child{font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--hdr);white-space:nowrap}
+
+/* ── SVG chart ── */
+.chart-container{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:28px}
+.chart-label{font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="ZION_Academy.html">
+    <svg width="34" height="34" viewBox="0 0 34 34" style="display:block;flex-shrink:0">
+      <circle cx="17" cy="17" r="15" fill="#050d1a" stroke="#ef4444" stroke-width="2.2"/>
+      <circle cx="17" cy="17" r="11" fill="none" stroke="#1e3a8a" stroke-width=".7" opacity=".4"/>
+      <polygon points="17,1 18.8,6.2 17,8.5 15.2,6.2" fill="#ef4444"/>
+      <circle cx="17" cy="17" r="2" fill="#ef4444"/>
+      <text x="17" y="22" font-family="Josefin Sans,sans-serif" font-size="17.5" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text>
+    </svg>
+    <span class="nav-ion">ION</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="ZION_Academy.html">← Academy</a>
+    <span class="nav-link active">Liquidity Sweeps</span>
+    <a class="nav-link" href="ZION_Command.html">Command</a>
+    <a class="nav-link" href="ZION_TrendLock.html">Trend-Lock</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="eyebrow">ZION Reference · Market Structure</div>
+  <h1 class="hero-title">Liquidity Sweeps — <em>What the Market Is Actually Doing</em></h1>
+  <p class="hero-sub">Most retail traders see a move against them and think they're wrong. They're not wrong about direction — they're wrong about timing. The market hunts stops before making its real move. This is not random. It is deliberate, predictable, and readable.</p>
+</div>
+
+<div class="main">
+
+  <!-- What is a liquidity sweep -->
+  <div class="sec-hdr">What Is a Liquidity Sweep</div>
+  <h2 class="sec-title">The Market Is Not Random</h2>
+  <p class="sec-intro">Large institutional participants — market makers, hedge funds, algorithmic traders — need liquidity to fill large orders. Retail stop losses sitting below support and above resistance are that liquidity. A sweep is when price intentionally moves to those stops, triggers them, fills the institutional order, and then reverses. Every single day. Predictable as sunrise.</p>
+
+  <div class="concept-grid">
+    <div class="concept-card bull">
+      <div class="cc-label" style="color:var(--teal)">Bullish Sweep (Buy-Side)</div>
+      <div class="cc-title">Price drops BELOW support to grab stops — then reverses UP</div>
+      <div class="cc-body">Retail traders set stop losses just below support levels. Price dips below, triggers those stops (forced sell orders), institutions buy that liquidity at the low, price reverses sharply upward. <strong>The wick below support is the tell.</strong></div>
+    </div>
+    <div class="concept-card bear">
+      <div class="cc-label" style="color:var(--crimson)">Bearish Sweep (Sell-Side)</div>
+      <div class="cc-title">Price spikes ABOVE resistance to grab stops — then reverses DOWN</div>
+      <div class="cc-body">Retail traders set stop losses just above resistance. Price spikes above, triggers those stops (forced buy orders), institutions sell into that buying, price reverses sharply downward. <strong>The wick above resistance is the tell.</strong></div>
+    </div>
+    <div class="concept-card neutral">
+      <div class="cc-label" style="color:var(--gold)">Where Stops Live</div>
+      <div class="cc-title">Retail always parks stops at obvious levels</div>
+      <div class="cc-body">Below round numbers. Below prior day lows. Below VWAP. Below the Kijun. Below the Lower Bollinger Band. <strong>The more obvious the level, the more stops are sitting there.</strong> The more stops, the more attractive it is to sweep.</div>
+    </div>
+    <div class="concept-card warning">
+      <div class="cc-label" style="color:var(--purple)">Why It Works Every Time</div>
+      <div class="cc-title">Predictability creates the opportunity</div>
+      <div class="cc-body">Retail behavior is consistent — they set stops at the same levels every session. Institutions know this. The sweep is not manipulation — it is <strong>the market finding liquidity at known price levels</strong> to facilitate institutional order flow.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The market was testing the Tenkan, MBB, and Lower Bollinger Band — sweeping liquidity — only to go back up. That is not the market being difficult. That is the market doing exactly what it always does before continuing the trend.</p>
+    <div class="insight-attr">— ZION · Observed June 16, 2026</div>
+  </div>
+
+  <!-- When sweeps happen -->
+  <div class="sec-hdr">When Sweeps Happen</div>
+  <h2 class="sec-title">Times of Day That Always Hunt Stops</h2>
+  <p class="sec-intro">Liquidity sweeps are not random — they cluster around specific session windows. Knowing when to expect them is the difference between panic-selling into a sweep and holding through it.</p>
+
+  <div class="time-grid">
+    <div class="time-row high">
+      <div class="tr-time">9:30 – 10:00am</div>
+      <div class="tr-desc"><strong>Opening Fuckery — highest sweep probability of the day.</strong> Pre-market levels, overnight gaps, and visible retail stops all get hunted within the first 30 minutes. Fakeouts in both directions. Never trade this window.</div>
+      <div class="tr-badge badge-high">HIGHEST RISK</div>
+    </div>
+    <div class="time-row high">
+      <div class="tr-time">11:30am – 1:30pm</div>
+      <div class="tr-desc"><strong>Midday Chop — low volume sweep territory.</strong> Algorithms probe both sides with no institutional conviction. Stops below morning lows and above morning highs get targeted. Nothing that happens here is real.</div>
+      <div class="tr-badge badge-high">HIGH RISK</div>
+    </div>
+    <div class="time-row med">
+      <div class="tr-time">1:30 – 2:00pm</div>
+      <div class="tr-desc"><strong>Smart Money Return transition.</strong> One final sweep attempt before real direction establishes. Watch for a quick dip or spike that reverses within 1-2 candles — that is the sweep clearing the way for the afternoon move.</div>
+      <div class="tr-badge badge-med">WATCH</div>
+    </div>
+    <div class="time-row med">
+      <div class="tr-time">3:45 – 4:00pm</div>
+      <div class="tr-desc"><strong>MOC imbalance stop hunt.</strong> Market on Close orders can cause a final directional sweep in the last 15 minutes. Stops just beyond the day's range get targeted. Not a time to enter new positions.</div>
+      <div class="tr-badge badge-med">WATCH</div>
+    </div>
+    <div class="time-row low">
+      <div class="tr-time">10:00 – 11:30am</div>
+      <div class="tr-desc"><strong>Pro Setup Window — lowest sweep risk.</strong> Real institutional volume establishes real direction. Sweeps can still occur but are less frequent and more clearly defined. This is the ZION primary trade window.</div>
+      <div class="tr-badge badge-low">LOWER RISK</div>
+    </div>
+  </div>
+
+  <!-- Anatomy of a sweep -->
+  <div class="sec-hdr">Anatomy of a Sweep</div>
+  <h2 class="sec-title">The Four-Phase Sequence</h2>
+  <p class="sec-intro">Every liquidity sweep follows the same sequence. Once you see it enough times, you recognize it as it's developing rather than after it's over.</p>
+
+  <div class="anatomy">
+    <div class="anatomy-header">Bullish sweep example — same logic inverted for bearish</div>
+    <div class="anatomy-steps">
+      <div class="a-step">
+        <div class="a-num" style="color:var(--gold)">1</div>
+        <div class="a-desc"><strong>Consolidation above support.</strong> Price has been holding above a key level — VWAP, Kijun, prior low, round number. Retail traders have set stops just below it. The longer price consolidates near the level, the more stops accumulate there.</div>
+        <div class="a-signal" style="color:var(--dim)">Watch: tight BBs, RSI neutral, volume declining</div>
+      </div>
+      <div class="a-step">
+        <div class="a-num" style="color:var(--wait)">2</div>
+        <div class="a-desc"><strong>The probe — price breaks below support.</strong> A candle closes below the key level, often with a spike in volume. Retail stops trigger. Panic selling begins. This looks like a breakdown. <strong>It is not a breakdown.</strong> It is the sweep.</div>
+        <div class="a-signal" style="color:var(--wait)">Watch: volume spike, RSI oversold flush</div>
+      </div>
+      <div class="a-step">
+        <div class="a-num" style="color:var(--crimson)">3</div>
+        <div class="a-desc"><strong>Maximum confusion.</strong> Price sits below the level. Retail traders who got stopped out are relieved they're "safe." Others are shorting the breakdown. Social media and Discord are saying "it's going lower." <strong>This is where institutions are buying.</strong></div>
+        <div class="a-signal" style="color:var(--crimson)">Watch: wicks lengthening, selling pressure drying up</div>
+      </div>
+      <div class="a-step">
+        <div class="a-num" style="color:var(--teal)">4</div>
+        <div class="a-desc"><strong>The reversal — sharp move back through the level.</strong> Price reclaims the broken level quickly, often within 1-3 candles. Volume returns. The move is fast. Retail traders who sold the breakdown are now underwater. <strong>This is the real move.</strong></div>
+        <div class="a-signal" style="color:var(--teal)">Watch: reclaim candle, RSI bounce, VWAP slope turning</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual sweep diagram -->
+  <div class="chart-container">
+    <div class="chart-label">Bullish sweep visual — price below support then sharp reversal</div>
+    <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+      <!-- Background -->
+      <rect width="700" height="260" fill="#0a1628"/>
+      
+      <!-- Support line -->
+      <line x1="40" y1="140" x2="660" y2="140" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="6,4" opacity=".6"/>
+      <text x="665" y="144" font-family="JetBrains Mono" font-size="10" fill="#fbbf24" opacity=".8">SUPPORT</text>
+
+      <!-- VWAP line -->
+      <line x1="40" y1="100" x2="660" y2="105" stroke="#00f5d4" stroke-width="1" stroke-dasharray="4,4" opacity=".4"/>
+      <text x="665" y="104" font-family="JetBrains Mono" font-size="10" fill="#00f5d4" opacity=".6">VWAP</text>
+
+      <!-- Candles: Phase 1 consolidation -->
+      <!-- Green consolidation candles above support -->
+      <rect x="60" y="110" width="12" height="25" fill="#00f5d4" opacity=".7" rx="1"/>
+      <line x1="66" y1="105" x2="66" y2="138" stroke="#00f5d4" opacity=".5" stroke-width="1"/>
+      
+      <rect x="85" y="115" width="12" height="20" fill="#00f5d4" opacity=".7" rx="1"/>
+      <line x1="91" y1="110" x2="91" y2="138" stroke="#00f5d4" opacity=".5" stroke-width="1"/>
+      
+      <rect x="110" y="112" width="12" height="22" fill="#00f5d4" opacity=".7" rx="1"/>
+      <line x1="116" y1="107" x2="116" y2="138" stroke="#00f5d4" opacity=".5" stroke-width="1"/>
+
+      <rect x="135" y="118" width="12" height="18" fill="#ff4d6d" opacity=".7" rx="1"/>
+      <line x1="141" y1="113" x2="141" y2="138" stroke="#ff4d6d" opacity=".5" stroke-width="1"/>
+
+      <rect x="160" y="114" width="12" height="22" fill="#00f5d4" opacity=".7" rx="1"/>
+      <line x1="166" y1="110" x2="166" y2="138" stroke="#00f5d4" opacity=".5" stroke-width="1"/>
+
+      <!-- Phase 2: The sweep candle -->
+      <rect x="200" y="142" width="14" height="32" fill="#ff4d6d" rx="1"/>
+      <line x1="207" y1="120" x2="207" y2="185" stroke="#ff4d6d" stroke-width="1.5"/>
+      <!-- Stop loss zone -->
+      <rect x="185" y="141" width="50" height="45" fill="#ff4d6d" opacity=".06" rx="2"/>
+      <text x="190" y="157" font-family="JetBrains Mono" font-size="8" fill="#ff4d6d" opacity=".7">STOPS</text>
+      <text x="190" y="167" font-family="JetBrains Mono" font-size="8" fill="#ff4d6d" opacity=".7">TRIGGERED</text>
+
+      <!-- Phase 3: Confusion candles below support -->
+      <rect x="228" y="158" width="12" height="18" fill="#ff4d6d" opacity=".6" rx="1"/>
+      <line x1="234" y1="150" x2="234" y2="180" stroke="#ff4d6d" opacity=".4" stroke-width="1"/>
+
+      <rect x="253" y="155" width="12" height="20" fill="#ff4d6d" opacity=".5" rx="1"/>
+      <line x1="259" y1="148" x2="259" y2="178" stroke="#ff4d6d" opacity=".4" stroke-width="1"/>
+
+      <!-- Wicks lengthening = drying up -->
+      <rect x="278" y="153" width="12" height="15" fill="#ff4d6d" opacity=".4" rx="1"/>
+      <line x1="284" y1="142" x2="284" y2="177" stroke="#ff4d6d" opacity=".3" stroke-width="1"/>
+
+      <!-- Phase 4: Reversal -->
+      <rect x="315" y="105" width="16" height="50" fill="#00f5d4" rx="1"/>
+      <line x1="323" y1="95" x2="323" y2="160" stroke="#00f5d4" stroke-width="2"/>
+      
+      <!-- Continuation candles -->
+      <rect x="345" y="95" width="14" height="40" fill="#00f5d4" opacity=".9" rx="1"/>
+      <line x1="352" y1="88" x2="352" y2="135" stroke="#00f5d4" stroke-width="1.5"/>
+
+      <rect x="373" y="85" width="14" height="45" fill="#00f5d4" opacity=".9" rx="1"/>
+      <line x1="380" y1="78" x2="380" y2="130" stroke="#00f5d4" stroke-width="1.5"/>
+
+      <rect x="401" y="80" width="14" height="40" fill="#00f5d4" rx="1"/>
+      <line x1="408" y1="74" x2="408" y2="120" stroke="#00f5d4" stroke-width="1.5"/>
+
+      <rect x="429" y="75" width="14" height="38" fill="#00f5d4" rx="1"/>
+      <line x1="436" y1="68" x2="436" y2="115" stroke="#00f5d4" stroke-width="1.5"/>
+
+      <!-- Labels -->
+      <text x="80" y="95" font-family="JetBrains Mono" font-size="9" fill="#fbbf24" opacity=".8">Phase 1</text>
+      <text x="65" y="105" font-family="JetBrains Mono" font-size="9" fill="#fbbf24" opacity=".6">Consolidation</text>
+
+      <text x="195" y="205" font-family="JetBrains Mono" font-size="9" fill="#ff4d6d" opacity=".9">Phase 2</text>
+      <text x="198" y="215" font-family="JetBrains Mono" font-size="9" fill="#ff4d6d" opacity=".7">The Sweep</text>
+
+      <text x="245" y="205" font-family="JetBrains Mono" font-size="9" fill="#4a6080">Phase 3</text>
+      <text x="238" y="215" font-family="JetBrains Mono" font-size="9" fill="#4a6080">Confusion</text>
+
+      <text x="325" y="205" font-family="JetBrains Mono" font-size="9" fill="#00f5d4" opacity=".9">Phase 4</text>
+      <text x="318" y="215" font-family="JetBrains Mono" font-size="9" fill="#00f5d4" opacity=".7">Real Move</text>
+
+      <!-- Arrow showing sweep depth -->
+      <line x1="207" y1="185" x2="207" y2="195" stroke="#ff4d6d" stroke-width="1" opacity=".6"/>
+      <text x="168" y="232" font-family="JetBrains Mono" font-size="8" fill="#ff4d6d" opacity=".6">How deep? Below key levels until stops are cleared</text>
+    </svg>
+  </div>
+
+  <!-- How to read a sweep -->
+  <div class="sec-hdr">How to Read It</div>
+  <h2 class="sec-title">Three Things to Watch</h2>
+
+  <div class="read-grid">
+    <div class="read-card">
+      <div class="rc-icon">📊</div>
+      <div class="rc-title">Sector + Index Confirmation</div>
+      <div class="rc-body">If XLK is raging and a tech stock is probing below VWAP, that is a sweep not a breakdown. The sector tells you the real trend. The individual stock is doing the stop hunt. They resolve in the same direction when the sweep is complete.</div>
+    </div>
+    <div class="read-card">
+      <div class="rc-icon">🕯</div>
+      <div class="rc-title">Wick vs Close</div>
+      <div class="rc-body">A long wick below support that CLOSES back above it is almost always a sweep. The wick grabbed stops. The close tells you where price actually wants to be. A full candle body that closes below support is a different story — that may be a real breakdown.</div>
+    </div>
+    <div class="read-card">
+      <div class="rc-icon">📉</div>
+      <div class="rc-title">Volume at the Extreme</div>
+      <div class="rc-body">Sweeps often show a volume spike at the low — that is the stop orders filling. Then volume dries up as the sweep completes. The reversal candle comes on renewed volume. Volume spike at the low + reversal = sweep confirmed.</div>
+    </div>
+  </div>
+
+  <!-- How deep do they probe -->
+  <div class="sec-hdr">How Deep Does the Probe Go</div>
+  <h2 class="sec-title">Common Sweep Targets</h2>
+
+  <table class="ref-table">
+    <thead>
+      <tr>
+        <th>Target Level</th>
+        <th>Why It Gets Hit</th>
+        <th>What to Watch After</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Below VWAP</td>
+        <td>Most retail traders use VWAP as their stop reference. Stops cluster just below it every session.</td>
+        <td>Reclaim of VWAP within 1-3 candles on the 5m — confirms sweep complete.</td>
+      </tr>
+      <tr>
+        <td>Below Tenkan (9-period)</td>
+        <td>Short-term equilibrium — swing traders set stops just below. Morning session sweep target especially during fuckery hour.</td>
+        <td>Candle close back above Tenkan on the 65m — thesis intact.</td>
+      </tr>
+      <tr>
+        <td>Below Kijun (26-period)</td>
+        <td>Medium-term equilibrium — more stops here than at Tenkan. A Kijun sweep is a higher-conviction move.</td>
+        <td>If price reclaims Kijun quickly — sweep. If it consolidates below — may be real breakdown.</td>
+      </tr>
+      <tr>
+        <td>Below Lower Bollinger Band</td>
+        <td>Momentum stops cluster outside the bands. LBB sweeps are aggressive and often signal exhaustion of selling pressure.</td>
+        <td>RSI oversold + LBB wick + VWAP slope flattening = high probability reversal setup.</td>
+      </tr>
+      <tr>
+        <td>Below Prior Day Low</td>
+        <td>Previous session's low is an obvious stop level. Every trader who bought above it has stops there.</td>
+        <td>Reclaim of PDL within the same session confirms sweep. Hold below PDL into close is bearish.</td>
+      </tr>
+      <tr>
+        <td>Below Round Numbers</td>
+        <td>$100, $150, $200 — psychological stops concentrate at round numbers. The more obvious, the bigger the sweep.</td>
+        <td>Fast reclaim = sweep. Slow grind below = real selling.</td>
+      </tr>
+      <tr>
+        <td>Above Prior Day High</td>
+        <td>Bearish sweep target. Breakout traders set buy stops just above PDH. Sweep triggers those, then reverses.</td>
+        <td>Fast rejection = sweep. Hold above PDH = real breakout.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ZION rules for sweeps -->
+  <div class="sec-hdr">ZION Rules for Sweeps</div>
+  <h2 class="sec-title">What You Do and Don't Do</h2>
+
+  <div class="rules">
+    <div class="rule">
+      <div class="rule-dot" style="background:var(--teal)"></div>
+      <div class="rule-text"><strong>Never exit a position on a sweep unless the Kijun closes below.</strong> A sweep below VWAP or the Tenkan during fuckery hour or midday chop is not a reason to exit. It is the market doing its job. The Kijun close is the exit signal — not the sweep itself.</div>
+    </div>
+    <div class="rule">
+      <div class="rule-dot" style="background:var(--teal)"></div>
+      <div class="rule-text"><strong>Use the sweep as entry confirmation, not as a reason to bail.</strong> The moment of maximum pain — price below your reference level, everyone saying it's broken — is often the best entry or add opportunity for a position in the direction of the real trend.</div>
+    </div>
+    <div class="rule">
+      <div class="rule-dot" style="background:var(--gold)"></div>
+      <div class="rule-text"><strong>Cross-reference the sector.</strong> If XLK is above VWAP and an XLK component is sweeping below its VWAP, you have confirmation that the sweep is false. The sector is telling you the real trend. The individual name is doing the stop hunt. Wait for the reclaim.</div>
+    </div>
+    <div class="rule">
+      <div class="rule-dot" style="background:var(--gold)"></div>
+      <div class="rule-text"><strong>Know the session window.</strong> A sweep during fuckery hour (9:30-10:00) is expected and ignorable. A sweep during the Smart Money Return window (1:30-3:00pm) with sector confirmation is more meaningful. Context is everything.</div>
+    </div>
+    <div class="rule">
+      <div class="rule-dot" style="background:var(--crimson)"></div>
+      <div class="rule-text"><strong>Do not enter a trade INTO the sweep.</strong> Fighting a sweep in real time — shorting the spike down, buying the spike up — is trading noise. The sweep happens fast. You will be late, wrong, or both. Wait for the reversal candle. Enter after confirmation, not during the hunt.</div>
+    </div>
+    <div class="rule">
+      <div class="rule-dot" style="background:var(--crimson)"></div>
+      <div class="rule-text"><strong>Do not set your stop losses AT obvious levels.</strong> This is the other side of the lesson. If you set your stop at the prior low, at VWAP, at the Kijun, at a round number — you are the liquidity being hunted. Structure your stops using ATR-based distance or below the NEXT significant level, not at the obvious one.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The market does not have AIDS. The market does not owe you a profit. It is probing for stops, collecting liquidity, and then doing what it was always going to do. The operator who understands this sits calmly while everyone else donates their stops to the casino.</p>
+    <div class="insight-attr">— ZION · There's No Crying in the Casino</div>
+  </div>
+
+  <!-- Quick reference -->
+  <div class="sec-hdr">Quick Reference</div>
+  <h2 class="sec-title">Sweep vs Breakdown — How to Tell</h2>
+
+  <table class="ref-table">
+    <thead>
+      <tr>
+        <th>Signal</th>
+        <th>Sweep (False Move)</th>
+        <th>Real Breakdown</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Candle structure</td>
+        <td>Long wick, closes back above level</td>
+        <td>Full body closes below level</td>
+      </tr>
+      <tr>
+        <td>Volume</td>
+        <td>Spike at extreme, dries up immediately</td>
+        <td>Sustained volume below level</td>
+      </tr>
+      <tr>
+        <td>Speed of reversal</td>
+        <td>Fast — 1 to 3 candles reclaim</td>
+        <td>Slow grind or consolidation below</td>
+      </tr>
+      <tr>
+        <td>Sector alignment</td>
+        <td>Sector still above VWAP / bullish</td>
+        <td>Sector also breaking down</td>
+      </tr>
+      <tr>
+        <td>Kijun status</td>
+        <td>Kijun still holding — no close below</td>
+        <td>Kijun close confirmed — thesis broken</td>
+      </tr>
+      <tr>
+        <td>Time of day</td>
+        <td>Fuckery hour, midday chop, MOC</td>
+        <td>Pro Setup or Smart Money windows</td>
+      </tr>
+      <tr>
+        <td>RSI</td>
+        <td>Oversold flush, bouncing</td>
+        <td>RSI declining with no bounce</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Navigation -->
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:48px;padding-top:32px;border-top:1px solid var(--border)">
+    <a style="background:var(--crimson);color:#050d1a;font-weight:700;font-size:13px;padding:12px 28px;border-radius:6px;text-decoration:none" href="ZION_TrendLock.html">Open Trend-Lock</a>
+    <a style="background:transparent;color:var(--blue);font-size:13px;padding:12px 28px;border-radius:6px;border:1px solid var(--blue);text-decoration:none" href="ZION_Module5_Exit.html">← Module 5: Exit Timing</a>
+    <a style="background:transparent;color:var(--blue);font-size:13px;padding:12px 28px;border-radius:6px;border:1px solid var(--blue);text-decoration:none" href="ZION_Academy.html">Academy Home</a>
+  </div>
+
+</div>
+
+</body>
+</html>
