@@ -490,6 +490,28 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-ui); font
           <span class="tc-topic">Morning Read</span>
         </div>
       </a>
+        <a class="track-card" href="ZION_Module4_Catalyst.html">
+        <div class="tc-top">
+          <span class="tc-tag" style="background:#f59e0b18;color:#f59e0b;border:1px solid #f59e0b33;font-family:var(--font-data);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px">Module 04 · The Catalyst · Prerequisites: 2, 3</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-m4">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">The Catalyst — Does the Business Support the Trade?</div>
+        <div class="tc-desc">Fundamental analysis meets Ichimoku structure. Revenue growth, margins, FCF, dilution, valuation — scored into a Catalyst Score 0–10. The highest-conviction trade is PRIME ▲ plus a strong fundamental picture behind it.</div>
+        </a>
+        <a class="track-card" href="ZION_Module5_Exit.html">
+        <div class="tc-top">
+          <span class="tc-tag" style="background:#00f5d418;color:#00f5d4;border:1px solid #00f5d433;font-family:var(--font-data);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px">Module 05 · Exit Timing · Prerequisites: 2, 3</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="tc-progress" id="prog-m5">—</span>
+            <span class="tc-arrow">→</span>
+          </div>
+        </div>
+        <div class="tc-title">Exit Timing — The Kijun, VWAP Slope, and the TK Cross</div>
+        <div class="tc-desc">Everyone teaches entries. Nobody teaches exits. ZION's exit framework uses three tools — Kijun as trailing anchor, VWAP slope as early warning, TK cross as the definitive signal. You entered on structure. You exit on structure.</div>
+        </a>
     </div>
 
   </div><!-- /track -->
@@ -624,6 +646,14 @@ const loadProgress = () => {
   if(m2Sections.every(s=>m2[s]))     document.querySelector('.node-m2').className='track-node node-done';
   if(m3Sections.every(s=>m3[s]))     document.querySelector('.node-m3').className='track-node node-done';
   if(primerSections.every(s=>primer[s])) document.querySelector('.node-primer').className='track-node node-done';
+
+  // M4 and M5 progress
+  const m4 = JSON.parse(localStorage.getItem('zion-m4-progress')||'{}');
+  const m5 = JSON.parse(localStorage.getItem('zion-m5-progress')||'{}');
+  const m4el = document.getElementById('prog-m4');
+  const m5el = document.getElementById('prog-m5');
+  if(m4el && Object.keys(m4).length) m4el.textContent = Object.keys(m4).length >= 4 ? '100%' : Math.round(Object.keys(m4).length/4*100)+'%';
+  if(m5el && Object.keys(m5).length) m5el.textContent = Object.keys(m5).length >= 6 ? '100%' : Math.round(Object.keys(m5).length/6*100)+'%';
 };
 loadProgress();
 </script>
