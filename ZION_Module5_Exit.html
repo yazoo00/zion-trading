@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZION Academy · Module 5: Exit Timing</title>
+<base href="/">
+<script src="ZION_Config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050d1a;--panel:#0a1628;--panel2:#0d1e35;
+  --border:#111f38;--border2:#1a2f4a;
+  --text:#c8d8f0;--dim:#4a6080;--hdr:#e8f0ff;
+  --teal:#00f5d4;--crimson:#ff4d6d;--gold:#fbbf24;
+  --blue:#60a5fa;--purple:#a78bfa;--wait:#fb923c;
+  --red:#ef4444;--navy:#1e3a8a;--green:#4ade80;
+  --accent:#f59e0b;
+  --font-data:'JetBrains Mono',monospace;
+  --font-ui:'Inter',sans-serif;
+  --font-brand:'Josefin Sans',sans-serif;
+  --font-disp:'Playfair Display',serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;line-height:1.7;overflow-x:hidden}
+
+/* ── Nav ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(5,13,26,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-ion{font-family:var(--font-brand);font-weight:300;font-size:21px;letter-spacing:7px;color:#fff;-webkit-text-stroke:.8px #ef4444;paint-order:stroke fill;text-transform:uppercase}
+.nav-right{display:flex;gap:6px}
+.nav-link{font-size:11px;color:var(--dim);text-decoration:none;padding:4px 10px;border:1px solid transparent;border-radius:4px;transition:all .15s}
+.nav-link:hover,.nav-link.active{color:var(--teal);background:#00f5d410}
+
+/* ── Sections ── */
+.module-section{display:none}
+.module-section.visible{display:block}
+#section-hero{display:block}
+
+/* ── Hero ── */
+.hero{min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#00f5d408 0%,transparent 65%);pointer-events:none}
+.module-eyebrow{font-family:var(--font-data);font-size:10px;letter-spacing:.25em;color:var(--teal);text-transform:uppercase;margin-bottom:20px}
+.hero-title{font-family:var(--font-disp);font-size:clamp(36px,6vw,72px);font-weight:700;color:var(--hdr);line-height:1.1;margin-bottom:16px}
+.hero-title em{font-style:italic;color:var(--teal)}
+.hero-sub{font-size:17px;color:var(--text);max-width:600px;line-height:1.8;margin:0 auto 40px}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:#050d1a;font-weight:700;font-size:13px;padding:12px 28px;border-radius:6px;border:none;cursor:pointer;transition:all .2s;letter-spacing:.04em;text-decoration:none}
+.hero-cta:hover{background:#00d4b8;transform:translateY(-1px)}
+
+/* ── Content ── */
+.section{padding:80px 24px;max-width:940px;margin:0 auto}
+.section-eyebrow{font-family:var(--font-data);font-size:10px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-title{font-family:var(--font-disp);font-size:clamp(26px,4vw,46px);font-weight:700;color:var(--hdr);line-height:1.2;margin-bottom:20px}
+.section-intro{font-size:16px;color:var(--text);line-height:1.85;margin-bottom:48px;max-width:720px}
+
+/* ── Key points ── */
+.key-points{display:flex;flex-direction:column;gap:10px;margin:24px 0}
+.key-point{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--panel);border-radius:6px;border-left:3px solid transparent}
+.key-point:hover{border-left-color:var(--teal)}
+.kp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:8px}
+.kp-text{font-size:13px;color:var(--text);line-height:1.65}
+.kp-text strong{color:var(--hdr)}
+
+/* ── Insight box ── */
+.insight-box{background:linear-gradient(135deg,#00f5d410,#060e1e);border:1px solid #00f5d430;border-radius:8px;padding:20px 24px;margin:28px 0;position:relative}
+.insight-box::before{content:'"';font-family:var(--font-disp);font-size:60px;color:var(--teal);opacity:.3;position:absolute;top:-10px;left:16px;line-height:1}
+.insight-text{font-family:var(--font-disp);font-style:italic;font-size:16px;color:var(--hdr);line-height:1.65;padding-left:8px}
+.insight-attr{font-family:var(--font-data);font-size:10px;color:var(--teal);letter-spacing:.1em;margin-top:10px;padding-left:8px}
+
+/* ── Rule cards ── */
+.rule-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:12px 0}
+.rc-header{padding:14px 18px;background:#070f1e;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.rc-num{font-family:var(--font-data);font-size:9px;color:var(--dim);letter-spacing:.1em}
+.rc-title{font-weight:700;color:var(--hdr);font-size:15px;flex:1}
+.rc-badge{font-family:var(--font-data);font-size:9px;padding:2px 10px;border-radius:3px;font-weight:700;letter-spacing:.06em}
+.badge-exit{background:#00f5d418;color:var(--teal);border:1px solid #00f5d433}
+.badge-warn{background:#fbbf2418;color:var(--gold);border:1px solid #fbbf2433}
+.badge-hold{background:#60a5fa18;color:var(--blue);border:1px solid #60a5fa33}
+.rc-body{padding:16px 18px;font-size:13px;color:var(--text);line-height:1.7}
+.rc-body strong{color:var(--hdr)}
+
+/* ── Kijun visual ── */
+.kijun-viz{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:20px 0;font-family:var(--font-data);font-size:11px}
+.kv-label{font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:10px}
+.kv-bars{display:flex;flex-direction:column;gap:4px}
+.kv-row{display:flex;align-items:center;gap:10px}
+.kv-scenario{width:120px;color:var(--dim);font-size:10px;flex-shrink:0}
+.kv-bar{height:8px;border-radius:4px;flex:1;position:relative;display:flex;align-items:center}
+.kv-price{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg)}
+.kv-action{font-size:10px;font-weight:700;width:80px;text-align:right;flex-shrink:0}
+
+/* ── VWAP slope indicator ── */
+.slope-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0}
+.slope-card{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
+.sc-arrow{font-size:28px;margin-bottom:6px}
+.sc-label{font-size:12px;font-weight:700;margin-bottom:4px}
+.sc-desc{font-size:11px;color:var(--dim);line-height:1.5}
+
+/* ── TK Cross exit ── */
+.tk-timeline{display:flex;flex-direction:column;gap:2px;margin:20px 0}
+.tk-step{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;background:var(--panel);border-radius:6px;border-left:3px solid var(--border2)}
+.tk-step.trigger{border-left-color:var(--crimson);background:linear-gradient(90deg,#ff4d6d10,var(--panel))}
+.tk-step.action{border-left-color:var(--teal);background:linear-gradient(90deg,#00f5d410,var(--panel))}
+.tk-step.warning{border-left-color:var(--gold);background:linear-gradient(90deg,#fbbf2410,var(--panel))}
+.tk-num{font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--dim);flex-shrink:0;min-width:24px;padding-top:1px}
+.tk-text{font-size:13px;color:var(--text);line-height:1.6}
+.tk-text strong{color:var(--hdr)}
+
+/* ── Partial exit framework ── */
+.partial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.pg-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.pg-pct{font-family:var(--font-data);font-size:28px;font-weight:700;margin-bottom:4px}
+.pg-label{font-size:11px;color:var(--dim);margin-bottom:6px;font-family:var(--font-data);letter-spacing:.06em;text-transform:uppercase}
+.pg-trigger{font-size:11px;color:var(--text);line-height:1.5}
+
+/* ── Exit ritual ── */
+.ritual-steps{display:flex;flex-direction:column;gap:8px;margin:20px 0}
+.rs{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--panel);border-radius:6px}
+.rs-num{font-family:var(--font-data);font-size:11px;color:var(--teal);flex-shrink:0;min-width:24px;font-weight:700;padding-top:1px}
+.rs-text{font-size:13px;color:var(--text);line-height:1.6}
+.rs-text strong{color:var(--hdr)}
+
+/* ── Quiz ── */
+.quiz-block{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;margin:40px 0}
+.quiz-label{font-family:var(--font-data);font-size:9px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+.quiz-question{font-size:15px;font-weight:600;color:var(--hdr);margin-bottom:16px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--panel2);border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text)}
+.quiz-opt:hover{border-color:var(--teal)}
+.quiz-opt.correct{border-color:var(--teal);background:#00f5d412;color:var(--teal);pointer-events:none}
+.quiz-opt.wrong{border-color:var(--crimson);background:#ff4d6d12;color:var(--crimson);pointer-events:none}
+.quiz-opt.disabled{pointer-events:none;opacity:.45}
+.quiz-letter{font-family:var(--font-data);font-weight:700;font-size:11px;color:var(--dim);flex-shrink:0;margin-top:1px}
+.quiz-feedback{margin-top:14px;padding:12px 16px;border-radius:6px;font-size:13px;line-height:1.6;display:none}
+.quiz-feedback.show.good{display:block;background:#00f5d412;border:1px solid #00f5d430;color:var(--teal)}
+.quiz-feedback.show.bad{display:block;background:#ff4d6d12;border:1px solid #ff4d6d30;color:var(--crimson)}
+
+/* ── Nav + completion ── */
+.divider{border:none;border-top:1px solid var(--border);margin:0}
+.next-section{display:flex;justify-content:center;padding:50px 24px}
+.next-btn{display:inline-flex;align-items:center;gap:10px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:var(--font-ui);font-size:13px;padding:10px 24px;border-radius:6px;cursor:pointer;transition:all .2s}
+.next-btn:hover{border-color:var(--teal);color:var(--teal);background:#00f5d408}
+.completion{text-align:center;padding:80px 24px;max-width:640px;margin:0 auto}
+.completion-icon{font-size:48px;margin-bottom:20px}
+.completion-title{font-family:var(--font-disp);font-size:36px;color:var(--hdr);margin-bottom:16px}
+.completion-text{font-size:15px;color:var(--text);line-height:1.85;margin-bottom:40px}
+.completion-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--teal);color:#050d1a;font-weight:700;font-size:13px;padding:12px 28px;border-radius:6px;border:none;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-secondary{background:transparent;color:var(--blue);font-size:13px;padding:12px 28px;border-radius:6px;border:1px solid var(--blue);text-decoration:none;display:inline-block}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="ZION_Academy.html">
+    <svg width="34" height="34" viewBox="0 0 34 34" style="display:block;flex-shrink:0">
+      <circle cx="17" cy="17" r="15" fill="#050d1a" stroke="#ef4444" stroke-width="2.2"/>
+      <circle cx="17" cy="17" r="11" fill="none" stroke="#1e3a8a" stroke-width=".7" opacity=".4"/>
+      <circle cx="17" cy="17" r="7.5" fill="none" stroke="#1e3a8a" stroke-width=".5" stroke-dasharray="2,3" opacity=".3"/>
+      <polygon points="17,1 18.8,6.2 17,8.5 15.2,6.2" fill="#ef4444"/>
+      <circle cx="17" cy="17" r="2" fill="#ef4444"/>
+      <text x="17" y="22" font-family="Josefin Sans,sans-serif" font-size="17.5" font-weight="300" text-anchor="middle" fill="#ffffff">Z</text>
+    </svg>
+    <span class="nav-ion">ION</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="ZION_Academy.html">← Academy</a>
+    <span class="nav-link active">Module 5</span>
+    <a class="nav-link" href="ZION_TrendLock.html">Trend-Lock</a>
+    <a class="nav-link" href="ZION_Dashboard.html">Dashboard</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div id="section-hero" class="module-section visible">
+<section class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="module-eyebrow">ZION · Module 05 · Exit Timing</div>
+    <h1 class="hero-title">Everyone knows<br>how to get in.<br><em>Nobody knows when to get out.</em></h1>
+    <p class="hero-sub">Entries are where you place your bet. Exits are where you collect your winnings — or cut your losses. The traders who survive long enough to become consistent don't have better entries. They have better exits.</p>
+    <button class="hero-cta" onclick="showSection('why')">→ Begin Module 5</button>
+    <div style="margin-top:16px;font-family:var(--font-data);font-size:10px;color:var(--dim)">Prerequisites: <a href="ZION_Module2_Ichimoku.html" style="color:var(--teal);text-decoration:none">Module 2 — Ichimoku</a> · <a href="ZION_Module3_Operator.html" style="color:var(--teal);text-decoration:none">Module 3 — The Operator</a></div>
+  </div>
+</section>
+<div class="next-section"><button class="next-btn" onclick="showSection('why')">Begin →</button></div>
+</div>
+
+<!-- ══ WHY EXITS ARE HARDER ══ -->
+<div id="section-why" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 01</div>
+  <h2 class="section-title">Why Exits Are <em style="font-family:var(--font-disp);font-style:italic">Harder Than Entries</em></h2>
+  <p class="section-intro">There are a thousand entry systems. Every indicator, every course, every Discord channel teaches you when to buy. Almost none of them teach you when to sell. That's not an accident — exits are emotionally harder, psychologically messier, and structurally more complex than entries. Here's why.</p>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--crimson)"></div>
+      <div class="kp-text"><strong>At entry, you're hopeful. At exit, you're emotional.</strong> When you enter a trade, your thesis is intact. The chart agrees with you. Everything feels right. When it's time to exit, you're either protecting a gain (fear of giving it back) or cutting a loss (hope that it comes back). Both emotions distort your judgment. The exit decision happens at the worst possible moment psychologically — which is exactly why it needs to be rule-based, not feeling-based.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Exits have no signal stack equivalent.</strong> Entry has PRIME ▲ — five conditions, all must align. Exit has no equivalent clarity. The market doesn't ring a bell. Price doesn't announce that the move is over. You're reading deteriorating signals while sitting in a position that's already working — which means every tick against you feels personal. The exit framework exists to replace that feeling with structure.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>Premature exits are just as costly as late exits.</strong> Exiting too early means leaving money in the market that was rightfully yours. Exiting too late means giving back gains you already had. Most traders oscillate between both extremes — selling the first time a trade moves against them, then holding losers forever hoping for a recovery. ZION's exit framework solves both by anchoring the decision to the Kijun and the TK relationship rather than to P/L.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>The exit is where the thesis is tested.</strong> Your entry was a hypothesis: "This structure is bullish and I expect price to continue higher." The exit answers the question: "Is the hypothesis still true?" Not "am I profitable?" Not "how does this feel?" The question is whether the structure that caused you to enter is still intact. When it isn't — that's the exit. ZION gives you three tools to answer that question.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The market doesn't know you're in a trade. It doesn't care about your cost basis, your stop loss, or your P/L. It is doing exactly what it always does — finding the next equilibrium. Your job as the operator is to read that process correctly and step aside when the structure that brought you in has ended.</p>
+    <div class="insight-attr">— ZION Module 5 · Exit Timing</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-why">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">A trader has NVDA calls up 40%. The trade has been open for 3 days. The P/L is the best they've had all month. They feel like they should take profits before it reverses. What does ZION say?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQ('quiz-why','a','c')"><span class="quiz-letter">A</span><span>Exit immediately — a 40% gain is a great result and you should lock it in.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-why','b','c')"><span class="quiz-letter">B</span><span>Hold indefinitely — never exit a winning trade.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-why','c','c')"><span class="quiz-letter">C</span><span>Check the structure, not the P/L. Is price still above the Kijun on your trade timeframe? Is the TK still bullish? If yes — the thesis is intact. The feeling of "I should take profits" is not an exit signal. The chart is.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-why-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('kijun')">Next: The Kijun Framework →</button></div>
+</div>
+
+<!-- ══ THE KIJUN ══ -->
+<div id="section-kijun" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 02</div>
+  <h2 class="section-title">The Kijun — <em style="font-family:var(--font-disp);font-style:italic">Your Trailing Anchor</em></h2>
+  <p class="section-intro">The Kijun-sen (Base Line) is the midpoint of the highest high and lowest low over the last 26 periods. It moves slowly, deliberately, and honestly. It doesn't react to noise. It represents the market's equilibrium over the medium term. When price is above it, the medium-term trend is bullish. When price closes below it — the thesis has changed.</p>
+
+  <div class="rule-card">
+    <div class="rc-header">
+      <span class="rc-num">RULE 01</span>
+      <span class="rc-title">Price above Kijun = thesis intact</span>
+      <span class="rc-badge badge-hold">HOLD</span>
+    </div>
+    <div class="rc-body">
+      As long as price on your trade timeframe (65m) stays above the Kijun, the medium-term structure that got you into the trade is still valid. <strong>Ignore short-term pullbacks that don't touch the Kijun.</strong> Price will breathe. It will test VWAP, bounce off the Tenkan, and momentarily look scary. None of that matters if the Kijun hasn't been touched. The Kijun is your structural floor — not your P/L, not your cost basis, not your daily stop.
+    </div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rc-header">
+      <span class="rc-num">RULE 02</span>
+      <span class="rc-title">Price tests Kijun = heightened attention</span>
+      <span class="rc-badge badge-warn">WATCH</span>
+    </div>
+    <div class="rc-body">
+      When price comes down to test the Kijun, pay attention. <strong>This is not an automatic exit</strong> — the Kijun is a support level and price bouncing off it is actually bullish confirmation. But a test of the Kijun means you should be watching the next candle closely. Does it bounce with conviction? Volume? Or does it stall and close below? The test is information. How price responds to the test is the signal.
+    </div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rc-header">
+      <span class="rc-num">RULE 03</span>
+      <span class="rc-title">Price closes below Kijun = thesis broken</span>
+      <span class="rc-badge badge-exit">EXIT SIGNAL</span>
+    </div>
+    <div class="rc-body">
+      <strong>A candle close below the Kijun on your trade timeframe is the primary ZION exit signal.</strong> Not a wick. Not an intraday touch. A full candle close below the Kijun means the market has accepted price at a level below your structural floor. The medium-term equilibrium has shifted. The thesis that got you in is no longer supported by the structure. You exit. Not because of P/L — because the chart has told you the structure has changed.
+    </div>
+  </div>
+
+  <!-- Visual: Kijun scenarios -->
+  <div class="kijun-viz">
+    <div class="kv-label">Kijun scenario reference — 65m timeframe</div>
+    <div class="kv-bars">
+      <div class="kv-row">
+        <div class="kv-scenario">Price well above</div>
+        <div class="kv-bar" style="background:linear-gradient(90deg,#14532d40,#14532d20)">
+          <div class="kv-price" style="background:var(--teal);left:75%"></div>
+          <div style="position:absolute;left:40%;width:2px;height:100%;background:var(--teal);opacity:.4"></div>
+        </div>
+        <div class="kv-action" style="color:var(--teal)">HOLD</div>
+      </div>
+      <div class="kv-row">
+        <div class="kv-scenario">Price near Kijun</div>
+        <div class="kv-bar" style="background:linear-gradient(90deg,#78350f30,#14532d20)">
+          <div class="kv-price" style="background:var(--gold);left:45%"></div>
+          <div style="position:absolute;left:40%;width:2px;height:100%;background:var(--teal);opacity:.4"></div>
+        </div>
+        <div class="kv-action" style="color:var(--gold)">WATCH</div>
+      </div>
+      <div class="kv-row">
+        <div class="kv-scenario">Close below</div>
+        <div class="kv-bar" style="background:linear-gradient(90deg,#7f1d1d30,#7f1d1d20)">
+          <div class="kv-price" style="background:var(--crimson);left:20%"></div>
+          <div style="position:absolute;left:40%;width:2px;height:100%;background:var(--teal);opacity:.4"></div>
+        </div>
+        <div class="kv-action" style="color:var(--crimson)">EXIT</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:9px;color:var(--dim)">Teal vertical line = Kijun level · Dot = price position · Rule: candle CLOSE, not wick</div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The Kijun doesn't lie. It has no opinion about where price should go. It simply tells you where equilibrium currently is. When price is above it, buyers are in control. When price closes below it, they're not. That's all you need to know.</p>
+    <div class="insight-attr">— ZION Module 5 · The Kijun Anchor</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-kijun">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">You're in an AAPL call. On the 65m chart, price wicks below the Kijun intraday but closes the candle above it. What do you do?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQ('quiz-kijun','a','c')"><span class="quiz-letter">A</span><span>Exit immediately — it touched the Kijun and that's a red flag.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-kijun','b','c')"><span class="quiz-letter">B</span><span>Exit half the position as a precaution.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-kijun','c','c')"><span class="quiz-letter">C</span><span>Hold. The rule is a candle CLOSE below the Kijun — not a wick. A wick below that closes back above is actually a bullish signal — the market tested support, found buyers, and rejected the lower level. That's the Kijun doing its job. Watch the next candle.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-kijun-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('vwap')">Next: VWAP Slope →</button></div>
+</div>
+
+<!-- ══ VWAP SLOPE ══ -->
+<div id="section-vwap" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 03</div>
+  <h2 class="section-title">VWAP Slope — <em style="font-family:var(--font-disp);font-style:italic">Reading Momentum Exhaustion</em></h2>
+  <p class="section-intro">The Kijun tells you whether the structure is intact. VWAP slope tells you whether the momentum driving the move is accelerating, maintaining, or exhausting. A steepening VWAP slope means institutional buyers are actively adding. A flattening slope means they've stepped back. A declining slope means selling pressure is taking over.</p>
+
+  <div class="slope-grid">
+    <div class="slope-card">
+      <div class="sc-arrow" style="color:var(--teal)">↗</div>
+      <div class="sc-label" style="color:var(--teal)">Steepening</div>
+      <div class="sc-desc">Institutional buying is accelerating. Strong hands adding. <strong style="color:var(--hdr)">Hold your full position.</strong> This is the trade working exactly as intended.</div>
+    </div>
+    <div class="slope-card">
+      <div class="sc-arrow" style="color:var(--gold)">→</div>
+      <div class="sc-label" style="color:var(--gold)">Flattening</div>
+      <div class="sc-desc">Momentum is pausing. Not reversing — consolidating. <strong style="color:var(--hdr)">Start paying attention.</strong> A flat VWAP slope that breaks lower is the first warning. A flat slope that resumes higher is continuation.</div>
+    </div>
+    <div class="slope-card">
+      <div class="sc-arrow" style="color:var(--crimson)">↘</div>
+      <div class="sc-label" style="color:var(--crimson)">Declining</div>
+      <div class="sc-desc">Sellers are in control of the session average. <strong style="color:var(--hdr)">Consider partial exit.</strong> If the Kijun is still holding, you're not out yet — but the momentum picture has deteriorated.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>VWAP slope is the early warning system — not the exit trigger.</strong> The Kijun close is the exit trigger. VWAP slope tells you whether to be on high alert or relaxed. A declining VWAP slope with price still above the Kijun is a yellow flag: tighten your mental stop, check the 5m for early signs of breakdown, but don't exit until the structure confirms it.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>Watch the relationship between VWAP and price, not just the slope.</strong> Price above a rising VWAP = strongest bullish configuration. Price above a flat VWAP = neutral, proceed with caution. Price below a declining VWAP = structure has deteriorated significantly. That last configuration combined with a Kijun close below is a full exit signal with no hesitation.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>VWAP slope resets every day.</strong> The morning VWAP slope in the first 30 minutes is meaningless — it's too early and too volatile. The VWAP slope becomes meaningful after 10am when real institutional volume is establishing direction. A VWAP slope that has been rising all morning and suddenly flattens at 11:15am is meaningful. A slope that's been erratic since the open tells you nothing.</div>
+    </div>
+  </div>
+
+  <div class="quiz-block" id="quiz-vwap">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">You're in an ORCL position. VWAP slope is declining and price is still above the Kijun. The 5m chart shows a consolidation below VWAP. What's the correct ZION read?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQ('quiz-vwap','a','c')"><span class="quiz-letter">A</span><span>Exit immediately — declining VWAP slope means the trade is over.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-vwap','b','c')"><span class="quiz-letter">B</span><span>Ignore the VWAP entirely and focus only on the Kijun.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-vwap','c','c')"><span class="quiz-letter">C</span><span>Yellow flag — not yet an exit. VWAP slope declining is the early warning. The Kijun still holding means the structural thesis is intact. Watch closely for a Kijun close below OR a TK cross. If those confirm, exit. Until then: hold but stay sharp.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-vwap-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('tk')">Next: The TK Cross Exit →</button></div>
+</div>
+
+<!-- ══ TK CROSS EXIT ══ -->
+<div id="section-tk" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 04</div>
+  <h2 class="section-title">The TK Cross — <em style="font-family:var(--font-disp);font-style:italic">The Definitive Exit Signal</em></h2>
+  <p class="section-intro">The same TK cross that signals entry on the way up signals exit on the way down. When the Tenkan (9-period midpoint) crosses below the Kijun (26-period midpoint) on the 65m chart, the short-term momentum has reversed against the medium-term trend. That is the ZION exit signal. Not a feeling. Not a P/L number. The cross.</p>
+
+  <div class="tk-timeline">
+    <div class="tk-step warning">
+      <div class="tk-num">01</div>
+      <div class="tk-text"><strong>Tenkan approaches Kijun from above.</strong> This is the warning phase. The gap between Tenkan and Kijun is narrowing. Short-term momentum is weakening relative to the medium-term trend. Watch this. Don't exit yet — TK narrowing is not the same as TK crossing. But it means the trade is entering a critical phase.</div>
+    </div>
+    <div class="tk-step warning">
+      <div class="tk-num">02</div>
+      <div class="tk-text"><strong>Tenkan and Kijun at the same level.</strong> This is the moment before the signal. If this occurs during midday chop or at low-volume periods, give it space — a TK cross during Midday Chop is less meaningful than one during Smart Money Return. Note the session window you're in before acting.</div>
+    </div>
+    <div class="tk-step trigger">
+      <div class="tk-num">03</div>
+      <div class="tk-text"><strong>Tenkan closes below Kijun on the 65m.</strong> This is the signal. The short-term momentum has crossed below the medium-term equilibrium. The entry signal stack has reversed. <strong>This is the ZION exit signal — the definitive close of the thesis that got you in.</strong> At this point you exit. Not "watch one more candle." Not "let me see where the next 5m closes." The 65m TK cross is the exit.</div>
+    </div>
+    <div class="tk-step action">
+      <div class="tk-num">04</div>
+      <div class="tk-text"><strong>Execute the exit cleanly.</strong> Market order or aggressive limit at mid-spread. The goal is to be out, not to optimize the fill by a few cents while the position moves against you. The decision has been made by the chart — now the operator's job is clean execution.</div>
+    </div>
+    <div class="tk-step action">
+      <div class="tk-num">05</div>
+      <div class="tk-text"><strong>Update the Trade Tracker. Note the exit reason: TK cross on 65m.</strong> Review the trade: did VWAP slope give an early warning? Did the Kijun close first? Understanding the sequence helps you read the next trade faster.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">The TK cross that got you in was the market telling you: short-term momentum has aligned with medium-term trend — this move has fuel. The TK cross that gets you out is the market telling you the opposite: short-term momentum has turned against the medium-term trend. The structure that justified the trade no longer exists. You leave. The market doesn't care about your cost basis and neither should you.</p>
+    <div class="insight-attr">— ZION Module 5 · The TK Cross Exit</div>
+  </div>
+
+  <div class="quiz-block" id="quiz-tk">
+    <div class="quiz-label">◆ Knowledge Check</div>
+    <div class="quiz-question">The Tenkan crosses below the Kijun on the 65m during Midday Chop at 12:15pm. Your IBKR calls are up 80%. What do you do?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answerQ('quiz-tk','a','c')"><span class="quiz-letter">A</span><span>Exit immediately — TK cross is the signal regardless of when it happens.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-tk','b','c')"><span class="quiz-letter">B</span><span>Exit half the position — take some profits but keep exposure.</span></div>
+      <div class="quiz-opt" onclick="answerQ('quiz-tk','c','c')"><span class="quiz-letter">C</span><span>This is nuanced. Midday Chop TK crosses are lower conviction — volume is thin and false crosses happen. A strict reading of the system says exit on the cross. A practical reading says: exit or take partial profits, then reassess when Smart Money Return begins at 1:30pm. What you must NOT do is hold through a confirmed 65m TK cross hoping it reverses without a plan.</span></div>
+    </div>
+    <div class="quiz-feedback" id="quiz-tk-feedback"></div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('partial')">Next: Partial Exits →</button></div>
+</div>
+
+<!-- ══ PARTIAL EXITS ══ -->
+<div id="section-partial" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 05</div>
+  <h2 class="section-title">Partial Exits — <em style="font-family:var(--font-disp);font-style:italic">Managing the Position</em></h2>
+  <p class="section-intro">The binary "all in or all out" approach to exits leaves money on the table and increases emotional volatility. ZION's partial exit framework lets you lock in gains at defined structural levels while keeping exposure for the full move. It's not about being right about exactly where the top is. It's about managing risk intelligently as the trade develops.</p>
+
+  <div class="partial-grid">
+    <div class="pg-card">
+      <div class="pg-pct" style="color:var(--teal)">25%</div>
+      <div class="pg-label">First Exit</div>
+      <div class="pg-trigger">At the first major resistance level or when the call doubles. Locks in a gain that covers a significant portion of the premium paid. Removes pressure from the remaining position.</div>
+    </div>
+    <div class="pg-card">
+      <div class="pg-pct" style="color:var(--gold)">50%</div>
+      <div class="pg-label">Second Exit</div>
+      <div class="pg-trigger">When VWAP slope flattens meaningfully or price approaches the next significant resistance. You're now playing with house money on the remaining 25%.</div>
+    </div>
+    <div class="pg-card">
+      <div class="pg-pct" style="color:var(--crimson)">25%</div>
+      <div class="pg-label">Final Exit</div>
+      <div class="pg-trigger">On the TK cross or Kijun close below. This is the structural exit. The last 25% rides the full thesis and exits when the structure confirms it's over.</div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--teal)"></div>
+      <div class="kp-text"><strong>Partial exits are not the same as taking profits out of fear.</strong> The 25% first exit is triggered by price action (resistance level, double) — not by emotion. The difference is that you've pre-defined the trigger before the trade, not in the moment of emotion. Pre-defined levels, executed without hesitation, are discipline. Randomly selling because you feel nervous is fear.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--gold)"></div>
+      <div class="kp-text"><strong>Playing with house money changes your psychology.</strong> Once you've exited enough of the position to recover your premium cost, the remaining position is "free." You can let it run to the structural exit without the anxiety of watching your entire premium erode. This is one of the most valuable psychological benefits of partial exits — it removes the fear of total loss and lets the structure drive the final decision.</div>
+    </div>
+    <div class="key-point">
+      <div class="kp-dot" style="background:var(--blue)"></div>
+      <div class="kp-text"><strong>Not every trade requires partial exits.</strong> A strong trending day with a steep VWAP slope, price above VWAP, and the Kijun accelerating upward is a "let it ride" scenario. Partial exits are most valuable when you have a big gain (50%+) and the structure is starting to show early warning signs (VWAP flattening, Kijun leveling). Apply judgment. The framework is a tool, not a rule for every situation.</div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<div class="next-section"><button class="next-btn" onclick="showSection('ritual')">Next: The Exit Ritual →</button></div>
+</div>
+
+<!-- ══ EXIT RITUAL ══ -->
+<div id="section-ritual" class="module-section">
+<section class="section">
+  <div class="section-eyebrow">Section 06 · The Complete Framework</div>
+  <h2 class="section-title">The Exit Ritual — <em style="font-family:var(--font-disp);font-style:italic">What You Do and When</em></h2>
+  <p class="section-intro">The three tools — Kijun, VWAP slope, TK cross — work together as a layered system. Not every exit uses all three. But knowing how they interact tells you exactly what to watch and when. Here's the complete sequence.</p>
+
+  <div class="ritual-steps">
+    <div class="rs">
+      <div class="rs-num">01</div>
+      <div class="rs-text"><strong>After entry — define your structural stop.</strong> Immediately after entering, note where the Kijun is on the 65m. That level is your structural stop. Not a dollar amount. Not a percentage. The Kijun. A candle close below it ends the trade. Write it in your Trade Tracker before you do anything else.</div>
+    </div>
+    <div class="rs">
+      <div class="rs-num">02</div>
+      <div class="rs-text"><strong>Monitor VWAP slope on the 65m and 5m.</strong> Is it steepening, flat, or declining? This tells you how much attention to give the trade. Steepening slope with price above VWAP — relax and let it work. Flattening slope — check the 5m more frequently. Declining slope — be ready to act on the next Kijun or TK signal.</div>
+    </div>
+    <div class="rs">
+      <div class="rs-num">03</div>
+      <div class="rs-text"><strong>Watch the TK gap on the 65m.</strong> As long as Tenkan is well above Kijun, the short-term momentum is strong. When TK starts narrowing, note the session window. Narrowing during Smart Money Return or Power Hour is more meaningful than narrowing during Midday Chop.</div>
+    </div>
+    <div class="rs">
+      <div class="rs-num">04</div>
+      <div class="rs-text"><strong>Take partial exits at pre-defined structural levels.</strong> If you've planned for partials, execute them when price hits your targets. Do not wait for the "perfect" exit. Take the 25% at your first target. Set your trade to "house money" mode and let the structure handle the rest.</div>
+    </div>
+    <div class="rs">
+      <div class="rs-num">05</div>
+      <div class="rs-text"><strong>Full exit on Kijun close below OR 65m TK cross — whichever comes first.</strong> These are not suggestions. When either condition is met, the trade is over. Execute cleanly. Update the tracker. No second-guessing the exit after it happens.</div>
+    </div>
+    <div class="rs">
+      <div class="rs-num">06</div>
+      <div class="rs-text"><strong>Post-trade review within 24 hours.</strong> Look at the full candle sequence. When did VWAP slope peak? When did the TK cross happen? Was there a Kijun close first? Understanding the sequence trains your eye to read the next setup faster. Every exit — win or loss — is a lesson about how the structure behaves.</div>
+    </div>
+  </div>
+
+  <!-- Full framework summary -->
+  <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:28px 0">
+    <div style="padding:10px 16px;background:#070f1e;border-bottom:1px solid var(--border);font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--teal);text-transform:uppercase">The ZION Exit Decision Matrix</div>
+    <div style="padding:16px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-items:center;padding:10px 14px;background:var(--panel);border-radius:6px;border-left:3px solid var(--teal)">
+          <div style="font-family:var(--font-data);font-size:10px;color:var(--dim)">Kijun: above<br>VWAP: rising<br>TK: bullish</div>
+          <div style="font-size:12px;color:var(--text)">All systems green</div>
+          <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--teal)">HOLD FULL</div>
+          <div style="font-size:11px;color:var(--dim)">Let the structure work</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-items:center;padding:10px 14px;background:var(--panel);border-radius:6px;border-left:3px solid var(--gold)">
+          <div style="font-family:var(--font-data);font-size:10px;color:var(--dim)">Kijun: above<br>VWAP: flat<br>TK: narrowing</div>
+          <div style="font-size:12px;color:var(--text)">Early warning</div>
+          <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--gold)">WATCH CLOSELY</div>
+          <div style="font-size:11px;color:var(--dim)">Consider partial if big gain</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-items:center;padding:10px 14px;background:var(--panel);border-radius:6px;border-left:3px solid var(--wait)">
+          <div style="font-family:var(--font-data);font-size:10px;color:var(--dim)">Kijun: testing<br>VWAP: declining<br>TK: at level</div>
+          <div style="font-size:12px;color:var(--text)">High alert</div>
+          <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--wait)">PARTIAL EXIT</div>
+          <div style="font-size:11px;color:var(--dim)">Exit 25–50%, hold rest</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-items:center;padding:10px 14px;background:var(--panel);border-radius:6px;border-left:3px solid var(--crimson)">
+          <div style="font-family:var(--font-data);font-size:10px;color:var(--dim)">Kijun: close below<br>OR TK cross down</div>
+          <div style="font-size:12px;color:var(--text)">Structure broken</div>
+          <div style="font-family:var(--font-data);font-size:11px;font-weight:700;color:var(--crimson)">FULL EXIT</div>
+          <div style="font-size:11px;color:var(--dim)">No hesitation. Execute.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="insight-text">A good exit doesn't have to be at the top. The top is unknowable. A good exit is one that follows the structure — that honors the signal that got you in by using the same signal to get you out. You entered on structure. You exit on structure. Everything in between is just managing the thesis.</p>
+    <div class="insight-attr">— ZION Module 5 · The Exit Ritual</div>
+  </div>
+</section>
+
+<!-- Completion -->
+<div class="completion">
+  <div class="completion-icon">◆</div>
+  <h2 class="completion-title">Module 5 Complete</h2>
+  <p class="completion-text">
+    You now have the complete ZION trading framework.<br><br>
+    Entry from PRIME ▲. Fundamentals from the Catalyst Score. Timing from the Market Cycle. Exit from the Kijun, VWAP slope, and TK cross.<br><br>
+    <strong style="color:var(--teal)">You entered on structure. You exit on structure. Everything in between is managing the thesis.</strong>
+  </p>
+  <div class="completion-actions">
+    <a class="btn-primary" href="ZION_TrendLock.html">Open Trend-Lock</a>
+    <a class="btn-primary" href="ZION_Pretrade.html">Pre-Trade Checklist</a>
+    <a class="btn-secondary" href="ZION_Module4_Catalyst.html">← Module 4</a>
+    <a class="btn-secondary" href="ZION_Academy.html">Academy Home</a>
+  </div>
+</div>
+</div>
+
+<script>
+const SECTIONS = ['hero','why','kijun','vwap','tk','partial','ritual'];
+let completed = JSON.parse(localStorage.getItem('zion-m5-progress')||'{}');
+
+const showSection = id => {
+  SECTIONS.forEach(s => {
+    const el = document.getElementById('section-'+s);
+    if(el) el.classList.toggle('visible', s===id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  completed[id] = true;
+  localStorage.setItem('zion-m5-progress', JSON.stringify(completed));
+};
+
+const FEEDBACK = {
+  'quiz-why':{
+    correct:'Exactly right. P/L is never the exit signal in ZION. The structure is. A 40% gain on a position with intact Kijun and bullish TK means the thesis is still working. Selling because it "feels like enough" is emotion-based trading. The chart tells you when to exit — not your P/L display.',
+    wrong:'The trade isn\'t over because of the P/L — it\'s over when the structure says it is. Check the Kijun (is price above it?), check the TK (is Tenkan still above Kijun?), check VWAP slope. If all green, the thesis is intact. The 40% gain is information — not an instruction.'
+  },
+  'quiz-kijun':{
+    correct:'Perfect. The rule is crystal clear: candle CLOSE below the Kijun — not a wick. A wick below that closes back above is bullish price action. The market tested a support level, found buyers, and rejected the lower price. That\'s the Kijun working exactly as it should. Watch the next candle and hold.',
+    wrong:'Remember the rule: it\'s a candle CLOSE below the Kijun, not a wick. Wicks happen — they\'re the market probing for liquidity below support. A wick that closes back above the Kijun tells you buyers stepped in at that level. That\'s bullish. The exit signal requires a full candle close below.'
+  },
+  'quiz-vwap':{
+    correct:'Correct — yellow flag, not exit. The VWAP slope is the early warning system, not the trigger. The Kijun is still holding, which means the structural thesis is intact. Stay in, tighten your attention, and watch for either a Kijun close below or a TK cross. Until one of those confirms, the trade is still valid.',
+    wrong:'VWAP slope declining is an early warning signal, not an exit trigger. The exit triggers in ZION are: (1) candle close below the Kijun, or (2) TK cross to the downside on the 65m. With the Kijun still holding, you\'re in yellow flag territory — watch closely, consider a partial if you have a significant gain, but the structural thesis is still intact.'
+  },
+  'quiz-tk':{
+    correct:'Well reasoned. The Midday Chop TK cross is a real signal but lower conviction due to thin volume. Strict ZION says exit on the cross. Practical ZION says at minimum take partial profits and be on high alert. What you cannot do is ignore it and assume it\'ll resolve by Power Hour. Acknowledge the signal. Respond to it.',
+    wrong:'The session window matters. A 65m TK cross during Midday Chop is a real signal but carries less weight than one during Smart Money Return or Power Hour. At minimum, take partial profits and tighten your management. Don\'t hold through a confirmed TK cross with no plan — that\'s hope, not structure.'
+  }
+};
+
+const answerQ = (id, chosen, correct) => {
+  const opts = document.querySelectorAll(`#${id} .quiz-opt`);
+  const fb = document.getElementById(`${id}-feedback`);
+  opts.forEach((o, i) => {
+    const l = String.fromCharCode(97+i);
+    o.classList.add('disabled');
+    if(l===correct) o.classList.add('correct');
+    else if(l===chosen) o.classList.add('wrong');
+  });
+  const ok = chosen===correct;
+  fb.textContent = (ok?'✓ ':'✗ ') + FEEDBACK[id][ok?'correct':'wrong'];
+  fb.className = `quiz-feedback show ${ok?'good':'bad'}`;
+};
+</script>
+</body>
+</html>

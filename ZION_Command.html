@@ -210,6 +210,72 @@ html,body { min-height:100vh; background:var(--bg); color:var(--text); font-fami
 
 <div class="grid">
 
+  
+<!-- ══ MARKET CYCLE ══ -->
+<div style="padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--border)">
+  <div style="font-family:var(--font-data);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:8px">◆ Daily Market Cycle — All Times ET</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:4px" id="cycleStrip"></div>
+</div>
+
+<script>
+const CYCLE=[
+  {time:'6–8pm',name:'Futures',type:'watch'},
+  {time:'8pm–4am',name:'Asian Session',type:'off'},
+  {time:'3–8am',name:'London Open',type:'watch'},
+  {time:'4–9:30am',name:'Pre-Market',type:'watch'},
+  {time:'9:30–10am',name:'Opening Fuckery',type:'red'},
+  {time:'10–11:30am',name:'Pro Setup',type:'green'},
+  {time:'11:30–1:30',name:'Midday Chop',type:'red'},
+  {time:'1:30–3pm',name:'Smart Money',type:'green'},
+  {time:'3–3:50pm',name:'Power Hour',type:'green'},
+  {time:'3:50–4pm',name:'MOC',type:'watch'},
+  {time:'4–6pm',name:'After Hours',type:'watch'},
+];
+const COLORS={
+  green:{bg:'#14532d22',border:'#166534',text:'#4ade80',label:'TRADE'},
+  red:{bg:'#7f1d1d22',border:'#991b1b',text:'#f87171',label:'SIT OUT'},
+  watch:{bg:'#78350f22',border:'#92400e',text:'#fbbf24',label:'WATCH'},
+  off:{bg:'#1f293722',border:'#374151',text:'#6b7280',label:'OFF'},
+};
+
+// Highlight current session
+const now = new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'}));
+const hh = now.getHours(), mm = now.getMinutes(), day = now.getDay();
+const mins = hh*60+mm;
+const isWeekend = day===0||day===6;
+
+function currentSession(){
+  if(isWeekend) return -1;
+  if(mins>=570&&mins<600) return 4;
+  if(mins>=600&&mins<690) return 5;
+  if(mins>=690&&mins<810) return 6;
+  if(mins>=810&&mins<900) return 7;
+  if(mins>=900&&mins<950) return 8;
+  if(mins>=950&&mins<960) return 9;
+  if(mins>=960&&mins<1080) return 10;
+  if(mins>=1080||mins<240) return 0;
+  if(mins>=240&&mins<330) return 1;
+  if(mins>=330&&mins<570) return 2;
+  return 3;
+}
+
+const active = currentSession();
+const strip = document.getElementById('cycleStrip');
+CYCLE.forEach((s,i)=>{
+  const c = COLORS[s.type];
+  const isActive = i===active;
+  const tile = document.createElement('div');
+  tile.style.cssText = `background:${isActive?c.bg.replace('22','44'):c.bg};border:1px solid ${c.border};border-radius:4px;padding:6px 8px;text-align:center;${isActive?'box-shadow:0 0 0 1px '+c.border+';':'' }`;
+  tile.innerHTML = `
+    <div style="font-family:var(--font-data);font-size:8px;color:${c.text};letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">${c.label}</div>
+    <div style="font-size:11px;font-weight:600;color:${isActive?'#fff':'var(--text)'};margin-bottom:2px;line-height:1.3">${s.name}</div>
+    <div style="font-family:var(--font-data);font-size:9px;color:var(--dim)">${s.time}</div>
+    ${isActive?'<div style="font-family:var(--font-data);font-size:8px;color:'+c.text+';margin-top:3px">◆ NOW</div>':''}
+  `;
+  strip.appendChild(tile);
+});
+</script>
+
   <!-- ══ ZION TOOLS ══ -->
   <div class="group theme-zion">
     <div class="group-header">
