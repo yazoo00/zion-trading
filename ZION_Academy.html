@@ -615,7 +615,7 @@ const showResult = (goal) => {
 const resetAssess = () => {
   assessAnswers = {};
   document.getElementById('assessResult').style.display = 'none';
-  ['step2','step3'].forEach(s => document.getElementById(s).style.display='none');
+  ['step2','step3'].forEach(id => document.getElementById(id).style.display='none');
   document.getElementById('step1').style.display = 'block';
 };
 
@@ -632,7 +632,7 @@ const loadProgress = () => {
   const m3Sections     = ['hero','edge','revenge','sizing','hands','ritual'];
 
   const pct = (prog, sections) => {
-    const done = sections.filter(s=>prog[s]).length;
+    const done = sections.filter(k=>prog[k]).length;
     return done===0 ? '—' : done===sections.length ? '✓ Complete' : `${Math.round(done/sections.length*100)}% done`;
   };
 
@@ -642,10 +642,10 @@ const loadProgress = () => {
   document.getElementById('prog-m3').textContent     = pct(m3, m3Sections);
 
   // Color the nodes if complete
-  if(m1Sections.every(s=>m1[s]))     document.querySelector('.node-m1').className='track-node node-done';
-  if(m2Sections.every(s=>m2[s]))     document.querySelector('.node-m2').className='track-node node-done';
-  if(m3Sections.every(s=>m3[s]))     document.querySelector('.node-m3').className='track-node node-done';
-  if(primerSections.every(s=>primer[s])) document.querySelector('.node-primer').className='track-node node-done';
+  if(m1Sections.every(k=>m1[k]))     document.querySelector('.node-m1').className='track-node node-done';
+  if(m2Sections.every(k=>m2[k]))     document.querySelector('.node-m2').className='track-node node-done';
+  if(m3Sections.every(k=>m3[k]))     document.querySelector('.node-m3').className='track-node node-done';
+  if(primerSections.every(k=>primer[k])) document.querySelector('.node-primer').className='track-node node-done';
 
   // M4 and M5 progress
   const m4 = JSON.parse(localStorage.getItem('zion-m4-progress')||'{}');
