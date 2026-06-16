@@ -181,9 +181,8 @@ html,body { min-height:100vh; background:var(--bg); color:var(--text); font-fami
 
 <script>
 // ── Config ─────────────────────────────────────────
-let API_KEY = (typeof getApiKey !== 'undefined') ? getApiKey() : (typeof ZION_CONFIG !== 'undefined' ? ZION_CONFIG.apiKey : '');
-
-const BASE = 'https://api.massive.com';
+// Data via Tradier proxy — token handled by ZION_Config.js
+// tradierFetch() is available globally from ZION_Config.js
 const fmt  = (n,d=2) => n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const pct  = n => n==null?'—':(n>=0?'+':'')+fmt(n)+'%';
 const bull  = v => v >= 0;
@@ -233,32 +232,104 @@ const vwapSlope = bars => {
 };
 
 // ── Fetch bars ────────────────────────────────────
+// ── Tradier fetch helpers ─────────────────────────────────────
+const toTradierDate = ms => new Date(ms).toISOString().slice(0,19);
+
 const fetchBars = async (sym, mult, span, limit=300) => {
-  const to   = Date.now();
-  const from = to - (limit * mult * (span==='minute'?60000:span==='hour'?3600000:86400000) * 2);
-  const url  = `${BASE}/v2/aggs/ticker/${sym}/range/${mult}/${span}/${from}/${to}?adjusted=true&sort=desc&limit=${limit}&apiKey=${API_KEY}`;
-  const r    = await fetch(url);
-  const d    = await r.json();
-  if(!d.results?.length) return [];
-  return d.results.map(b=>({open:b.o,high:b.h,low:b.l,close:b.c,volume:b.v,t:b.t})).reverse();
+  try {
+    if (span === 'day' || span === 'daily') {
+      // Daily bars via history endpoint
+      const end   = new Date();
+      const start = new Date(end - limit * 86400000 * 1.5);
+      const d = await tradierFetch('history', {
+        symbol: sym,
+        interval: 'daily',
+        start: start.toISOString().slice(0,10),
+        end: end.toISOString().slice(0,10),
+      });
+      const history = d?.history?.day;
+      if (!history) return [];
+      const arr = Array.isArray(history) ? history : [history];
+      return arr.slice(-limit).map(b => ({
+        open: b.open, high: b.high, low: b.low, close: b.close,
+        volume: b.volume, t: new Date(b.date).getTime()
+      }));
+    } else {
+      // Intraday bars via timesales endpoint
+      // Map mult+span to Tradier interval
+      let interval = '5min';
+      if (mult <= 1)  interval = '1min';
+      if (mult >= 5 && mult < 15)  interval = '5min';
+      if (mult >= 15 && mult < 60) interval = '15min';
+      if (mult >= 60) interval = '15min'; // 65min → use 15min bars, aggregate
+
+      const end   = new Date();
+      const days  = interval === '1min' ? 10 : 18;
+      const start = new Date(end - days * 86400000);
+
+      const d = await tradierFetch('timesales', {
+        symbol: sym,
+        interval,
+        start: toTradierDate(start),
+        end: toTradierDate(end),
+        session_filter: 'open',
+      });
+
+      const series = d?.series?.data;
+      if (!series) return [];
+      const arr = Array.isArray(series) ? series : [series];
+
+      // For 65min — aggregate 15min bars into ~65min bars
+      if (mult === 65) {
+        const aggregated = [];
+        const bucketSize = 4; // 4 × 15min = 60min approx
+        for (let i = 0; i < arr.length; i += bucketSize) {
+          const bucket = arr.slice(i, i + bucketSize);
+          if (!bucket.length) continue;
+          aggregated.push({
+            open:   bucket[0].open,
+            high:   Math.max(...bucket.map(b => b.high)),
+            low:    Math.min(...bucket.map(b => b.low)),
+            close:  bucket[bucket.length-1].close,
+            volume: bucket.reduce((s, b) => s + (b.volume||0), 0),
+            t:      new Date(bucket[0].time).getTime(),
+          });
+        }
+        return aggregated.slice(-limit);
+      }
+
+      return arr.slice(-limit).map(b => ({
+        open: b.open, high: b.high, low: b.low, close: b.close,
+        volume: b.volume, t: new Date(b.time).getTime()
+      }));
+    }
+  } catch (err) {
+    console.error(`fetchBars error for ${sym}:`, err);
+    return [];
+  }
 };
 
 // ── Fetch snapshot ────────────────────────────────
 const fetchSnap = async sym => {
-  const url = `${BASE}/v2/snapshot/locale/us/markets/stocks/tickers/${sym}?apiKey=${API_KEY}`;
-  const r   = await fetch(url);
-  const d   = await r.json();
-  const t   = d.ticker;
-  if(!t) return {};
-  return {
-    price: t.day?.c || t.lastTrade?.p,
-    prevClose: t.prevDay?.c,
-    pct: t.todaysChangePerc,
-    change: t.todaysChange,
-    hod: t.day?.h,
-    lod: t.day?.l,
-    vol: t.day?.v,
-  };
+  try {
+    const d = await tradierFetch('quotes', { symbols: sym, greeks: 'false' });
+    const q = d?.quotes?.quote;
+    if (!q) return {};
+    const prevClose = q.prevclose || q.close || 0;
+    const price = q.last || q.close || 0;
+    return {
+      price,
+      prevClose,
+      pct: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
+      change: price - prevClose,
+      hod: q.high,
+      lod: q.low,
+      vol: q.volume,
+    };
+  } catch (err) {
+    console.error('fetchSnap error:', err);
+    return {};
+  }
 };
 
 // ── Analyze timeframe ─────────────────────────────
@@ -389,18 +460,22 @@ const render = (sym, snap, f5, f65, fD, bars5, bars65, barsD) => {
   ].join('');
 
   // Invalidation zones — cascading stops
-  const iv = (level, type, consequence, isBear=false) =>
-    `<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:6px 10px;font-family:var(--font-data);font-size:11px;font-weight:700;color:${isBear?'var(--crimson)':'var(--wait)'}">$${fmt(level)}</td>
-      <td style="padding:6px 10px;color:var(--text);font-size:11px">${type}</td>
-      <td style="padding:6px 10px;color:${isBear?'var(--crimson)':'var(--dim)'};font-size:10px">${consequence}</td>
-    </tr>`;
+  const iv = function(level, type, consequence, isBear) {
+  isBear = isBear || false;
+  var color = isBear ? 'var(--crimson)' : 'var(--wait)';
+  var bearColor = isBear ? 'var(--crimson)' : 'var(--text)';
+  return '<tr style="border-bottom:1px solid var(--border)">' +
+    '<td style="padding:6px 10px;font-family:var(--font-data);font-size:11px;font-weight:700;color:' + color + '">$' + fmt(level) + '</td>' +
+    '<td style="padding:6px 10px;color:var(--text);font-size:11px">' + type + '</td>' +
+    '<td style="padding:6px 10px;color:' + bearColor + ';font-size:11px">' + consequence + '</td>' +
+    '</tr>';
+}
 
   const invalidationRows = [
     iv(f65?.vw||0,   'VWAP loss',   'Institutional support gone — reassess'),
     iv(f65?.k||0,    'Kijun loss',  'Structural stop — thesis broken, exit'),
     iv(cloudTop||0,  'Cloud top loss', 'Bull structure compromised'),
-    iv(cloudBot||0,  'Cloud bottom',  'Inside cloud — no man's land'),
+    iv(cloudBot||0,  'Cloud bottom',  "Inside cloud - no mans land"),
     iv(f65?.sb||0,   'Span B loss', 'Bear thesis takes control', true),
   ].join('');
 
@@ -760,10 +835,8 @@ const render = (sym, snap, f5, f65, fD, bars5, bars65, barsD) => {
 const runTrendLock = async () => {
   const sym = document.getElementById('tickerInput').value.trim().toUpperCase();
   if(!sym) return;
-  if(!API_KEY) {
-    document.getElementById('scanStatus').textContent='⚠ Add your Massive API key to ZION_Config.js';
-    return;
-  }
+  // Token handled by proxy — proceed
+  
   const btn = document.getElementById('scanBtn');
   btn.disabled=true; btn.textContent='Scanning…';
   document.getElementById('scanStatus').textContent=`Fetching 5m · 65m · Daily for ${sym}…`;
@@ -806,8 +879,8 @@ const runTrendLock = async () => {
   document.getElementById('squeezeDesc').textContent = sqDesc;
   document.getElementById('scanStatus').textContent=`${sym} · Updated ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true})}`;
   } catch(e) {
-    document.getElementById('scanStatus').textContent=`Error: ${e.message}`;
-    console.error(e);
+    console.error('TrendLock error:', e);
+    document.getElementById('scanStatus').textContent = 'Tradier pending approval — data unavailable until account is active';
   }
 
   btn.disabled=false; btn.textContent='⚡ Trend-Lock';
