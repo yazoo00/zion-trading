@@ -247,10 +247,10 @@ const COLORS={
 const now = new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'}));
 const hh = now.getHours(), mm = now.getMinutes(), day = now.getDay();
 const mins = hh*60+mm;
-const isWeekend = day===0||day===6;
+const cycleIsWeekend = day===0||day===6;
 
 function currentSession(){
-  if(isWeekend) return -1;
+  if(cycleIsWeekend) return -1;
   if(mins>=570&&mins<600) return 4;
   if(mins>=600&&mins<690) return 5;
   if(mins>=690&&mins<810) return 6;
@@ -575,7 +575,7 @@ CYCLE.forEach((s,i)=>{
 
 <script>
 // ── Clock ──────────────────────────────────────────
-// ── NYSE Market Holiday Calendar ──────────────────────
+// ── NYSE Market Holiday Calendar ─────────────────────
 // Covers 2025-2027. Update annually.
 const MARKET_HOLIDAYS = new Set([
   // 2025
@@ -740,14 +740,14 @@ const loadPositions = () => {
     return `<div class="mini-pos" onclick="window.location='ZION_Trades.html'">
       <div class="mp-sym">${t.ticker}</div>
       <div class="mp-contract">$${t.strike}${t.type==='CALL'?'C':'P'} ${t.expDate}</div>
-      <div class="mp-dte ${dteCls}">${dteIcon} ${dte}d · ${t.contracts} con</div>
+      <div class="mp-dte ${dteCls}">${dteIcon} $${dte}d · $${t.contracts} con</div>
       <div class="mp-cost">@ $${t.premium.toFixed(2)}</div>
     </div>`;
   }).join('');
 };
 loadPositions();
 
-// ── Quick journal ──────────────────────────────────
+// ── Quick journal ───────────────────────────────
 const loadRecentJournal = () => {
   const journal = JSON.parse(localStorage.getItem('zion-journal')||'[]');
   const recent  = [...journal].reverse().slice(0,3);
@@ -761,7 +761,7 @@ const loadRecentJournal = () => {
   el.innerHTML = recent.map(e => `
     <div class="recent-entry">
       <div class="re-meta">${e.date} · ${e.time}</div>
-      <div class="re-text ${e.isStamp?'re-stamp':''}">${e.text.slice(0,120)}${e.text.length>120?'…':''}</div>
+      <div class="re-text ${e.isStamp?'re-stamp':''}">$${e.text.slice(0,120)}${e.text.length>120?'…':''}</div>
     </div>`).join('');
 };
 loadRecentJournal();
